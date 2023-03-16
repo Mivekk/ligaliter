@@ -28,6 +28,7 @@ exports.UserResolver = void 0;
 const User_1 = require("../entities/User");
 const type_graphql_1 = require("type-graphql");
 const argon2_1 = __importDefault(require("argon2"));
+const constants_1 = require("../constants");
 let FieldError = class FieldError {
 };
 __decorate([
@@ -82,8 +83,7 @@ let UserResolver = class UserResolver {
             if (!req.session.userId) {
                 return null;
             }
-            const user = yield User_1.User.findOneBy({ id: req.session.userId });
-            return user;
+            return User_1.User.findOneBy({ id: req.session.userId });
         });
     }
     users() {
@@ -124,9 +124,19 @@ let UserResolver = class UserResolver {
             };
         });
     }
-    logout({ req }) {
+    logout({ req, res }) {
         return __awaiter(this, void 0, void 0, function* () {
-            return true;
+            return new Promise((resolve) => {
+                req.session.destroy((err) => {
+                    res.clearCookie(constants_1.COOKIE_NAME);
+                    if (err) {
+                        console.log(err);
+                        resolve(false);
+                        return;
+                    }
+                    resolve(true);
+                });
+            });
         });
     }
 };

@@ -19,7 +19,7 @@ const server_1 = require("@apollo/server");
 const express4_1 = require("@apollo/server/express4");
 const type_graphql_1 = require("type-graphql");
 const user_1 = require("./resolvers/user");
-const body_parser_1 = __importDefault(require("body-parser"));
+const body_parser_1 = require("body-parser");
 const constants_1 = require("./constants");
 const ioredis_1 = require("ioredis");
 const connect_redis_1 = __importDefault(require("connect-redis"));
@@ -39,8 +39,8 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         cookie: {
             maxAge: 1000 * 60 * 60 * 24 * 365,
             httpOnly: true,
-            sameSite: "none",
-            secure: true,
+            sameSite: "lax",
+            secure: false,
         },
         secret: "ugabugahehe",
         resave: false,
@@ -53,7 +53,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         }),
     });
     yield apolloServer.start();
-    app.use("/graphql", (0, cors_1.default)(), body_parser_1.default.json(), (0, express4_1.expressMiddleware)(apolloServer, {
+    app.use("/graphql", (0, cors_1.default)(), (0, body_parser_1.json)(), (0, express4_1.expressMiddleware)(apolloServer, {
         context: ({ req, res }) => __awaiter(void 0, void 0, void 0, function* () {
             return ({
                 req,

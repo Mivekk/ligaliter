@@ -5,7 +5,7 @@ import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
 import { buildSchema } from "type-graphql";
 import { UserResolver } from "./resolvers/user";
-import bodyParser from "body-parser";
+import { json } from "body-parser";
 import { COOKIE_NAME } from "./constants";
 import { Redis } from "ioredis";
 import { ApolloContext } from "./types";
@@ -31,8 +31,8 @@ const main = async () => {
       cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year
         httpOnly: true,
-        sameSite: "none",
-        secure: true,
+        sameSite: "lax",
+        secure: false,
       },
       secret: "ugabugahehe",
       resave: false,
@@ -50,8 +50,8 @@ const main = async () => {
   await apolloServer.start();
   app.use(
     "/graphql",
-    cors<cors.CorsRequest>(),
-    bodyParser.json(),
+    cors(),
+    json(),
     expressMiddleware(apolloServer, {
       context: async ({ req, res }): Promise<ApolloContext> => ({
         req,

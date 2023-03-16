@@ -1,1 +1,1 @@
-export const COOKIE_NAME = "llC";
+export const COOKIE_NAME = "llc";

@@ -11,6 +11,7 @@ import {
 } from "type-graphql";
 import argon2 from "argon2";
 import { ApolloContext } from "../types";
+import { COOKIE_NAME } from "../constants";
 
 @ObjectType()
 class FieldError {
@@ -53,8 +54,7 @@ export class UserResolver {
       return null;
     }
 
-    const user = await User.findOneBy({ id: req.session.userId });
-    return user;
+    return User.findOneBy({ id: req.session.userId });
   }
 
   @Query(() => [User])
@@ -107,7 +107,19 @@ export class UserResolver {
   }
 
   @Mutation(() => Boolean)
-  async logout(@Ctx() { req }: ApolloContext): Promise<boolean> {
-    return true;
+  async logout(@Ctx() { req, res }: ApolloContext): Promise<boolean> {
+    return new Promise((resolve) => {
+      req.session.destroy((err) => {
+        res.clearCookie(COOKIE_NAME);
+
+        if (err) {
+          console.log(err);
+          resolve(false);
+          return;
+        }
+
+        resolve(true);
+      });
+    });
   }
 }
