@@ -1,4 +1,5 @@
 import { DataSource } from "typeorm";
+import { Game } from "./entities/Game";
 import { User } from "./entities/User";
 
 export const AppDataSource = new DataSource({
@@ -10,5 +11,5 @@ export const AppDataSource = new DataSource({
   database: "ligaliter",
   synchronize: true,
   logging: true,
-  entities: [User],
+  entities: [User, Game],
 });

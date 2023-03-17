@@ -9,54 +9,41 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.User = void 0;
-const typeorm_1 = require("typeorm");
+exports.Game = void 0;
 const type_graphql_1 = require("type-graphql");
-const Game_1 = require("./Game");
-let User = class User extends typeorm_1.BaseEntity {
+const typeorm_1 = require("typeorm");
+const User_1 = require("./User");
+let Game = class Game extends typeorm_1.BaseEntity {
 };
 __decorate([
     (0, type_graphql_1.Field)(),
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
-], User.prototype, "id", void 0);
+], Game.prototype, "id", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(() => [Game_1.Game], { nullable: true }),
-    (0, typeorm_1.ManyToMany)(() => Game_1.Game, (game) => game.players, { nullable: true }),
+    (0, type_graphql_1.Field)(() => [User_1.User]),
+    (0, typeorm_1.ManyToMany)(() => User_1.User, (user) => user.games),
+    (0, typeorm_1.JoinTable)(),
     __metadata("design:type", Array)
-], User.prototype, "games", void 0);
+], Game.prototype, "players", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(() => [Game_1.Game], { nullable: true }),
-    (0, typeorm_1.OneToMany)(() => Game_1.Game, (game) => game.winner, { nullable: true }),
-    __metadata("design:type", Array)
-], User.prototype, "games_won", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(),
-    (0, typeorm_1.Column)({ unique: true }),
-    __metadata("design:type", String)
-], User.prototype, "username", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(),
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], User.prototype, "email", void 0);
-__decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], User.prototype, "password", void 0);
+    (0, type_graphql_1.Field)(() => User_1.User, { nullable: true }),
+    (0, typeorm_1.ManyToOne)(() => User_1.User, (user) => user.games_won, { nullable: true }),
+    __metadata("design:type", User_1.User)
+], Game.prototype, "winner", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)
-], User.prototype, "created_at", void 0);
+], Game.prototype, "created_at", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
     (0, typeorm_1.UpdateDateColumn)(),
     __metadata("design:type", Date)
-], User.prototype, "updated_at", void 0);
-User = __decorate([
+], Game.prototype, "updated_at", void 0);
+Game = __decorate([
     (0, type_graphql_1.ObjectType)(),
     (0, typeorm_1.Entity)()
-], User);
-exports.User = User;
-//# sourceMappingURL=User.js.map
+], Game);
+exports.Game = Game;
+//# sourceMappingURL=Game.js.map
