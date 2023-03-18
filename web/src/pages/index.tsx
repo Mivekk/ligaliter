@@ -1,8 +1,14 @@
+import NavBar from "@/components/Navbar";
+import StartGame from "@/components/StartGame";
+import Wrapper from "@/components/Wrapper";
+
 const Home: React.FC<{}> = ({}) => {
   return (
-    <div className="flex ">
-      <h1 className="text-center">Hey</h1>
-    </div>
+    <Wrapper>
+      <div className="flex w-full h-screen items-center justify-center">
+        <StartGame />
+      </div>
+    </Wrapper>
   );
 };
 
