@@ -53,7 +53,10 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         }),
     });
     yield apolloServer.start();
-    app.use("/graphql", (0, cors_1.default)(), (0, body_parser_1.json)(), (0, express4_1.expressMiddleware)(apolloServer, {
+    app.use("/graphql", (0, cors_1.default)({
+        credentials: true,
+        origin: ["http://localhost:3000"],
+    }), (0, body_parser_1.json)(), (0, express4_1.expressMiddleware)(apolloServer, {
         context: ({ req, res }) => __awaiter(void 0, void 0, void 0, function* () {
             return ({
                 req,

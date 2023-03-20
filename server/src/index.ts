@@ -50,7 +50,10 @@ const main = async () => {
   await apolloServer.start();
   app.use(
     "/graphql",
-    cors(),
+    cors({
+      credentials: true,
+      origin: ["http://localhost:3000"],
+    }),
     json(),
     expressMiddleware(apolloServer, {
       context: async ({ req, res }): Promise<ApolloContext> => ({

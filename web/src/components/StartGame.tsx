@@ -9,7 +9,7 @@ const StartGame: React.FC<StartGameProps> = () => {
       <div>Click here to start new game</div>
       <Link
         href={"/newgame"}
-        className="border px-8 py-2 bg-lime-400 text-white mt-2 hover:opacity-75"
+        className="border px-8 py-2 bg-blue-400 text-white mt-2 hover:opacity-75"
       >
         New game
       </Link>

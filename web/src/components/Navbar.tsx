@@ -1,21 +1,42 @@
+import { LogoutDocument, MeDocument } from "@/generated/graphql";
 import Link from "next/link";
 import React from "react";
+import { useQuery, useMutation } from "urql";
 
 interface NavBarProps {}
 
 const NavBar: React.FC<NavBarProps> = () => {
+  const [{ data }] = useQuery({ query: MeDocument });
+  const [, logout] = useMutation(LogoutDocument);
+
   return (
-    <div className="flex flex-row items-center justify-between px-4 w-full h-14 bg-lime-400">
+    <div className="flex flex-row items-center justify-between px-4 w-full h-14 bg-orange-400">
       <Link href={"/"} className="hover:opacity-75">
         home
       </Link>
       <div className="flex gap-4">
-        <Link href={"/login"} className="hover:opacity-75">
-          login
-        </Link>
-        <Link href={"/register"} className="hover:opacity-75">
-          register
-        </Link>
+        {data?.me ? (
+          <>
+            {data?.me.username}
+            <Link
+              href={"/"}
+              onClick={() => {
+                logout({});
+              }}
+            >
+              logout
+            </Link>
+          </>
+        ) : (
+          <>
+            <Link href={"/login"} className="hover:opacity-75">
+              login
+            </Link>
+            <Link href={"/register"} className="hover:opacity-75">
+              register
+            </Link>
+          </>
+        )}
       </div>
     </div>
   );

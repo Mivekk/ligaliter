@@ -1,11 +1,27 @@
-import {
-  createClient,
-  dedupExchange,
-  cacheExchange,
-  fetchExchange,
-} from "urql";
+import { LoginMutation, MeDocument } from "@/generated/graphql";
+import { cacheExchange } from "@urql/exchange-graphcache";
+import { createClient, dedupExchange, fetchExchange } from "urql";
 
 export const client = createClient({
   url: "http://localhost:4000/graphql",
-  exchanges: [dedupExchange, cacheExchange, fetchExchange],
+  fetchOptions: {
+    credentials: "include",
+  },
+  exchanges: [
+    dedupExchange,
+    cacheExchange({
+      updates: {
+        Mutation: {
+          login: (result: LoginMutation, args, cache, info) => {
+            cache.updateQuery({ query: MeDocument }, (data) => {
+              return {
+                me: result.login.user,
+              };
+            });
+          },
+        },
+      },
+    }),
+    fetchExchange,
+  ],
 });

@@ -43,7 +43,7 @@ const Register: React.FC<RegisterProps> = () => {
                 value={values.password}
                 onChange={handleChange}
               />
-              <button type="submit" className="w-28 h-8 bg-lime-400 text-white">
+              <button type="submit" className="w-28 h-8 bg-blue-400 text-white">
                 Register
               </button>
             </Form>
