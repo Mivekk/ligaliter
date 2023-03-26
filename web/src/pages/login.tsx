@@ -1,8 +1,8 @@
 import Heading from "@/components/Heading";
 import InputField from "@/components/InputField";
-import Wrapper from "@/components/Wrapper";
 import { LoginDocument } from "@/generated/graphql";
 import { Formik, Form } from "formik";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
 import { useMutation } from "urql";
@@ -14,24 +14,23 @@ const Login: React.FC<LoginProps> = () => {
   const [, login] = useMutation(LoginDocument);
 
   return (
-    <Wrapper>
-      <div className="flex w-full justify-center">
+    <div className="flex w-full h-screen items-center justify-center bg-plt-four">
+      <div className="flex flex-col items-center justify-center w-[26rem] h-[22rem] bg-plt-three rounded-md">
+        <Heading>Login</Heading>
         <Formik
           initialValues={{ username: "", password: "" }}
           onSubmit={async (values) => {
-            const response = await login({ options: values });
-            console.log(response);
+            await login({ options: values });
 
-            router.push("/");
+            router.replace("/");
           }}
         >
           {({ values, handleChange }) => (
             <Form className="flex flex-col gap-4 mt-8">
-              <Heading>Login</Heading>
               <InputField
                 type="text"
                 name="username"
-                placeholder="mivekk"
+                placeholder="username"
                 label="Username"
                 value={values.username}
                 onChange={handleChange}
@@ -39,19 +38,30 @@ const Login: React.FC<LoginProps> = () => {
               <InputField
                 type="password"
                 name="password"
-                placeholder="mivekk"
+                placeholder="password"
                 label="Password"
                 value={values.password}
                 onChange={handleChange}
               />
-              <button type="submit" className="w-28 h-8 bg-blue-400 text-white">
-                Login
-              </button>
+              <div className="flex justify-between">
+                <button
+                  type="submit"
+                  className="w-28 h-8 bg-plt-one hover:opacity-75 text-white"
+                >
+                  Login
+                </button>
+                <div>
+                  <div>Don't have an account?</div>
+                  <Link href="/register" className="text-plt-one">
+                    Click here to register!
+                  </Link>
+                </div>
+              </div>
             </Form>
           )}
         </Formik>
       </div>
-    </Wrapper>
+    </div>
   );
 };
 

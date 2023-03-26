@@ -1,4 +1,4 @@
-import { LoginMutation, MeDocument } from "@/generated/graphql";
+import { LoginMutation, LogoutMutation, MeDocument } from "@/generated/graphql";
 import { cacheExchange } from "@urql/exchange-graphcache";
 import { createClient, dedupExchange, fetchExchange } from "urql";
 
@@ -12,11 +12,14 @@ export const client = createClient({
     cacheExchange({
       updates: {
         Mutation: {
-          login: (result: LoginMutation, args, cache, info) => {
-            cache.updateQuery({ query: MeDocument }, (data) => {
-              return {
-                me: result.login.user,
-              };
+          login: (result: LoginMutation, _args, cache, _info) => {
+            cache.updateQuery({ query: MeDocument }, () => {
+              return { me: result.login.user };
+            });
+          },
+          logout: (result: LogoutMutation, _args, cache, _info) => {
+            cache.updateQuery({ query: MeDocument }, () => {
+              return { me: null };
             });
           },
         },

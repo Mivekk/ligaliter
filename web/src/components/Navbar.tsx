@@ -10,7 +10,7 @@ const NavBar: React.FC<NavBarProps> = () => {
   const [, logout] = useMutation(LogoutDocument);
 
   return (
-    <div className="flex flex-row items-center justify-between px-4 w-full h-14 bg-orange-400">
+    <div className="flex absolute flex-row items-center justify-between px-4 w-full h-14 bg-plt-four">
       <Link href={"/"} className="hover:opacity-75">
         home
       </Link>

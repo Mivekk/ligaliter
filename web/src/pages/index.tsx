@@ -1,30 +1,29 @@
+import { MeDocument } from "@/generated/graphql";
+import { useQuery } from "urql";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 import StartGame from "@/components/StartGame";
 import Wrapper from "@/components/Wrapper";
-import { MeDocument, UsersDocument } from "@/generated/graphql";
-import { useQuery } from "urql";
 
-const Home: React.FC<{}> = ({}) => {
-  const [{ data, fetching }] = useQuery({ query: UsersDocument });
+const Index: React.FC<{}> = ({}) => {
+  const [{ data, fetching }] = useQuery({ query: MeDocument });
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!fetching && !data?.me) {
+      router.replace("/login");
+    }
+  }, [fetching, data]);
 
   return (
-    <>
-      {/*<Wrapper>
-      <>
-        {data && !fetching
-          ? data.users.map((item) => (
-              <h1 key={item.id}>{item.username + ", " + item.created_at}</h1>
-            ))
-          : null}
-        <div className="flex w-full h-screen items-center justify-center">
+    <Wrapper>
+      <div className="w-full h-screen flex justify-center items-center bg-plt-four">
+        <div className="flex justify-center items-center w-[26rem] h-[10rem] bg-plt-three rounded-md">
           <StartGame />
         </div>
-      </>
-    </Wrapper>*/}
-      <div className="w-full h-screen bg-sky-900">
-        <div className="m-10 w-40 h-10 p-4 bg-sky-800 rounded-md"></div>
       </div>
-    </>
+    </Wrapper>
   );
 };
 
-export default Home;
+export default Index;
