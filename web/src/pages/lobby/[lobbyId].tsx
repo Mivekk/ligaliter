@@ -1,10 +1,13 @@
 import Heading from "@/components/Heading";
 import Wrapper from "@/components/Wrapper";
+import { isAuth } from "@/utils/isAuth";
 import React from "react";
 
 interface NewGameProps {}
 
 const NewGame: React.FC<NewGameProps> = () => {
+  isAuth();
+
   return (
     <Wrapper>
       <div className="flex w-full h-screen items-center justify-center bg-plt-four">

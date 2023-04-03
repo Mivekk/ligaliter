@@ -91,11 +91,14 @@ let UserResolver = class UserResolver {
             return User_1.User.find();
         });
     }
-    register(options) {
+    register(options, { req }) {
         return __awaiter(this, void 0, void 0, function* () {
             const hashedPassword = yield argon2_1.default.hash(options.password);
             const user = yield User_1.User.create(Object.assign(Object.assign({}, options), { password: hashedPassword })).save();
-            return user;
+            req.session.userId = user.id;
+            return {
+                user,
+            };
         });
     }
     login({ username, password }, { req }) {
@@ -154,10 +157,11 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "users", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(() => User_1.User),
+    (0, type_graphql_1.Mutation)(() => ResponseObject),
     __param(0, (0, type_graphql_1.Arg)("options")),
+    __param(1, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [RegisterInput]),
+    __metadata("design:paramtypes", [RegisterInput, Object]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "register", null);
 __decorate([

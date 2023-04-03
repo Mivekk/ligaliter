@@ -1,19 +1,29 @@
 import Heading from "@/components/Heading";
 import InputField from "@/components/InputField";
+import { RegisterDocument } from "@/generated/graphql";
 import { Formik, Form } from "formik";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import React from "react";
+import { useMutation } from "urql";
 
 interface RegisterProps {}
 
 const Register: React.FC<RegisterProps> = () => {
+  const router = useRouter();
+  const [, register] = useMutation(RegisterDocument);
+
   return (
     <div className="flex w-full h-screen items-center justify-center bg-plt-four">
       <div className="flex flex-col items-center justify-center w-[26rem] h-[26rem] bg-plt-three rounded-md">
         <Heading>Register</Heading>
         <Formik
           initialValues={{ username: "", email: "", password: "" }}
-          onSubmit={() => {}}
+          onSubmit={async (values) => {
+            await register({ options: values });
+
+            router.replace("/");
+          }}
         >
           {({ values, handleChange }) => (
             <Form className="flex flex-col gap-4 mt-8">

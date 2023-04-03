@@ -1,0 +1,3 @@
+mutation NewLobby($uuid: String!) {
+  newLobby(uuid: $uuid)
+}

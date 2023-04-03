@@ -62,8 +62,11 @@ export class UserResolver {
     return User.find();
   }
 
-  @Mutation(() => User)
-  async register(@Arg("options") options: RegisterInput): Promise<User> {
+  @Mutation(() => ResponseObject)
+  async register(
+    @Arg("options") options: RegisterInput,
+    @Ctx() { req }: ApolloContext
+  ): Promise<ResponseObject> {
     const hashedPassword = await argon2.hash(options.password);
 
     const user = await User.create({
@@ -71,7 +74,11 @@ export class UserResolver {
       password: hashedPassword,
     }).save();
 
-    return user;
+    req.session.userId = user.id;
+
+    return {
+      user,
+    };
   }
 
   @Mutation(() => ResponseObject)

@@ -12,6 +12,7 @@ import { ApolloContext } from "./types";
 import RedisStore from "connect-redis";
 import session from "express-session";
 import cors from "cors";
+import { GameResolver } from "./resolvers/game";
 
 const main = async () => {
   await AppDataSource.initialize();
@@ -42,7 +43,7 @@ const main = async () => {
 
   const apolloServer = new ApolloServer<ApolloContext>({
     schema: await buildSchema({
-      resolvers: [UserResolver],
+      resolvers: [UserResolver, GameResolver],
       validate: false,
     }),
   });

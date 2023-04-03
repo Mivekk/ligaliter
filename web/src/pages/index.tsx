@@ -1,25 +1,15 @@
-import { MeDocument } from "@/generated/graphql";
-import { useQuery } from "urql";
-import { useRouter } from "next/router";
-import { useEffect } from "react";
-import StartGame from "@/components/StartGame";
+import PickLobby from "@/components/PickLobby";
 import Wrapper from "@/components/Wrapper";
+import { isAuth } from "@/utils/isAuth";
 
 const Index: React.FC<{}> = ({}) => {
-  const [{ data, fetching }] = useQuery({ query: MeDocument });
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!fetching && !data?.me) {
-      router.replace("/login");
-    }
-  }, [fetching, data]);
+  isAuth();
 
   return (
     <Wrapper>
       <div className="w-full h-screen flex justify-center items-center bg-plt-four">
         <div className="flex justify-center items-center w-[26rem] h-[10rem] bg-plt-three rounded-md">
-          <StartGame />
+          <PickLobby />
         </div>
       </div>
     </Wrapper>
