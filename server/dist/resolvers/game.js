@@ -29,15 +29,34 @@ let GameResolver = class GameResolver {
         return __awaiter(this, void 0, void 0, function* () {
             const ownerId = req.session.userId;
             const owner = User_1.User.findOneBy({ id: ownerId });
-            if (!owner) {
+            if (!owner || !ownerId) {
                 return false;
             }
             const data = {
-                owner: uuid,
+                owner: ownerId,
                 createdAt: new Date(),
+                players: [{ id: ownerId }],
             };
             redis.setex(uuid, 3600, JSON.stringify(data));
             return true;
+        });
+    }
+    lobbyPlayers(uuid, { redis }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const lobbyData = yield redis.get(uuid);
+            if (!lobbyData) {
+                return null;
+            }
+            const playersData = JSON.parse(lobbyData);
+            const players = playersData.players.map((item) => __awaiter(this, void 0, void 0, function* () {
+                const user = yield User_1.User.findOneBy({ id: item.id });
+                if (!user) {
+                    return null;
+                }
+                return user;
+            }));
+            console.log(playersData);
+            return players;
         });
     }
 };
@@ -49,6 +68,14 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], GameResolver.prototype, "newLobby", null);
+__decorate([
+    (0, type_graphql_1.Query)(() => [User_1.User], { nullable: true }),
+    __param(0, (0, type_graphql_1.Arg)("uuid")),
+    __param(1, (0, type_graphql_1.Ctx)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], GameResolver.prototype, "lobbyPlayers", null);
 GameResolver = __decorate([
     (0, type_graphql_1.Resolver)()
 ], GameResolver);

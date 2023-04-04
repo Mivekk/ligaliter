@@ -7,6 +7,12 @@ export type ApolloContext = {
   redis: Redis;
 };
 
+export type LobbyData = {
+  owner: number;
+  createdAt: Date;
+  players: Array<{ id: number }>;
+};
+
 declare module "express-session" {
   interface SessionData {
     userId: number;
