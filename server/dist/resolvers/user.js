@@ -29,32 +29,32 @@ const User_1 = require("../entities/User");
 const type_graphql_1 = require("type-graphql");
 const argon2_1 = __importDefault(require("argon2"));
 const constants_1 = require("../constants");
-let FieldError = class FieldError {
+let UserFieldError = class UserFieldError {
 };
 __decorate([
     (0, type_graphql_1.Field)(),
     __metadata("design:type", String)
-], FieldError.prototype, "field", void 0);
+], UserFieldError.prototype, "field", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
     __metadata("design:type", String)
-], FieldError.prototype, "message", void 0);
-FieldError = __decorate([
+], UserFieldError.prototype, "message", void 0);
+UserFieldError = __decorate([
     (0, type_graphql_1.ObjectType)()
-], FieldError);
-let ResponseObject = class ResponseObject {
+], UserFieldError);
+let UserResponseObject = class UserResponseObject {
 };
 __decorate([
-    (0, type_graphql_1.Field)(() => FieldError, { nullable: true }),
-    __metadata("design:type", FieldError)
-], ResponseObject.prototype, "error", void 0);
+    (0, type_graphql_1.Field)(() => UserFieldError, { nullable: true }),
+    __metadata("design:type", UserFieldError)
+], UserResponseObject.prototype, "error", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => User_1.User, { nullable: true }),
     __metadata("design:type", User_1.User)
-], ResponseObject.prototype, "user", void 0);
-ResponseObject = __decorate([
+], UserResponseObject.prototype, "user", void 0);
+UserResponseObject = __decorate([
     (0, type_graphql_1.ObjectType)()
-], ResponseObject);
+], UserResponseObject);
 let LoginInput = class LoginInput {
 };
 __decorate([
@@ -157,7 +157,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "users", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(() => ResponseObject),
+    (0, type_graphql_1.Mutation)(() => UserResponseObject),
     __param(0, (0, type_graphql_1.Arg)("options")),
     __param(1, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
@@ -165,7 +165,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "register", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(() => ResponseObject),
+    (0, type_graphql_1.Mutation)(() => UserResponseObject),
     __param(0, (0, type_graphql_1.Arg)("options")),
     __param(1, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),

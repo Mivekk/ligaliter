@@ -25,7 +25,7 @@ const ioredis_1 = require("ioredis");
 const connect_redis_1 = __importDefault(require("connect-redis"));
 const express_session_1 = __importDefault(require("express-session"));
 const cors_1 = __importDefault(require("cors"));
-const game_1 = require("./resolvers/game");
+const lobby_1 = require("./resolvers/lobby");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     yield data_source_1.AppDataSource.initialize();
     const app = (0, express_1.default)();
@@ -49,7 +49,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     }));
     const apolloServer = new server_1.ApolloServer({
         schema: yield (0, type_graphql_1.buildSchema)({
-            resolvers: [user_1.UserResolver, game_1.GameResolver],
+            resolvers: [user_1.UserResolver, lobby_1.LobbyResolver],
             validate: false,
         }),
     });

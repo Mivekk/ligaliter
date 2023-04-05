@@ -14,7 +14,7 @@ import { ApolloContext } from "../types";
 import { COOKIE_NAME } from "../constants";
 
 @ObjectType()
-class FieldError {
+class UserFieldError {
   @Field()
   field: string;
 
@@ -23,9 +23,9 @@ class FieldError {
 }
 
 @ObjectType()
-class ResponseObject {
-  @Field(() => FieldError, { nullable: true })
-  error?: FieldError;
+class UserResponseObject {
+  @Field(() => UserFieldError, { nullable: true })
+  error?: UserFieldError;
 
   @Field(() => User, { nullable: true })
   user?: User;
@@ -62,11 +62,11 @@ export class UserResolver {
     return User.find();
   }
 
-  @Mutation(() => ResponseObject)
+  @Mutation(() => UserResponseObject)
   async register(
     @Arg("options") options: RegisterInput,
     @Ctx() { req }: ApolloContext
-  ): Promise<ResponseObject> {
+  ): Promise<UserResponseObject> {
     const hashedPassword = await argon2.hash(options.password);
 
     const user = await User.create({
@@ -81,11 +81,11 @@ export class UserResolver {
     };
   }
 
-  @Mutation(() => ResponseObject)
+  @Mutation(() => UserResponseObject)
   async login(
     @Arg("options") { username, password }: LoginInput,
     @Ctx() { req }: ApolloContext
-  ): Promise<ResponseObject> {
+  ): Promise<UserResponseObject> {
     const user = await User.findOneBy({ username });
     if (!user) {
       return {
