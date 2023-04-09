@@ -15,6 +15,7 @@ import RedisStore from "connect-redis";
 import session from "express-session";
 import cors from "cors";
 import { LobbyResolver } from "./resolvers/lobby";
+import { GameResolver } from "./resolvers/game";
 
 const main = async () => {
   await AppDataSource.initialize();
@@ -45,7 +46,7 @@ const main = async () => {
 
   const apolloServer = new ApolloServer<ApolloContext>({
     schema: await buildSchema({
-      resolvers: [UserResolver, LobbyResolver],
+      resolvers: [UserResolver, LobbyResolver, GameResolver],
       validate: false,
     }),
   });

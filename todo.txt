@@ -1,1 +1,0 @@
-- navbar is not responsive, it cuts out content

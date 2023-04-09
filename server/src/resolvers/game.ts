@@ -1,31 +1,17 @@
-import { Arg, Field, Mutation, ObjectType, Resolver } from "type-graphql";
-
-@ObjectType()
-class GameFieldError {
-  @Field()
-  field: string;
-
-  @Field()
-  message: string;
-}
-
-@ObjectType()
-class GameResponseObject {
-  @Field(() => GameFieldError, { nullable: true })
-  error?: GameFieldError;
-
-  @Field(() => Boolean)
-  success: boolean;
-}
+import { Arg, Mutation, Resolver } from "type-graphql";
+import { ResponseObject } from "./user";
 
 @Resolver()
 export class GameResolver {
-  @Mutation(() => GameResponseObject)
-  async newGame(@Arg("uuid") _uuid: string): Promise<GameResponseObject> {
+  @Mutation(() => ResponseObject)
+  async newGame(@Arg("uuid") _uuid: string): Promise<ResponseObject> {
     console.log("nowa gra");
 
     return {
-      success: true,
+      error: {
+        field: "",
+        message: "",
+      },
     };
   }
 }

@@ -1,55 +1,28 @@
+import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { User } from "../entities/User";
 import { ApolloContext, LobbyData } from "../types";
-import {
-  Arg,
-  Ctx,
-  Field,
-  Mutation,
-  ObjectType,
-  Query,
-  Resolver,
-} from "type-graphql";
-
-@ObjectType()
-class LobbyFieldError {
-  @Field()
-  field: string;
-
-  @Field()
-  message: string;
-}
-
-@ObjectType()
-class LobbyResponseObject {
-  @Field(() => LobbyFieldError, { nullable: true })
-  error?: LobbyFieldError;
-
-  @Field(() => Boolean)
-  success: boolean;
-}
+import { ResponseObject } from "./user";
 
 @Resolver()
 export class LobbyResolver {
-  @Mutation(() => LobbyResponseObject)
+  @Mutation(() => ResponseObject)
   async newLobby(
     @Arg("uuid") uuid: string,
     @Ctx() { req, redis }: ApolloContext
-  ): Promise<LobbyResponseObject> {
-    const ownerId = req.session.userId;
-    if (!ownerId) {
+  ): Promise<ResponseObject> {
+    const userId = req.session.userId;
+    if (!userId) {
       return {
-        success: false,
         error: {
-          field: "cookie",
-          message: "not logged in",
+          field: "session",
+          message: "session expired",
         },
       };
     }
 
-    const owner = await User.findOneBy({ id: ownerId });
-    if (!owner) {
+    const user = await User.findOneBy({ id: userId });
+    if (!user) {
       return {
-        success: false,
         error: {
           field: "user",
           message: "user doesn't exist",
@@ -58,60 +31,68 @@ export class LobbyResolver {
     }
 
     const data: LobbyData = {
-      owner: ownerId,
+      owner: userId,
       createdAt: new Date(),
-      players: [{ id: ownerId }],
+      players: [{ id: userId }],
     };
 
     await redis.setex(uuid, 3600, JSON.stringify(data));
 
     return {
-      success: true,
+      user,
     };
   }
 
-  @Query(() => [User])
+  @Query(() => [User], { nullable: true })
   async lobbyPlayers(
     @Arg("uuid") uuid: string,
     @Ctx() { redis }: ApolloContext
-  ): Promise<Array<User | null>> {
-    const lobbyData = await redis.get(uuid);
-    console.log("yooo", uuid, lobbyData);
-    if (!lobbyData) {
-      return [];
+  ): Promise<User[] | null> {
+    const lobby = await redis.get(uuid);
+    if (!lobby) {
+      return null;
     }
 
-    const playersData = JSON.parse(lobbyData) as LobbyData;
+    const lobbyData = JSON.parse(lobby) as LobbyData;
 
     const players = await Promise.all(
-      playersData.players.map(
+      lobbyData.players.map(
         async (item) => await User.findOneBy({ id: item.id })
       )
     );
+    players.filter((item) => item !== null);
 
-    return players;
+    return players as User[];
   }
 
-  @Mutation(() => LobbyResponseObject)
+  @Mutation(() => ResponseObject)
   async joinLobby(
     @Arg("uuid") uuid: string,
     @Ctx() { req, redis }: ApolloContext
-  ): Promise<LobbyResponseObject> {
+  ): Promise<ResponseObject> {
     const userId = req.session.userId;
     if (!userId) {
       return {
-        success: false,
         error: {
-          field: "cookie",
-          message: "not logged in",
+          field: "session",
+          message: "session expired",
         },
       };
     }
 
-    const lobbyData = await redis.get(uuid);
-    if (!lobbyData) {
+    const user = await User.findOneBy({ id: userId });
+    if (!user) {
       return {
-        success: false,
+        error: {
+          field: "user",
+          message: "user doesn't exist",
+        },
+      };
+    }
+
+    const lobby = await redis.get(uuid);
+    if (!lobby) {
+      return {
         error: {
           field: "uuid",
           message: "incorrect uuid",
@@ -119,14 +100,14 @@ export class LobbyResolver {
       };
     }
 
-    const playersData = JSON.parse(lobbyData) as LobbyData;
+    const lobbyData = JSON.parse(lobby) as LobbyData;
 
-    playersData.players.push({ id: userId });
+    lobbyData.players.push({ id: userId });
 
-    await redis.setex(uuid, 3600, JSON.stringify(playersData));
+    await redis.setex(uuid, 3600, JSON.stringify(lobbyData));
 
     return {
-      success: true,
+      user,
     };
   }
 }

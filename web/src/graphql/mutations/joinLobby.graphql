@@ -1,5 +1,5 @@
-mutation NewLobby($uuid: String!) {
-  newLobby(uuid: $uuid) {
+mutation JoinLobby($uuid: String!) {
+  joinLobby(uuid: $uuid) {
     error {
       ...ErrorFields
     }

@@ -1,11 +1,9 @@
 import { LogoutDocument, MeDocument } from "@/generated/graphql";
 import Link from "next/link";
 import React from "react";
-import { useQuery, useMutation } from "urql";
+import { useMutation, useQuery } from "urql";
 
-interface NavBarProps {}
-
-const NavBar: React.FC<NavBarProps> = () => {
+const NavBar: React.FC<{}> = ({}) => {
   const [{ data }] = useQuery({ query: MeDocument });
   const [, logout] = useMutation(LogoutDocument);
 

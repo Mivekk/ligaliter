@@ -1,13 +1,15 @@
-import Link from "next/link";
-import React from "react";
-import { v4 } from "uuid";
-import { useMutation } from "urql";
 import { NewLobbyDocument } from "@/generated/graphql";
+import Link from "next/link";
 import { useRouter } from "next/router";
+import React, { Dispatch, SetStateAction } from "react";
+import { useMutation } from "urql";
+import { v4 } from "uuid";
 
-interface PickLobbyProps {}
+interface SelectLobbyProps {
+  setSelectLobby: Dispatch<SetStateAction<boolean>>;
+}
 
-const PickLobby: React.FC<PickLobbyProps> = () => {
+const SelectLobby: React.FC<SelectLobbyProps> = ({ setSelectLobby }) => {
   const router = useRouter();
   const [, newLobby] = useMutation(NewLobbyDocument);
 
@@ -31,15 +33,15 @@ const PickLobby: React.FC<PickLobbyProps> = () => {
         >
           New lobby
         </button>
-        <Link
-          href={`/join`}
+        <button
+          onClick={() => setSelectLobby(false)}
           className="px-8 py-2 bg-plt-one text-white mt-2 hover:opacity-75"
         >
           Join lobby
-        </Link>
+        </button>
       </div>
     </div>
   );
 };
 
-export default PickLobby;
+export default SelectLobby;

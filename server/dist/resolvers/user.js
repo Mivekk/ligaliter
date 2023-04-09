@@ -24,37 +24,38 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserResolver = void 0;
+exports.UserResolver = exports.ResponseObject = void 0;
 const User_1 = require("../entities/User");
 const type_graphql_1 = require("type-graphql");
 const argon2_1 = __importDefault(require("argon2"));
 const constants_1 = require("../constants");
-let UserFieldError = class UserFieldError {
+let FieldError = class FieldError {
 };
 __decorate([
     (0, type_graphql_1.Field)(),
     __metadata("design:type", String)
-], UserFieldError.prototype, "field", void 0);
+], FieldError.prototype, "field", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
     __metadata("design:type", String)
-], UserFieldError.prototype, "message", void 0);
-UserFieldError = __decorate([
+], FieldError.prototype, "message", void 0);
+FieldError = __decorate([
     (0, type_graphql_1.ObjectType)()
-], UserFieldError);
-let UserResponseObject = class UserResponseObject {
+], FieldError);
+let ResponseObject = class ResponseObject {
 };
 __decorate([
-    (0, type_graphql_1.Field)(() => UserFieldError, { nullable: true }),
-    __metadata("design:type", UserFieldError)
-], UserResponseObject.prototype, "error", void 0);
+    (0, type_graphql_1.Field)(() => FieldError, { nullable: true }),
+    __metadata("design:type", FieldError)
+], ResponseObject.prototype, "error", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => User_1.User, { nullable: true }),
     __metadata("design:type", User_1.User)
-], UserResponseObject.prototype, "user", void 0);
-UserResponseObject = __decorate([
+], ResponseObject.prototype, "user", void 0);
+ResponseObject = __decorate([
     (0, type_graphql_1.ObjectType)()
-], UserResponseObject);
+], ResponseObject);
+exports.ResponseObject = ResponseObject;
 let LoginInput = class LoginInput {
 };
 __decorate([
@@ -157,7 +158,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "users", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(() => UserResponseObject),
+    (0, type_graphql_1.Mutation)(() => ResponseObject),
     __param(0, (0, type_graphql_1.Arg)("options")),
     __param(1, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
@@ -165,7 +166,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "register", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(() => UserResponseObject),
+    (0, type_graphql_1.Mutation)(() => ResponseObject),
     __param(0, (0, type_graphql_1.Arg)("options")),
     __param(1, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),

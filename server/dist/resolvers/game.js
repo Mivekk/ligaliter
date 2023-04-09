@@ -23,44 +23,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameResolver = void 0;
 const type_graphql_1 = require("type-graphql");
-let GameFieldError = class GameFieldError {
-};
-__decorate([
-    (0, type_graphql_1.Field)(),
-    __metadata("design:type", String)
-], GameFieldError.prototype, "field", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(),
-    __metadata("design:type", String)
-], GameFieldError.prototype, "message", void 0);
-GameFieldError = __decorate([
-    (0, type_graphql_1.ObjectType)()
-], GameFieldError);
-let GameResponseObject = class GameResponseObject {
-};
-__decorate([
-    (0, type_graphql_1.Field)(() => GameFieldError, { nullable: true }),
-    __metadata("design:type", GameFieldError)
-], GameResponseObject.prototype, "error", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(() => Boolean),
-    __metadata("design:type", Boolean)
-], GameResponseObject.prototype, "success", void 0);
-GameResponseObject = __decorate([
-    (0, type_graphql_1.ObjectType)()
-], GameResponseObject);
+const user_1 = require("./user");
 let GameResolver = class GameResolver {
     newGame(_uuid) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log("nowa gra");
             return {
-                success: true,
+                error: {
+                    field: "",
+                    message: "",
+                },
             };
         });
     }
 };
 __decorate([
-    (0, type_graphql_1.Mutation)(() => GameResponseObject),
+    (0, type_graphql_1.Mutation)(() => user_1.ResponseObject),
     __param(0, (0, type_graphql_1.Arg)("uuid")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),

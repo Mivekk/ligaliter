@@ -1,18 +1,24 @@
-import PickLobby from "@/components/PickLobby";
-import Wrapper from "@/components/Wrapper";
-import { isAuth } from "@/utils/isAuth";
+import JoinLobby from "@/components/JoinLobby";
+import NavBar from "@/components/Navbar";
+import SelectLobby from "@/components/SelectLobby";
+import { useState } from "react";
 
 const Index: React.FC<{}> = ({}) => {
-  isAuth();
+  const [selectLobby, setSelectLobby] = useState(true);
 
   return (
-    <Wrapper>
+    <>
+      <NavBar />
       <div className="w-full h-screen flex justify-center items-center bg-plt-four">
         <div className="flex justify-center items-center w-[26rem] h-[10rem] bg-plt-three rounded-md">
-          <PickLobby />
+          {selectLobby ? (
+            <SelectLobby setSelectLobby={setSelectLobby} />
+          ) : (
+            <JoinLobby setSelectLobby={setSelectLobby} />
+          )}
         </div>
       </div>
-    </Wrapper>
+    </>
   );
 };
 

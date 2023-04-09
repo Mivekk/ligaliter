@@ -22,51 +22,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LobbyResolver = void 0;
-const User_1 = require("../entities/User");
 const type_graphql_1 = require("type-graphql");
-let LobbyFieldError = class LobbyFieldError {
-};
-__decorate([
-    (0, type_graphql_1.Field)(),
-    __metadata("design:type", String)
-], LobbyFieldError.prototype, "field", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(),
-    __metadata("design:type", String)
-], LobbyFieldError.prototype, "message", void 0);
-LobbyFieldError = __decorate([
-    (0, type_graphql_1.ObjectType)()
-], LobbyFieldError);
-let LobbyResponseObject = class LobbyResponseObject {
-};
-__decorate([
-    (0, type_graphql_1.Field)(() => LobbyFieldError, { nullable: true }),
-    __metadata("design:type", LobbyFieldError)
-], LobbyResponseObject.prototype, "error", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(() => Boolean),
-    __metadata("design:type", Boolean)
-], LobbyResponseObject.prototype, "success", void 0);
-LobbyResponseObject = __decorate([
-    (0, type_graphql_1.ObjectType)()
-], LobbyResponseObject);
+const User_1 = require("../entities/User");
+const user_1 = require("./user");
 let LobbyResolver = class LobbyResolver {
     newLobby(uuid, { req, redis }) {
         return __awaiter(this, void 0, void 0, function* () {
-            const ownerId = req.session.userId;
-            if (!ownerId) {
+            const userId = req.session.userId;
+            if (!userId) {
                 return {
-                    success: false,
                     error: {
-                        field: "cookie",
-                        message: "not logged in",
+                        field: "session",
+                        message: "session expired",
                     },
                 };
             }
-            const owner = yield User_1.User.findOneBy({ id: ownerId });
-            if (!owner) {
+            const user = yield User_1.User.findOneBy({ id: userId });
+            if (!user) {
                 return {
-                    success: false,
                     error: {
                         field: "user",
                         message: "user doesn't exist",
@@ -74,25 +47,25 @@ let LobbyResolver = class LobbyResolver {
                 };
             }
             const data = {
-                owner: ownerId,
+                owner: userId,
                 createdAt: new Date(),
-                players: [{ id: ownerId }],
+                players: [{ id: userId }],
             };
             yield redis.setex(uuid, 3600, JSON.stringify(data));
             return {
-                success: true,
+                user,
             };
         });
     }
     lobbyPlayers(uuid, { redis }) {
         return __awaiter(this, void 0, void 0, function* () {
-            const lobbyData = yield redis.get(uuid);
-            console.log("yooo", uuid, lobbyData);
-            if (!lobbyData) {
-                return [];
+            const lobby = yield redis.get(uuid);
+            if (!lobby) {
+                return null;
             }
-            const playersData = JSON.parse(lobbyData);
-            const players = yield Promise.all(playersData.players.map((item) => __awaiter(this, void 0, void 0, function* () { return yield User_1.User.findOneBy({ id: item.id }); })));
+            const lobbyData = JSON.parse(lobby);
+            const players = yield Promise.all(lobbyData.players.map((item) => __awaiter(this, void 0, void 0, function* () { return yield User_1.User.findOneBy({ id: item.id }); })));
+            players.filter((item) => item !== null);
             return players;
         });
     }
@@ -101,34 +74,41 @@ let LobbyResolver = class LobbyResolver {
             const userId = req.session.userId;
             if (!userId) {
                 return {
-                    success: false,
                     error: {
-                        field: "cookie",
-                        message: "not logged in",
+                        field: "session",
+                        message: "session expired",
                     },
                 };
             }
-            const lobbyData = yield redis.get(uuid);
-            if (!lobbyData) {
+            const user = yield User_1.User.findOneBy({ id: userId });
+            if (!user) {
                 return {
-                    success: false,
+                    error: {
+                        field: "user",
+                        message: "user doesn't exist",
+                    },
+                };
+            }
+            const lobby = yield redis.get(uuid);
+            if (!lobby) {
+                return {
                     error: {
                         field: "uuid",
                         message: "incorrect uuid",
                     },
                 };
             }
-            const playersData = JSON.parse(lobbyData);
-            playersData.players.push({ id: userId });
-            yield redis.setex(uuid, 3600, JSON.stringify(playersData));
+            const lobbyData = JSON.parse(lobby);
+            lobbyData.players.push({ id: userId });
+            yield redis.setex(uuid, 3600, JSON.stringify(lobbyData));
             return {
-                success: true,
+                user,
             };
         });
     }
 };
 __decorate([
-    (0, type_graphql_1.Mutation)(() => LobbyResponseObject),
+    (0, type_graphql_1.Mutation)(() => user_1.ResponseObject),
     __param(0, (0, type_graphql_1.Arg)("uuid")),
     __param(1, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
@@ -136,7 +116,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], LobbyResolver.prototype, "newLobby", null);
 __decorate([
-    (0, type_graphql_1.Query)(() => [User_1.User]),
+    (0, type_graphql_1.Query)(() => [User_1.User], { nullable: true }),
     __param(0, (0, type_graphql_1.Arg)("uuid")),
     __param(1, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
@@ -144,7 +124,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], LobbyResolver.prototype, "lobbyPlayers", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(() => LobbyResponseObject),
+    (0, type_graphql_1.Mutation)(() => user_1.ResponseObject),
     __param(0, (0, type_graphql_1.Arg)("uuid")),
     __param(1, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
