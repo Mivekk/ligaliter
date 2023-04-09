@@ -1,4 +1,6 @@
 import "reflect-metadata";
+import * as dotenv from "dotenv";
+dotenv.config();
 import { AppDataSource } from "./data-source";
 import express from "express";
 import { ApolloServer } from "@apollo/server";

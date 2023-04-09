@@ -22,71 +22,50 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameResolver = void 0;
-const User_1 = require("../entities/User");
 const type_graphql_1 = require("type-graphql");
+let GameFieldError = class GameFieldError {
+};
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", String)
+], GameFieldError.prototype, "field", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", String)
+], GameFieldError.prototype, "message", void 0);
+GameFieldError = __decorate([
+    (0, type_graphql_1.ObjectType)()
+], GameFieldError);
+let GameResponseObject = class GameResponseObject {
+};
+__decorate([
+    (0, type_graphql_1.Field)(() => GameFieldError, { nullable: true }),
+    __metadata("design:type", GameFieldError)
+], GameResponseObject.prototype, "error", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(() => Boolean),
+    __metadata("design:type", Boolean)
+], GameResponseObject.prototype, "success", void 0);
+GameResponseObject = __decorate([
+    (0, type_graphql_1.ObjectType)()
+], GameResponseObject);
 let GameResolver = class GameResolver {
-    newLobby(uuid, { req, redis }) {
+    newGame(_uuid) {
         return __awaiter(this, void 0, void 0, function* () {
-            const ownerId = req.session.userId;
-            const owner = User_1.User.findOneBy({ id: ownerId });
-            if (!owner || !ownerId) {
-                return false;
-            }
-            const data = {
-                owner: ownerId,
-                createdAt: new Date(),
-                players: [{ id: ownerId }],
+            console.log("nowa gra");
+            return {
+                success: true,
             };
-            redis.setex(uuid, 3600, JSON.stringify(data));
-            return true;
-        });
-    }
-    lobbyPlayers(uuid, { redis }) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const lobbyData = yield redis.get(uuid);
-            if (!lobbyData) {
-                return [null];
-            }
-            const playersData = JSON.parse(lobbyData);
-            const players = yield Promise.all(playersData.players.map((item) => __awaiter(this, void 0, void 0, function* () { return yield User_1.User.findOneBy({ id: item.id }); })));
-            return players;
-        });
-    }
-    joinLobby(uuid, { req, redis }) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const id = req.session.userId;
-            const lobbyData = yield redis.get(uuid);
-            const playersData = JSON.parse(lobbyData);
-            playersData.players.push({ id });
-            yield redis.setex(uuid, 3600, JSON.stringify(playersData));
-            return true;
         });
     }
 };
 __decorate([
-    (0, type_graphql_1.Mutation)(() => Boolean),
+    (0, type_graphql_1.Mutation)(() => GameResponseObject),
     __param(0, (0, type_graphql_1.Arg)("uuid")),
-    __param(1, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
-], GameResolver.prototype, "newLobby", null);
-__decorate([
-    (0, type_graphql_1.Query)(() => [User_1.User], { nullable: true }),
-    __param(0, (0, type_graphql_1.Arg)("uuid")),
-    __param(1, (0, type_graphql_1.Ctx)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
-    __metadata("design:returntype", Promise)
-], GameResolver.prototype, "lobbyPlayers", null);
-__decorate([
-    (0, type_graphql_1.Mutation)(() => Boolean),
-    __param(0, (0, type_graphql_1.Arg)("uuid")),
-    __param(1, (0, type_graphql_1.Ctx)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
-    __metadata("design:returntype", Promise)
-], GameResolver.prototype, "joinLobby", null);
+], GameResolver.prototype, "newGame", null);
 GameResolver = __decorate([
     (0, type_graphql_1.Resolver)()
 ], GameResolver);

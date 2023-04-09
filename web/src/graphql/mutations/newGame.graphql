@@ -1,0 +1,9 @@
+mutation NewGame($uuid: String!) {
+  newGame(uuid: $uuid) {
+    error {
+      field
+      message
+    }
+    success
+  }
+}

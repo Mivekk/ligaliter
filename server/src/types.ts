@@ -18,3 +18,15 @@ declare module "express-session" {
     userId: number;
   }
 }
+
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv {
+      DB_HOSTNAME: string;
+      DB_PORT: number;
+      DB_USERNAME: string;
+      DB_PASSWORD: string;
+      DB_NAME: string;
+    }
+  }
+}

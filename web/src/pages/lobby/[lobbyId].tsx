@@ -18,8 +18,9 @@ const NewGame: React.FC<NewGameProps> = () => {
 
   isAuth();
 
-  const lobbyPlayers =
-    !fetching && data ? data.lobbyPlayers?.map((item) => item.username) : null;
+  const lobbyPlayers = data
+    ? data.lobbyPlayers?.map((item) => item.username)
+    : null;
 
   return (
     <Wrapper>
