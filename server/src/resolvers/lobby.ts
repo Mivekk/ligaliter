@@ -1,7 +1,21 @@
-import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
+import {
+  Arg,
+  Ctx,
+  Mutation,
+  PubSub,
+  Publisher,
+  Query,
+  Resolver,
+  Root,
+  Subscription,
+} from "type-graphql";
 import { User } from "../entities/User";
-import { ApolloContext, LobbyData } from "../types";
+import { ApolloContext, LobbyData, LobbyPlayers } from "../types";
 import { ResponseObject } from "./user";
+
+enum TOPICS {
+  NEW_PLAYER_IN_LOBBY = "NEW_PLAYER_IN_LOBBY",
+}
 
 @Resolver()
 export class LobbyResolver {
@@ -44,7 +58,7 @@ export class LobbyResolver {
   }
 
   @Query(() => [User], { nullable: true })
-  async lobbyPlayers(
+  async lobbyPlayersQuery(
     @Arg("uuid") uuid: string,
     @Ctx() { redis }: ApolloContext
   ): Promise<User[] | null> {
@@ -54,13 +68,29 @@ export class LobbyResolver {
     }
 
     const lobbyData = JSON.parse(lobby) as LobbyData;
-
     const players = await Promise.all(
       lobbyData.players.map(
         async (item) => await User.findOneBy({ id: item.id })
       )
-    );
-    players.filter((item) => item !== null);
+    ).then((res) => res.filter((item) => item !== null));
+
+    return players as User[];
+  }
+
+  @Subscription(() => [User], {
+    nullable: true,
+    topics: TOPICS.NEW_PLAYER_IN_LOBBY,
+    filter: ({ payload, args }) => payload.uuid === args.uuid,
+  })
+  async lobbyPlayers(
+    @Root() lobbyPlayersPayload: LobbyPlayers,
+    @Arg("uuid") _uuid: string
+  ): Promise<User[] | null> {
+    const players = await Promise.all(
+      lobbyPlayersPayload.players.map(
+        async (item) => await User.findOneBy({ id: item.id })
+      )
+    ).then((res) => res.filter((item) => item !== null));
 
     return players as User[];
   }
@@ -68,7 +98,8 @@ export class LobbyResolver {
   @Mutation(() => ResponseObject)
   async joinLobby(
     @Arg("uuid") uuid: string,
-    @Ctx() { req, redis }: ApolloContext
+    @Ctx() { req, redis }: ApolloContext,
+    @PubSub(TOPICS.NEW_PLAYER_IN_LOBBY) publish: Publisher<LobbyPlayers>
   ): Promise<ResponseObject> {
     const userId = req.session.userId;
     if (!userId) {
@@ -105,6 +136,8 @@ export class LobbyResolver {
     lobbyData.players.push({ id: userId });
 
     await redis.setex(uuid, 3600, JSON.stringify(lobbyData));
+
+    await publish({ players: lobbyData.players, uuid });
 
     return {
       user,

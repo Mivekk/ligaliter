@@ -25,6 +25,10 @@ exports.LobbyResolver = void 0;
 const type_graphql_1 = require("type-graphql");
 const User_1 = require("../entities/User");
 const user_1 = require("./user");
+var TOPICS;
+(function (TOPICS) {
+    TOPICS["NEW_PLAYER_IN_LOBBY"] = "NEW_PLAYER_IN_LOBBY";
+})(TOPICS || (TOPICS = {}));
 let LobbyResolver = class LobbyResolver {
     newLobby(uuid, { req, redis }) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -57,19 +61,24 @@ let LobbyResolver = class LobbyResolver {
             };
         });
     }
-    lobbyPlayers(uuid, { redis }) {
+    lobbyPlayersQuery(uuid, { redis }) {
         return __awaiter(this, void 0, void 0, function* () {
             const lobby = yield redis.get(uuid);
             if (!lobby) {
                 return null;
             }
             const lobbyData = JSON.parse(lobby);
-            const players = yield Promise.all(lobbyData.players.map((item) => __awaiter(this, void 0, void 0, function* () { return yield User_1.User.findOneBy({ id: item.id }); })));
-            players.filter((item) => item !== null);
+            const players = yield Promise.all(lobbyData.players.map((item) => __awaiter(this, void 0, void 0, function* () { return yield User_1.User.findOneBy({ id: item.id }); }))).then((res) => res.filter((item) => item !== null));
             return players;
         });
     }
-    joinLobby(uuid, { req, redis }) {
+    lobbyPlayers(lobbyPlayersPayload, _uuid) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const players = yield Promise.all(lobbyPlayersPayload.players.map((item) => __awaiter(this, void 0, void 0, function* () { return yield User_1.User.findOneBy({ id: item.id }); }))).then((res) => res.filter((item) => item !== null));
+            return players;
+        });
+    }
+    joinLobby(uuid, { req, redis }, publish) {
         return __awaiter(this, void 0, void 0, function* () {
             const userId = req.session.userId;
             if (!userId) {
@@ -101,6 +110,7 @@ let LobbyResolver = class LobbyResolver {
             const lobbyData = JSON.parse(lobby);
             lobbyData.players.push({ id: userId });
             yield redis.setex(uuid, 3600, JSON.stringify(lobbyData));
+            yield publish({ players: lobbyData.players, uuid });
             return {
                 user,
             };
@@ -122,13 +132,26 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
+], LobbyResolver.prototype, "lobbyPlayersQuery", null);
+__decorate([
+    (0, type_graphql_1.Subscription)(() => [User_1.User], {
+        nullable: true,
+        topics: TOPICS.NEW_PLAYER_IN_LOBBY,
+        filter: ({ payload, args }) => payload.uuid === args.uuid,
+    }),
+    __param(0, (0, type_graphql_1.Root)()),
+    __param(1, (0, type_graphql_1.Arg)("uuid")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
 ], LobbyResolver.prototype, "lobbyPlayers", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => user_1.ResponseObject),
     __param(0, (0, type_graphql_1.Arg)("uuid")),
     __param(1, (0, type_graphql_1.Ctx)()),
+    __param(2, (0, type_graphql_1.PubSub)(TOPICS.NEW_PLAYER_IN_LOBBY)),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, Object, Function]),
     __metadata("design:returntype", Promise)
 ], LobbyResolver.prototype, "joinLobby", null);
 LobbyResolver = __decorate([

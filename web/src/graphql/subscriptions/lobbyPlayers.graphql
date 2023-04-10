@@ -1,0 +1,9 @@
+subscription LobbyPlayers($uuid: String!) {
+  lobbyPlayers(uuid: $uuid) {
+    id
+    username
+    email
+    created_at
+    updated_at
+  }
+}

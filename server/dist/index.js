@@ -52,11 +52,25 @@ const express_session_1 = __importDefault(require("express-session"));
 const cors_1 = __importDefault(require("cors"));
 const lobby_1 = require("./resolvers/lobby");
 const game_1 = require("./resolvers/game");
+const http_1 = require("http");
+const ws_1 = require("ws");
+const ws_2 = require("graphql-ws/lib/use/ws");
+const drainHttpServer_1 = require("@apollo/server/plugin/drainHttpServer");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     yield data_source_1.AppDataSource.initialize();
     const app = (0, express_1.default)();
     const port = 4000;
+    const httpServer = (0, http_1.createServer)(app);
+    const wsServer = new ws_1.WebSocketServer({
+        server: httpServer,
+        path: "/graphql",
+    });
+    const schema = yield (0, type_graphql_1.buildSchema)({
+        resolvers: [user_1.UserResolver, lobby_1.LobbyResolver, game_1.GameResolver],
+        validate: false,
+    });
     const redis = new ioredis_1.Redis();
+    const serverCleanup = (0, ws_2.useServer)({ schema, context: () => redis }, wsServer);
     app.use((0, express_session_1.default)({
         name: constants_1.COOKIE_NAME,
         store: new connect_redis_1.default({
@@ -74,10 +88,23 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         saveUninitialized: false,
     }));
     const apolloServer = new server_1.ApolloServer({
-        schema: yield (0, type_graphql_1.buildSchema)({
-            resolvers: [user_1.UserResolver, lobby_1.LobbyResolver, game_1.GameResolver],
-            validate: false,
-        }),
+        schema,
+        plugins: [
+            (0, drainHttpServer_1.ApolloServerPluginDrainHttpServer)({ httpServer }),
+            {
+                serverWillStart() {
+                    return __awaiter(this, void 0, void 0, function* () {
+                        return {
+                            drainServer() {
+                                return __awaiter(this, void 0, void 0, function* () {
+                                    yield serverCleanup.dispose();
+                                });
+                            },
+                        };
+                    });
+                },
+            },
+        ],
     });
     yield apolloServer.start();
     app.use("/graphql", (0, cors_1.default)({
@@ -92,7 +119,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             });
         }),
     }));
-    app.listen(port, () => {
+    httpServer.listen(port, () => {
         console.log("> Started server on port", port);
     });
 });

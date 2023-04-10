@@ -1,22 +1,38 @@
 import Heading from "@/components/Heading";
 import NavBar from "@/components/Navbar";
-import { LobbyPlayersDocument } from "@/generated/graphql";
+import {
+  LobbyPlayersDocument,
+  LobbyPlayersQueryDocument,
+} from "@/generated/graphql";
 import { isAuth } from "@/utils/isAuth";
 import { useRouter } from "next/router";
 import React from "react";
-import { useQuery } from "urql";
+import { useQuery, useSubscription } from "urql";
 
 const Lobby: React.FC<{}> = ({}) => {
   const router = useRouter();
-  const [{ data }] = useQuery({
-    query: LobbyPlayersDocument,
+  const [{ data: queryData }] = useQuery({
+    query: LobbyPlayersQueryDocument,
     variables: { uuid: `${router.query.lobbyId}` },
-    requestPolicy: "network-only",
   });
 
-  const lobbyPlayers = data
-    ? data.lobbyPlayers?.map((item) => <div>{item.username}</div>)
-    : null;
+  const [{ data }] = useSubscription({
+    query: LobbyPlayersDocument,
+    variables: { uuid: `${router.query.lobbyId}` },
+  });
+
+  let lobbyPlayers = null;
+  if (queryData && !data) {
+    // first fetch
+    lobbyPlayers = queryData.lobbyPlayersQuery?.map((item) => (
+      <div key={item.id}>{item.username}</div>
+    ));
+  } else if (data) {
+    // second and consecutive fetches
+    lobbyPlayers = data.lobbyPlayers?.map((item) => (
+      <div key={item.id}>{item.username}</div>
+    ));
+  }
 
   isAuth();
 

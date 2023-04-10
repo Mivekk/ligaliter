@@ -16,6 +16,10 @@ import session from "express-session";
 import cors from "cors";
 import { LobbyResolver } from "./resolvers/lobby";
 import { GameResolver } from "./resolvers/game";
+import { createServer } from "http";
+import { WebSocketServer } from "ws";
+import { useServer } from "graphql-ws/lib/use/ws";
+import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
 
 const main = async () => {
   await AppDataSource.initialize();
@@ -23,7 +27,21 @@ const main = async () => {
   const app = express();
   const port = 4000;
 
+  const httpServer = createServer(app);
+
+  const wsServer = new WebSocketServer({
+    server: httpServer,
+    path: "/graphql",
+  });
+
+  const schema = await buildSchema({
+    resolvers: [UserResolver, LobbyResolver, GameResolver],
+    validate: false,
+  });
+
   const redis = new Redis();
+
+  const serverCleanup = useServer({ schema, context: () => redis }, wsServer);
 
   app.use(
     session({
@@ -45,10 +63,19 @@ const main = async () => {
   );
 
   const apolloServer = new ApolloServer<ApolloContext>({
-    schema: await buildSchema({
-      resolvers: [UserResolver, LobbyResolver, GameResolver],
-      validate: false,
-    }),
+    schema,
+    plugins: [
+      ApolloServerPluginDrainHttpServer({ httpServer }),
+      {
+        async serverWillStart() {
+          return {
+            async drainServer() {
+              await serverCleanup.dispose();
+            },
+          };
+        },
+      },
+    ],
   });
 
   await apolloServer.start();
@@ -68,7 +95,7 @@ const main = async () => {
     })
   );
 
-  app.listen(port, () => {
+  httpServer.listen(port, () => {
     console.log("> Started server on port", port);
   });
 };

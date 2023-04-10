@@ -13,6 +13,11 @@ export type LobbyData = {
   players: Array<{ id: number }>;
 };
 
+export type LobbyPlayers = {
+  players: { id: number }[];
+  uuid: string;
+};
+
 declare module "express-session" {
   interface SessionData {
     userId: number;

@@ -20,9 +20,10 @@ const documents = {
     "mutation Logout {\n  logout\n}": types.LogoutDocument,
     "mutation NewLobby($uuid: String!) {\n  newLobby(uuid: $uuid) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}": types.NewLobbyDocument,
     "mutation Register($options: RegisterInput!) {\n  register(options: $options) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}": types.RegisterDocument,
-    "query LobbyPlayers($uuid: String!) {\n  lobbyPlayers(uuid: $uuid) {\n    ...UserFields\n  }\n}": types.LobbyPlayersDocument,
+    "query LobbyPlayersQuery($uuid: String!) {\n  lobbyPlayersQuery(uuid: $uuid) {\n    ...UserFields\n  }\n}": types.LobbyPlayersQueryDocument,
     "query Me {\n  me {\n    ...UserFields\n  }\n}": types.MeDocument,
     "query Users {\n  users {\n    ...UserFields\n  }\n}": types.UsersDocument,
+    "subscription LobbyPlayers($uuid: String!) {\n  lobbyPlayers(uuid: $uuid) {\n    id\n    username\n    email\n    created_at\n    updated_at\n  }\n}": types.LobbyPlayersDocument,
 };
 
 /**
@@ -70,7 +71,7 @@ export function graphql(source: "mutation Register($options: RegisterInput!) {\n
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "query LobbyPlayers($uuid: String!) {\n  lobbyPlayers(uuid: $uuid) {\n    ...UserFields\n  }\n}"): (typeof documents)["query LobbyPlayers($uuid: String!) {\n  lobbyPlayers(uuid: $uuid) {\n    ...UserFields\n  }\n}"];
+export function graphql(source: "query LobbyPlayersQuery($uuid: String!) {\n  lobbyPlayersQuery(uuid: $uuid) {\n    ...UserFields\n  }\n}"): (typeof documents)["query LobbyPlayersQuery($uuid: String!) {\n  lobbyPlayersQuery(uuid: $uuid) {\n    ...UserFields\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -79,6 +80,10 @@ export function graphql(source: "query Me {\n  me {\n    ...UserFields\n  }\n}")
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "query Users {\n  users {\n    ...UserFields\n  }\n}"): (typeof documents)["query Users {\n  users {\n    ...UserFields\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "subscription LobbyPlayers($uuid: String!) {\n  lobbyPlayers(uuid: $uuid) {\n    id\n    username\n    email\n    created_at\n    updated_at\n  }\n}"): (typeof documents)["subscription LobbyPlayers($uuid: String!) {\n  lobbyPlayers(uuid: $uuid) {\n    id\n    username\n    email\n    created_at\n    updated_at\n  }\n}"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

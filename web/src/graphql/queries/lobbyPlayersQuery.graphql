@@ -1,0 +1,5 @@
+query LobbyPlayersQuery($uuid: String!) {
+  lobbyPlayersQuery(uuid: $uuid) {
+    ...UserFields
+  }
+}

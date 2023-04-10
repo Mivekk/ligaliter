@@ -1,5 +1,0 @@
-query LobbyPlayers($uuid: String!) {
-  lobbyPlayers(uuid: $uuid) {
-    ...UserFields
-  }
-}
