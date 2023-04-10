@@ -1,20 +1,21 @@
 import React from "react";
-import Heading from "./Heading";
 
 interface PopupProps {
-  text: string;
-  result: boolean;
+  children: React.ReactNode;
+  active: boolean;
+  onClose: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Popup: React.FC<PopupProps> = ({ text, result }) => {
+const Popup: React.FC<PopupProps> = ({ children, active, onClose }) => {
+  if (!active) {
+    return null;
+  }
+
   return (
-    <div className="absolute top-[10%] left-[50%] w-[30rem] h-[10rem] translate-x-[-50%] bg-plt-two border border-white rounded-md">
-      <div className="ml-3">
-        <Heading>Popup</Heading>
-      </div>
-      <div className="m-2 text-white">{text}</div>
-      <button>Cancel</button>
-      <button>Accept</button>
+    <div>
+      {children}
+      <button onClick={() => onClose(true)}>Accept</button>
+      <button onClick={() => onClose(false)}>Close</button>
     </div>
   );
 };

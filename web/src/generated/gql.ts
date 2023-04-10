@@ -19,6 +19,7 @@ const documents = {
     "mutation Login($options: LoginInput!) {\n  login(options: $options) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}": types.LoginDocument,
     "mutation Logout {\n  logout\n}": types.LogoutDocument,
     "mutation NewLobby($uuid: String!) {\n  newLobby(uuid: $uuid) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}": types.NewLobbyDocument,
+    "mutation QuitLobby($uuid: String!) {\n  quitLobby(uuid: $uuid) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}": types.QuitLobbyDocument,
     "mutation Register($options: RegisterInput!) {\n  register(options: $options) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}": types.RegisterDocument,
     "query LobbyPlayersQuery($uuid: String!) {\n  lobbyPlayersQuery(uuid: $uuid) {\n    ...UserFields\n  }\n}": types.LobbyPlayersQueryDocument,
     "query Me {\n  me {\n    ...UserFields\n  }\n}": types.MeDocument,
@@ -64,6 +65,10 @@ export function graphql(source: "mutation Logout {\n  logout\n}"): (typeof docum
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "mutation NewLobby($uuid: String!) {\n  newLobby(uuid: $uuid) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}"): (typeof documents)["mutation NewLobby($uuid: String!) {\n  newLobby(uuid: $uuid) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "mutation QuitLobby($uuid: String!) {\n  quitLobby(uuid: $uuid) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}"): (typeof documents)["mutation QuitLobby($uuid: String!) {\n  quitLobby(uuid: $uuid) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

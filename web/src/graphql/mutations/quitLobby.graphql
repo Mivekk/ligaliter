@@ -1,0 +1,10 @@
+mutation QuitLobby($uuid: String!) {
+  quitLobby(uuid: $uuid) {
+    error {
+      ...ErrorFields
+    }
+    user {
+      ...UserFields
+    }
+  }
+}

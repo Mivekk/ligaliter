@@ -116,6 +116,44 @@ let LobbyResolver = class LobbyResolver {
             };
         });
     }
+    quitLobby(uuid, { redis, req }, publish) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const userId = req.session.userId;
+            if (!userId) {
+                return {
+                    error: {
+                        field: "session",
+                        message: "session expired",
+                    },
+                };
+            }
+            const user = yield User_1.User.findOneBy({ id: userId });
+            if (!user) {
+                return {
+                    error: {
+                        field: "user",
+                        message: "user doesn't exist",
+                    },
+                };
+            }
+            const lobby = yield redis.get(uuid);
+            if (!lobby) {
+                return {
+                    error: {
+                        field: "uuid",
+                        message: "incorrect uuid",
+                    },
+                };
+            }
+            const lobbyData = JSON.parse(lobby);
+            lobbyData.players = lobbyData.players.filter((item) => item.id !== userId);
+            yield redis.setex(uuid, 3600, JSON.stringify(lobbyData));
+            yield publish({ players: lobbyData.players, uuid });
+            return {
+                user,
+            };
+        });
+    }
 };
 __decorate([
     (0, type_graphql_1.Mutation)(() => user_1.ResponseObject),
@@ -154,6 +192,15 @@ __decorate([
     __metadata("design:paramtypes", [String, Object, Function]),
     __metadata("design:returntype", Promise)
 ], LobbyResolver.prototype, "joinLobby", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(() => user_1.ResponseObject),
+    __param(0, (0, type_graphql_1.Arg)("uuid")),
+    __param(1, (0, type_graphql_1.Ctx)()),
+    __param(2, (0, type_graphql_1.PubSub)(TOPICS.NEW_PLAYER_IN_LOBBY)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object, Function]),
+    __metadata("design:returntype", Promise)
+], LobbyResolver.prototype, "quitLobby", null);
 LobbyResolver = __decorate([
     (0, type_graphql_1.Resolver)()
 ], LobbyResolver);

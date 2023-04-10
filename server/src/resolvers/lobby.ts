@@ -68,6 +68,7 @@ export class LobbyResolver {
     }
 
     const lobbyData = JSON.parse(lobby) as LobbyData;
+
     const players = await Promise.all(
       lobbyData.players.map(
         async (item) => await User.findOneBy({ id: item.id })
@@ -134,6 +135,55 @@ export class LobbyResolver {
     const lobbyData = JSON.parse(lobby) as LobbyData;
 
     lobbyData.players.push({ id: userId });
+
+    await redis.setex(uuid, 3600, JSON.stringify(lobbyData));
+
+    await publish({ players: lobbyData.players, uuid });
+
+    return {
+      user,
+    };
+  }
+
+  @Mutation(() => ResponseObject)
+  async quitLobby(
+    @Arg("uuid") uuid: string,
+    @Ctx() { redis, req }: ApolloContext,
+    @PubSub(TOPICS.NEW_PLAYER_IN_LOBBY) publish: Publisher<LobbyPlayers>
+  ): Promise<ResponseObject> {
+    const userId = req.session.userId;
+    if (!userId) {
+      return {
+        error: {
+          field: "session",
+          message: "session expired",
+        },
+      };
+    }
+
+    const user = await User.findOneBy({ id: userId });
+    if (!user) {
+      return {
+        error: {
+          field: "user",
+          message: "user doesn't exist",
+        },
+      };
+    }
+
+    const lobby = await redis.get(uuid);
+    if (!lobby) {
+      return {
+        error: {
+          field: "uuid",
+          message: "incorrect uuid",
+        },
+      };
+    }
+
+    const lobbyData = JSON.parse(lobby) as LobbyData;
+
+    lobbyData.players = lobbyData.players.filter((item) => item.id !== userId);
 
     await redis.setex(uuid, 3600, JSON.stringify(lobbyData));
 
