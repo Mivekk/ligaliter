@@ -17,7 +17,7 @@ const NavBar: React.FC<NavBarProps> = ({ warnOnLeave }) => {
   const [popupOpen, setPopupOpen] = useState(false);
   const [urlTo, setUrlTo] = useState("/");
 
-  const popupLogic = (path: string) => {
+  const popupTriggered = (path: string) => {
     if (warnOnLeave) {
       setUrlTo(path);
       setPopupOpen(true);
@@ -45,29 +45,34 @@ const NavBar: React.FC<NavBarProps> = ({ warnOnLeave }) => {
       >
         <div>Moj maly popup</div>
       </Popup>
-      <div className="flex absolute flex-row items-center justify-between px-4 w-full h-14 bg-plt-four">
-        <button onClick={() => popupLogic("/")} className="hover:opacity-75">
-          home
+      <div className="flex absolute flex-row items-center justify-between px-6 w-full h-14 text-md bg-darker1 shadow-sm shadow-darker2">
+        <button
+          onClick={() => popupTriggered("/home")}
+          className="hover:opacity-75"
+        >
+          Home
         </button>
         <div className="flex gap-4">
           {data?.me ? (
             <>
-              {data?.me.username}
-              <button onClick={() => popupLogic("/?logout")}>logout</button>
+              Logged as: {data?.me.username}
+              <div>|</div>
+              <button onClick={() => popupTriggered("/?logout")}>Logout</button>
             </>
           ) : (
             <>
               <button
                 className="hover:opacity-75"
-                onClick={() => popupLogic("/login")}
+                onClick={() => popupTriggered("/login")}
               >
-                login
+                Login
               </button>
+              <div>|</div>
               <button
                 className="hover:opacity-75"
-                onClick={() => popupLogic("/register")}
+                onClick={() => popupTriggered("/register")}
               >
-                register
+                Register
               </button>
             </>
           )}

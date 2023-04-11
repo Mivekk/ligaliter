@@ -6,9 +6,7 @@ interface HeadingProps {
 
 const Heading: React.FC<HeadingProps> = ({ children }) => {
   return (
-    <div className="text-4xl font-semibold leading-[3rem] text-white">
-      {children}
-    </div>
+    <div className="text-4xl font-semibold leading-[3rem]">{children}</div>
   );
 };
 

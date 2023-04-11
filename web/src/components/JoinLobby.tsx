@@ -1,23 +1,19 @@
 import { JoinLobbyDocument } from "@/generated/graphql";
 import { Form, Formik } from "formik";
 import { useRouter } from "next/router";
-import React, { Dispatch, SetStateAction } from "react";
+import React from "react";
 import { useMutation } from "urql";
 import Heading from "./Heading";
 import InputField from "./InputField";
 
-interface JoinLobbyProps {
-  setSelectLobby: Dispatch<SetStateAction<boolean>>;
-}
-
-const JoinLobby: React.FC<JoinLobbyProps> = ({ setSelectLobby }) => {
+const JoinLobby: React.FC<{}> = ({}) => {
   const router = useRouter();
   const [, joinLobby] = useMutation(JoinLobbyDocument);
 
   return (
     <div className="flex flex-col">
       <div className="flex justify-center">
-        <Heading>Join lobby</Heading>
+        <Heading>Join lobby!</Heading>
       </div>
       <Formik
         initialValues={{ uuid: "" }}
@@ -32,29 +28,21 @@ const JoinLobby: React.FC<JoinLobbyProps> = ({ setSelectLobby }) => {
         }}
       >
         {({ values, handleChange }) => (
-          <Form>
+          <Form className="flex flex-col">
             <InputField
               type="text"
               name="uuid"
-              placeholder="xxxxx-xxx-xxxxx-xxxx"
-              label="Lobby UUID"
+              placeholder="xxxxxx"
+              label="Lobby ID"
               value={values.uuid}
               onChange={handleChange}
             />
-            <div className="flex mt-1.5 justify-between">
-              <button
-                type="submit"
-                className="w-28 h-8 bg-plt-one hover:opacity-75 text-white"
-              >
-                Join
-              </button>
-              <div
-                className="text-plt-one cursor-pointer"
-                onClick={() => setSelectLobby(true)}
-              >
-                Go back
-              </div>
-            </div>
+            <button
+              type="submit"
+              className="w-36 h-10 rounded-xl bg-utility hover:opacity-75 text-white mt-4 self-center"
+            >
+              Join lobby
+            </button>
           </Form>
         )}
       </Formik>

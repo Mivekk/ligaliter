@@ -1,5 +1,6 @@
 import Heading from "@/components/Heading";
 import NavBar from "@/components/Navbar";
+import Wrapper from "@/components/Wrapper";
 import {
   LobbyPlayersDocument,
   LobbyPlayersQueryDocument,
@@ -42,34 +43,31 @@ const Lobby: React.FC<{}> = ({}) => {
   isAuth();
 
   return (
-    <>
-      <NavBar warnOnLeave />
-      <div className="flex w-full h-screen items-center justify-center bg-plt-four">
-        <div className="flex items-center justify-center w-[50rem] h-[26rem] bg-plt-three rounded-md gap-2.5">
-          <div className="w-[24rem] h-[25rem] border border-black rounded-md p-4">
-            <Heading>Players:</Heading>
-            {lobbyPlayers}
-          </div>
-          <div className="w-[24rem] h-[25rem] border border-black rounded-md p-4">
-            <Heading>Settings:</Heading>
-            <button className="w-28 h-8 bg-plt-one hover:opacity-75 text-white">
-              Start game
-            </button>
-            <br />
-            <br />
-            <button
-              className="w-28 h-8 bg-plt-one hover:opacity-75 text-white"
-              onClick={() => {
-                quitLobby({ uuid: lobbyUUID as string });
-                router.push("/");
-              }}
-            >
-              Leave lobby
-            </button>
-          </div>
+    <Wrapper>
+      <div className="flex items-center justify-center w-[50rem] h-[26rem] bg-secondary rounded-md gap-2.5 shadow-xl">
+        <div className="w-[24rem] h-[25rem] rounded-md">
+          <Heading>Players:</Heading>
+          {lobbyPlayers}
+        </div>
+        <div className="w-[24rem] h-[25rem] rounded-md">
+          <Heading>Settings:</Heading>
+          <button className="w-28 h-8 bg-[#BC4749] hover:opacity-75 text-white">
+            Start game
+          </button>
+          <br />
+          <br />
+          <button
+            className="w-28 h-8 bg-[#BC4749] hover:opacity-75 text-white"
+            onClick={() => {
+              quitLobby({ uuid: lobbyUUID as string });
+              router.push("/home");
+            }}
+          >
+            Leave lobby
+          </button>
         </div>
       </div>
-    </>
+    </Wrapper>
   );
 };
 
