@@ -5,6 +5,7 @@ import React from "react";
 import { useMutation } from "urql";
 import Heading from "./Heading";
 import InputField from "./InputField";
+import Button from "./Button";
 
 const JoinLobby: React.FC<{}> = ({}) => {
   const router = useRouter();
@@ -17,17 +18,17 @@ const JoinLobby: React.FC<{}> = ({}) => {
       </div>
       <Formik
         initialValues={{ uuid: "" }}
-        onSubmit={async (values) => {
+        onSubmit={async (values, { setErrors }) => {
           const result = await joinLobby({ uuid: values.uuid });
 
           if (result.data?.joinLobby.error) {
-            // display error
+            setErrors({ uuid: result.data.joinLobby.error.message });
           } else {
             router.push(`/lobby/${values.uuid}`);
           }
         }}
       >
-        {({ values, handleChange }) => (
+        {({ values, handleChange, errors }) => (
           <Form className="flex flex-col">
             <InputField
               type="text"
@@ -36,13 +37,11 @@ const JoinLobby: React.FC<{}> = ({}) => {
               label="Lobby ID"
               value={values.uuid}
               onChange={handleChange}
+              error={errors.uuid}
             />
-            <button
-              type="submit"
-              className="w-36 h-10 rounded-xl bg-utility hover:opacity-75 text-white mt-4 self-center"
-            >
-              Join lobby
-            </button>
+            <div className="self-center">
+              <Button type="submit">Join lobby</Button>
+            </div>
           </Form>
         )}
       </Formik>

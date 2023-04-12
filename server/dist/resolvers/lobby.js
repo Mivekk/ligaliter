@@ -147,8 +147,13 @@ let LobbyResolver = class LobbyResolver {
             }
             const lobbyData = JSON.parse(lobby);
             lobbyData.players = lobbyData.players.filter((item) => item.id !== userId);
-            yield redis.setex(uuid, 3600, JSON.stringify(lobbyData));
-            yield publish({ players: lobbyData.players, uuid });
+            if (lobbyData.players.length > 0) {
+                yield redis.setex(uuid, 3600, JSON.stringify(lobbyData));
+                yield publish({ players: lobbyData.players, uuid });
+            }
+            else {
+                yield redis.del(uuid);
+            }
             return {
                 user,
             };

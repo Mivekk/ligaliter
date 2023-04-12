@@ -8,7 +8,7 @@ const Index: React.FC<{}> = ({}) => {
 
   return (
     <div className="flex flex-col w-full h-screen items-center justify-center bg-main">
-      <div className="text-[#F4F9EA] text-8xl font-home font-bold -translate-y-8">
+      <div className="text-white text-8xl font-home font-bold -translate-y-8 drop-shadow-md">
         <div className="rotate-[3deg]">LIGA</div>
         <div className="rotate-[-10deg]">LITER</div>
       </div>

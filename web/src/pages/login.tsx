@@ -1,3 +1,4 @@
+import Button from "@/components/Button";
 import Heading from "@/components/Heading";
 import InputField from "@/components/InputField";
 import NavBar from "@/components/Navbar";
@@ -19,13 +20,21 @@ const Login: React.FC<{}> = ({}) => {
         <Heading>Login</Heading>
         <Formik
           initialValues={{ username: "", password: "" }}
-          onSubmit={async (values) => {
-            await login({ options: values });
+          onSubmit={async (values, { setErrors }) => {
+            const response = await login({ options: values });
 
-            router.replace("/home");
+            if (response.data?.login.error) {
+              const errorMap: Record<string, string> = {};
+              errorMap[response.data.login.error.field.toString()] =
+                response.data.login.error.message.toString();
+
+              setErrors(errorMap);
+            } else {
+              router.replace("/home");
+            }
           }}
         >
-          {({ values, handleChange }) => (
+          {({ values, handleChange, errors, isSubmitting }) => (
             <Form className="flex flex-col gap-4 mt-8">
               <InputField
                 type="text"
@@ -34,6 +43,7 @@ const Login: React.FC<{}> = ({}) => {
                 label="Username"
                 value={values.username}
                 onChange={handleChange}
+                error={errors.username}
               />
               <InputField
                 type="password"
@@ -42,11 +52,10 @@ const Login: React.FC<{}> = ({}) => {
                 label="Password"
                 value={values.password}
                 onChange={handleChange}
+                error={errors.password}
               />
               <div className="flex justify-between">
-                <button className="w-28 h-8 bg-utility hover:opacity-75 text-white">
-                  Login
-                </button>
+                <Button type="submit">Login</Button>
                 <div>
                   <div>Don't have an account?</div>
                   <Link href="/register" className="text-utility">

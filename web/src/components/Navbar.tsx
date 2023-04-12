@@ -45,7 +45,7 @@ const NavBar: React.FC<NavBarProps> = ({ warnOnLeave }) => {
       >
         <div>Moj maly popup</div>
       </Popup>
-      <div className="flex absolute flex-row items-center justify-between px-6 w-full h-14 text-md bg-darker1 shadow-sm shadow-darker2">
+      <div className="flex absolute flex-row items-center justify-between px-6 w-full h-14 text-md bg-darker1 shadow-sm shadow-darker2 text-white">
         <button
           onClick={() => popupTriggered("/home")}
           className="hover:opacity-75"

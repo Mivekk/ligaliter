@@ -1,3 +1,4 @@
+import Button from "@/components/Button";
 import Heading from "@/components/Heading";
 import InputField from "@/components/InputField";
 import NavBar from "@/components/Navbar";
@@ -19,13 +20,21 @@ const Register: React.FC<{}> = ({}) => {
         <Heading>Register</Heading>
         <Formik
           initialValues={{ username: "", email: "", password: "" }}
-          onSubmit={async (values) => {
-            await register({ options: values });
+          onSubmit={async (values, { setErrors }) => {
+            const response = await register({ options: values });
 
-            router.replace("/home");
+            if (response.data?.register.error) {
+              const errorMap: Record<string, string> = {};
+              errorMap[response.data.register.error.field.toString()] =
+                response.data.register.error.message.toString();
+
+              setErrors(errorMap);
+            } else {
+              router.replace("/home");
+            }
           }}
         >
-          {({ values, handleChange }) => (
+          {({ values, handleChange, errors }) => (
             <Form className="flex flex-col gap-4 mt-8">
               <InputField
                 type="text"
@@ -34,6 +43,7 @@ const Register: React.FC<{}> = ({}) => {
                 label="Username"
                 value={values.username}
                 onChange={handleChange}
+                error={errors.username}
               />
               <InputField
                 type="text"
@@ -42,6 +52,7 @@ const Register: React.FC<{}> = ({}) => {
                 label="Email"
                 value={values.email}
                 onChange={handleChange}
+                error={errors.email}
               />
               <InputField
                 type="password"
@@ -50,14 +61,10 @@ const Register: React.FC<{}> = ({}) => {
                 label="Password"
                 value={values.password}
                 onChange={handleChange}
+                error={errors.password}
               />
               <div className="flex justify-between">
-                <button
-                  type="submit"
-                  className="w-28 h-8 bg-utility hover:opacity-75 text-white"
-                >
-                  Register
-                </button>
+                <Button type="submit">Register</Button>
                 <div>
                   <div>Already have an account?</div>
                   <Link href="/login" className="text-utility">

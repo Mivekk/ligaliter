@@ -185,9 +185,14 @@ export class LobbyResolver {
 
     lobbyData.players = lobbyData.players.filter((item) => item.id !== userId);
 
-    await redis.setex(uuid, 3600, JSON.stringify(lobbyData));
+    if (lobbyData.players.length > 0) {
+      await redis.setex(uuid, 3600, JSON.stringify(lobbyData));
 
-    await publish({ players: lobbyData.players, uuid });
+      await publish({ players: lobbyData.players, uuid });
+    } else {
+      // delete key if lobby is empty
+      await redis.del(uuid);
+    }
 
     return {
       user,
