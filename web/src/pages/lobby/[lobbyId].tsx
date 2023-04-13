@@ -17,6 +17,8 @@ const Lobby: React.FC<{}> = ({}) => {
   const router = useRouter();
   const lobbyUUID = router.query.lobbyId;
 
+  const [{ data: meData }] = useQuery({ query: MeDocument });
+
   const [{ data: queryData }] = useQuery({
     query: LobbyPlayersQueryDocument,
     variables: { uuid: lobbyUUID as string },
@@ -31,7 +33,7 @@ const Lobby: React.FC<{}> = ({}) => {
 
   const [, newGame] = useMutation(NewGameDocument);
 
-  const initialPlayers = queryData?.lobbyPlayersQuery?.map((item) => (
+  const initialPlayers = queryData?.lobbyPlayersQuery?.players?.map((item) => (
     <div key={item.id} className="text-xl">
       {item.username}
     </div>
@@ -49,6 +51,8 @@ const Lobby: React.FC<{}> = ({}) => {
     router.push(`/game/${lobbyUUID}`);
   }
 
+  const isOwner = queryData?.lobbyPlayersQuery.owner?.id === meData?.me?.id;
+
   isAuth();
 
   return (
@@ -61,6 +65,7 @@ const Lobby: React.FC<{}> = ({}) => {
             onClick={async () => {
               const response = await newGame({ uuid: lobbyUUID as string });
             }}
+            disabled={isOwner ? false : true}
           >
             Start game
           </Button>

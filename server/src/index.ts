@@ -56,7 +56,7 @@ const main = async () => {
         sameSite: "lax",
         secure: false,
       },
-      secret: "ugabugahehe",
+      secret: process.env.COOKIE_SECRET,
       resave: false,
       saveUninitialized: false,
     })

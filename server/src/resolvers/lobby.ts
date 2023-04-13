@@ -21,6 +21,15 @@ export enum TOPICS {
 }
 
 @ObjectType()
+class LobbyQueryResponseObject {
+  @Field(() => [User], { nullable: true })
+  players: User[] | null;
+
+  @Field(() => User, { nullable: true })
+  owner: User | null;
+}
+
+@ObjectType()
 class LobbyReponseObject {
   @Field(() => [User], { nullable: true })
   players: User[] | null;
@@ -69,25 +78,23 @@ export class LobbyResolver {
     };
   }
 
-  @Query(() => [User], { nullable: true })
+  @Query(() => LobbyQueryResponseObject)
   async lobbyPlayersQuery(
     @Arg("uuid") uuid: string,
     @Ctx() { redis }: ApolloContext
-  ): Promise<User[] | null> {
+  ): Promise<LobbyQueryResponseObject> {
     const lobby = await redis.get(uuid);
     if (!lobby) {
-      return null;
+      return { players: null, owner: null };
     }
 
     const lobbyData = JSON.parse(lobby) as LobbyData;
 
-    const players = await Promise.all(
-      lobbyData.players.map(
-        async (item) => await User.findOneBy({ id: item.id })
-      )
-    ).then((res) => res.filter((item) => item !== null));
+    const players = await playerIdToUser(lobbyData.players);
 
-    return players as User[];
+    const owner = players.find((item) => item.id === lobbyData.owner) as User;
+
+    return { players, owner };
   }
 
   @Subscription(() => LobbyReponseObject, {
@@ -140,6 +147,15 @@ export class LobbyResolver {
     }
 
     const lobbyData = JSON.parse(lobby) as LobbyData;
+
+    if (lobbyData.players.find((item) => item.id === user.id)) {
+      return {
+        error: {
+          field: "session",
+          message: "already in lobby",
+        },
+      };
+    }
 
     lobbyData.players.push({ id: userId });
 

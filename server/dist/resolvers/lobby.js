@@ -30,6 +30,19 @@ var TOPICS;
 (function (TOPICS) {
     TOPICS["NEW_PLAYER_IN_LOBBY"] = "NEW_PLAYER_IN_LOBBY";
 })(TOPICS = exports.TOPICS || (exports.TOPICS = {}));
+let LobbyQueryResponseObject = class LobbyQueryResponseObject {
+};
+__decorate([
+    (0, type_graphql_1.Field)(() => [User_1.User], { nullable: true }),
+    __metadata("design:type", Object)
+], LobbyQueryResponseObject.prototype, "players", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(() => User_1.User, { nullable: true }),
+    __metadata("design:type", Object)
+], LobbyQueryResponseObject.prototype, "owner", void 0);
+LobbyQueryResponseObject = __decorate([
+    (0, type_graphql_1.ObjectType)()
+], LobbyQueryResponseObject);
 let LobbyReponseObject = class LobbyReponseObject {
 };
 __decorate([
@@ -79,11 +92,12 @@ let LobbyResolver = class LobbyResolver {
         return __awaiter(this, void 0, void 0, function* () {
             const lobby = yield redis.get(uuid);
             if (!lobby) {
-                return null;
+                return { players: null, owner: null };
             }
             const lobbyData = JSON.parse(lobby);
-            const players = yield Promise.all(lobbyData.players.map((item) => __awaiter(this, void 0, void 0, function* () { return yield User_1.User.findOneBy({ id: item.id }); }))).then((res) => res.filter((item) => item !== null));
-            return players;
+            const players = yield (0, playerIdToUser_1.playerIdToUser)(lobbyData.players);
+            const owner = players.find((item) => item.id === lobbyData.owner);
+            return { players, owner };
         });
     }
     lobbyPlayers(lobbyPlayersPayload, _uuid) {
@@ -122,6 +136,14 @@ let LobbyResolver = class LobbyResolver {
                 };
             }
             const lobbyData = JSON.parse(lobby);
+            if (lobbyData.players.find((item) => item.id === user.id)) {
+                return {
+                    error: {
+                        field: "session",
+                        message: "already in lobby",
+                    },
+                };
+            }
             lobbyData.players.push({ id: userId });
             yield redis.setex(uuid, 3600, JSON.stringify(lobbyData));
             yield publish({ players: lobbyData.players, uuid, started: false });
@@ -183,7 +205,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], LobbyResolver.prototype, "newLobby", null);
 __decorate([
-    (0, type_graphql_1.Query)(() => [User_1.User], { nullable: true }),
+    (0, type_graphql_1.Query)(() => LobbyQueryResponseObject),
     __param(0, (0, type_graphql_1.Arg)("uuid")),
     __param(1, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),

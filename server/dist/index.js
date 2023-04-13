@@ -83,7 +83,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             sameSite: "lax",
             secure: false,
         },
-        secret: "ugabugahehe",
+        secret: process.env.COOKIE_SECRET,
         resave: false,
         saveUninitialized: false,
     }));
