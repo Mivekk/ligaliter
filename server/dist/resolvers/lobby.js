@@ -21,14 +21,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LobbyResolver = void 0;
+exports.LobbyResolver = exports.TOPICS = void 0;
 const type_graphql_1 = require("type-graphql");
 const User_1 = require("../entities/User");
 const user_1 = require("./user");
+const playerIdToUser_1 = require("../utils/playerIdToUser");
 var TOPICS;
 (function (TOPICS) {
     TOPICS["NEW_PLAYER_IN_LOBBY"] = "NEW_PLAYER_IN_LOBBY";
-})(TOPICS || (TOPICS = {}));
+})(TOPICS = exports.TOPICS || (exports.TOPICS = {}));
+let LobbyReponseObject = class LobbyReponseObject {
+};
+__decorate([
+    (0, type_graphql_1.Field)(() => [User_1.User], { nullable: true }),
+    __metadata("design:type", Object)
+], LobbyReponseObject.prototype, "players", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(() => Boolean),
+    __metadata("design:type", Boolean)
+], LobbyReponseObject.prototype, "started", void 0);
+LobbyReponseObject = __decorate([
+    (0, type_graphql_1.ObjectType)()
+], LobbyReponseObject);
 let LobbyResolver = class LobbyResolver {
     newLobby(uuid, { req, redis }) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -74,8 +88,8 @@ let LobbyResolver = class LobbyResolver {
     }
     lobbyPlayers(lobbyPlayersPayload, _uuid) {
         return __awaiter(this, void 0, void 0, function* () {
-            const players = yield Promise.all(lobbyPlayersPayload.players.map((item) => __awaiter(this, void 0, void 0, function* () { return yield User_1.User.findOneBy({ id: item.id }); }))).then((res) => res.filter((item) => item !== null));
-            return players;
+            const players = yield (0, playerIdToUser_1.playerIdToUser)(lobbyPlayersPayload.players);
+            return { players: players, started: lobbyPlayersPayload.started };
         });
     }
     joinLobby(uuid, { req, redis }, publish) {
@@ -110,7 +124,7 @@ let LobbyResolver = class LobbyResolver {
             const lobbyData = JSON.parse(lobby);
             lobbyData.players.push({ id: userId });
             yield redis.setex(uuid, 3600, JSON.stringify(lobbyData));
-            yield publish({ players: lobbyData.players, uuid });
+            yield publish({ players: lobbyData.players, uuid, started: false });
             return {
                 user,
             };
@@ -149,7 +163,7 @@ let LobbyResolver = class LobbyResolver {
             lobbyData.players = lobbyData.players.filter((item) => item.id !== userId);
             if (lobbyData.players.length > 0) {
                 yield redis.setex(uuid, 3600, JSON.stringify(lobbyData));
-                yield publish({ players: lobbyData.players, uuid });
+                yield publish({ players: lobbyData.players, uuid, started: false });
             }
             else {
                 yield redis.del(uuid);
@@ -177,8 +191,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], LobbyResolver.prototype, "lobbyPlayersQuery", null);
 __decorate([
-    (0, type_graphql_1.Subscription)(() => [User_1.User], {
-        nullable: true,
+    (0, type_graphql_1.Subscription)(() => LobbyReponseObject, {
         topics: TOPICS.NEW_PLAYER_IN_LOBBY,
         filter: ({ payload, args }) => payload.uuid === args.uuid,
     }),

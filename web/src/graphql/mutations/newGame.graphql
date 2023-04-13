@@ -1,0 +1,7 @@
+mutation NewGame($uuid: String!) {
+  newGame(uuid: $uuid) {
+    players {
+      id
+    }
+  }
+}

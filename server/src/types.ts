@@ -16,6 +16,7 @@ export type LobbyData = {
 export type LobbyPlayers = {
   players: { id: number }[];
   uuid: string;
+  started: boolean;
 };
 
 declare module "express-session" {

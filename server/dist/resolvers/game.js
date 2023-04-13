@@ -23,25 +23,51 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameResolver = void 0;
 const type_graphql_1 = require("type-graphql");
-const user_1 = require("./user");
+const lobby_1 = require("./lobby");
+const Game_1 = require("../entities/Game");
+const playerIdToUser_1 = require("../utils/playerIdToUser");
+let PlayerIdsFormat = class PlayerIdsFormat {
+};
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", Number)
+], PlayerIdsFormat.prototype, "id", void 0);
+PlayerIdsFormat = __decorate([
+    (0, type_graphql_1.ObjectType)()
+], PlayerIdsFormat);
+let GameResponseObject = class GameResponseObject {
+};
+__decorate([
+    (0, type_graphql_1.Field)(() => [PlayerIdsFormat]),
+    __metadata("design:type", Array)
+], GameResponseObject.prototype, "players", void 0);
+GameResponseObject = __decorate([
+    (0, type_graphql_1.ObjectType)()
+], GameResponseObject);
 let GameResolver = class GameResolver {
-    newGame(_uuid) {
+    newGame(uuid, { redis }, publish) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log("nowa gra");
+            const lobbyID = yield redis.get(uuid);
+            if (!lobbyID) {
+                return null;
+            }
+            const lobbyData = JSON.parse(lobbyID);
+            const players = yield (0, playerIdToUser_1.playerIdToUser)(lobbyData.players);
+            yield Game_1.Game.create({ players }).save();
+            yield publish({ players: lobbyData.players, uuid, started: true });
             return {
-                error: {
-                    field: "",
-                    message: "",
-                },
+                players: lobbyData.players,
             };
         });
     }
 };
 __decorate([
-    (0, type_graphql_1.Mutation)(() => user_1.ResponseObject),
+    (0, type_graphql_1.Mutation)(() => GameResponseObject, { nullable: true }),
     __param(0, (0, type_graphql_1.Arg)("uuid")),
+    __param(1, (0, type_graphql_1.Ctx)()),
+    __param(2, (0, type_graphql_1.PubSub)(lobby_1.TOPICS.NEW_PLAYER_IN_LOBBY)),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, Object, Function]),
     __metadata("design:returntype", Promise)
 ], GameResolver.prototype, "newGame", null);
 GameResolver = __decorate([

@@ -5,6 +5,7 @@ import {
   LobbyPlayersDocument,
   LobbyPlayersQueryDocument,
   MeDocument,
+  NewGameDocument,
   QuitLobbyDocument,
 } from "@/generated/graphql";
 import { isAuth } from "@/utils/isAuth";
@@ -21,28 +22,31 @@ const Lobby: React.FC<{}> = ({}) => {
     variables: { uuid: lobbyUUID as string },
   });
 
-  const [, quitLobby] = useMutation(QuitLobbyDocument);
-
-  const [{ data }] = useSubscription({
+  const [{ data: subscriptionData }] = useSubscription({
     query: LobbyPlayersDocument,
     variables: { uuid: lobbyUUID as string },
   });
 
-  let lobbyPlayers = null;
-  if (queryData && !data) {
-    // first fetch
-    lobbyPlayers = queryData.lobbyPlayersQuery?.map((item) => (
+  const [, quitLobby] = useMutation(QuitLobbyDocument);
+
+  const [, newGame] = useMutation(NewGameDocument);
+
+  const initialPlayers = queryData?.lobbyPlayersQuery?.map((item) => (
+    <div key={item.id} className="text-xl">
+      {item.username}
+    </div>
+  ));
+
+  const subsequentPlayers = subscriptionData?.lobbyPlayers?.players?.map(
+    (item) => (
       <div key={item.id} className="text-xl">
         {item.username}
       </div>
-    ));
-  } else if (data) {
-    // second and consecutive fetches
-    lobbyPlayers = data.lobbyPlayers?.map((item) => (
-      <div key={item.id} className="text-xl">
-        {item.username}
-      </div>
-    ));
+    )
+  );
+
+  if (subscriptionData?.lobbyPlayers.started) {
+    router.push(`/game/${lobbyUUID}`);
   }
 
   isAuth();
@@ -51,12 +55,18 @@ const Lobby: React.FC<{}> = ({}) => {
     <Wrapper>
       <div className="flex flex-col items-center justify-center w-[50rem] h-[26rem] bg-secondary rounded-md gap-2.5 shadow-xl">
         <Heading>Players:</Heading>
-        {lobbyPlayers}
+        {subsequentPlayers ? subsequentPlayers : initialPlayers}
         <div className="flex gap-2">
-          <Button>Start game</Button>
           <Button
-            onClick={() => {
-              quitLobby({ uuid: lobbyUUID as string });
+            onClick={async () => {
+              const response = await newGame({ uuid: lobbyUUID as string });
+            }}
+          >
+            Start game
+          </Button>
+          <Button
+            onClick={async () => {
+              await quitLobby({ uuid: lobbyUUID as string });
               router.push("/home");
             }}
           >

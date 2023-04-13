@@ -1,7 +1,9 @@
 import {
   Arg,
   Ctx,
+  Field,
   Mutation,
+  ObjectType,
   PubSub,
   Publisher,
   Query,
@@ -12,9 +14,19 @@ import {
 import { User } from "../entities/User";
 import { ApolloContext, LobbyData, LobbyPlayers } from "../types";
 import { ResponseObject } from "./user";
+import { playerIdToUser } from "../utils/playerIdToUser";
 
-enum TOPICS {
+export enum TOPICS {
   NEW_PLAYER_IN_LOBBY = "NEW_PLAYER_IN_LOBBY",
+}
+
+@ObjectType()
+class LobbyReponseObject {
+  @Field(() => [User], { nullable: true })
+  players: User[] | null;
+
+  @Field(() => Boolean)
+  started: boolean;
 }
 
 @Resolver()
@@ -78,22 +90,17 @@ export class LobbyResolver {
     return players as User[];
   }
 
-  @Subscription(() => [User], {
-    nullable: true,
+  @Subscription(() => LobbyReponseObject, {
     topics: TOPICS.NEW_PLAYER_IN_LOBBY,
     filter: ({ payload, args }) => payload.uuid === args.uuid,
   })
   async lobbyPlayers(
     @Root() lobbyPlayersPayload: LobbyPlayers,
     @Arg("uuid") _uuid: string
-  ): Promise<User[] | null> {
-    const players = await Promise.all(
-      lobbyPlayersPayload.players.map(
-        async (item) => await User.findOneBy({ id: item.id })
-      )
-    ).then((res) => res.filter((item) => item !== null));
+  ): Promise<LobbyReponseObject> {
+    const players = await playerIdToUser(lobbyPlayersPayload.players);
 
-    return players as User[];
+    return { players: players as User[], started: lobbyPlayersPayload.started };
   }
 
   @Mutation(() => ResponseObject)
@@ -138,7 +145,7 @@ export class LobbyResolver {
 
     await redis.setex(uuid, 3600, JSON.stringify(lobbyData));
 
-    await publish({ players: lobbyData.players, uuid });
+    await publish({ players: lobbyData.players, uuid, started: false });
 
     return {
       user,
@@ -188,7 +195,7 @@ export class LobbyResolver {
     if (lobbyData.players.length > 0) {
       await redis.setex(uuid, 3600, JSON.stringify(lobbyData));
 
-      await publish({ players: lobbyData.players, uuid });
+      await publish({ players: lobbyData.players, uuid, started: false });
     } else {
       // delete key if lobby is empty
       await redis.del(uuid);
