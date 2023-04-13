@@ -1,10 +1,11 @@
 import Button from "@/components/Button";
 import Heading from "@/components/Heading";
 import InputField from "@/components/InputField";
-import NavBar from "@/components/Navbar";
 import Wrapper from "@/components/Wrapper";
 import { RegisterDocument } from "@/generated/graphql";
+import { createUrqlClient } from "@/utils/createUrqlClient";
 import { Form, Formik } from "formik";
+import { withUrqlClient } from "next-urql";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
@@ -80,4 +81,4 @@ const Register: React.FC<{}> = ({}) => {
   );
 };
 
-export default Register;
+export default withUrqlClient(createUrqlClient)(Register);

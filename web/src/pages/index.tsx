@@ -1,10 +1,17 @@
 import { MeDocument } from "@/generated/graphql";
 import { useQuery } from "urql";
 import { useRouter } from "next/router";
+import { withUrqlClient } from "next-urql";
+import { createUrqlClient } from "@/utils/createUrqlClient";
 
 const Index: React.FC<{}> = ({}) => {
   const router = useRouter();
-  const [{ data, fetching }] = useQuery({ query: MeDocument });
+  const [{ data, fetching }] = useQuery({
+    query: MeDocument,
+    requestPolicy: "cache-and-network",
+  });
+
+  console.log(data);
 
   return (
     <div className="flex flex-col w-full h-screen items-center justify-center bg-main">
@@ -28,4 +35,4 @@ const Index: React.FC<{}> = ({}) => {
   );
 };
 
-export default Index;
+export default withUrqlClient(createUrqlClient, { ssr: true })(Index);

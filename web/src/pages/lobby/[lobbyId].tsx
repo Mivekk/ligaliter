@@ -12,6 +12,8 @@ import { isAuth } from "@/utils/isAuth";
 import { useRouter } from "next/router";
 import React from "react";
 import { useMutation, useQuery, useSubscription } from "urql";
+import { withUrqlClient } from "next-urql";
+import { createUrqlClient } from "@/utils/createUrqlClient";
 
 const Lobby: React.FC<{}> = ({}) => {
   const router = useRouter();
@@ -83,4 +85,4 @@ const Lobby: React.FC<{}> = ({}) => {
   );
 };
 
-export default Lobby;
+export default withUrqlClient(createUrqlClient)(Lobby);

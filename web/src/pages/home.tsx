@@ -3,6 +3,8 @@ import JoinLobby from "@/components/JoinLobby";
 import Wrapper from "@/components/Wrapper";
 import { isAuth } from "@/utils/isAuth";
 import React, { useState } from "react";
+import { withUrqlClient } from "next-urql";
+import { createUrqlClient } from "@/utils/createUrqlClient";
 
 const Home: React.FC<{}> = ({}) => {
   const [isCreatingLobby, setIsCreatingLobby] = useState(true);
@@ -38,4 +40,4 @@ const Home: React.FC<{}> = ({}) => {
   );
 };
 
-export default Home;
+export default withUrqlClient(createUrqlClient, { ssr: true })(Home);
