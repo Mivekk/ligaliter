@@ -17,18 +17,18 @@ import { createUrqlClient } from "@/utils/createUrqlClient";
 
 const Lobby: React.FC<{}> = ({}) => {
   const router = useRouter();
-  const lobbyUUID = router.query.lobbyId;
+  const lobbyUUID = router.query.lobbyId as string;
 
   const [{ data: meData }] = useQuery({ query: MeDocument });
 
   const [{ data: queryData }] = useQuery({
     query: LobbyPlayersQueryDocument,
-    variables: { uuid: lobbyUUID as string },
+    variables: { uuid: lobbyUUID },
   });
 
   const [{ data: subscriptionData }] = useSubscription({
     query: LobbyPlayersDocument,
-    variables: { uuid: lobbyUUID as string },
+    variables: { uuid: lobbyUUID },
   });
 
   const [, quitLobby] = useMutation(QuitLobbyDocument);
@@ -54,6 +54,7 @@ const Lobby: React.FC<{}> = ({}) => {
   }
 
   const isOwner = queryData?.lobbyPlayersQuery.owner?.id === meData?.me?.id;
+  console.log(isOwner);
 
   isAuth();
 
@@ -65,7 +66,7 @@ const Lobby: React.FC<{}> = ({}) => {
         <div className="flex gap-2">
           <Button
             onClick={async () => {
-              const response = await newGame({ uuid: lobbyUUID as string });
+              const response = await newGame({ uuid: lobbyUUID });
             }}
             disabled={isOwner ? false : true}
           >
@@ -73,7 +74,7 @@ const Lobby: React.FC<{}> = ({}) => {
           </Button>
           <Button
             onClick={async () => {
-              await quitLobby({ uuid: lobbyUUID as string });
+              await quitLobby({ uuid: lobbyUUID });
               router.push("/home");
             }}
           >

@@ -1,5 +1,5 @@
 import CreateLobby from "@/components/CreateLobby";
-import JoinLobby from "@/components/JoinLobby";
+import JoinLobby from "@/components/lobby/JoinLobby";
 import Wrapper from "@/components/Wrapper";
 import { isAuth } from "@/utils/isAuth";
 import React, { useState } from "react";

@@ -11,8 +11,6 @@ const Index: React.FC<{}> = ({}) => {
     requestPolicy: "cache-and-network",
   });
 
-  console.log(data);
-
   return (
     <div className="flex flex-col w-full h-screen items-center justify-center bg-main">
       <div className="text-white text-8xl font-home font-bold -translate-y-8 drop-shadow-md">

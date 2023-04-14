@@ -3,9 +3,9 @@ import { Form, Formik } from "formik";
 import { useRouter } from "next/router";
 import React from "react";
 import { useMutation } from "urql";
-import Heading from "./Heading";
+import Heading from "../Heading";
 import InputField from "./InputField";
-import Button from "./Button";
+import Button from "../Button";
 
 const JoinLobby: React.FC<{}> = ({}) => {
   const router = useRouter();
