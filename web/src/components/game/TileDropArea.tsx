@@ -3,13 +3,13 @@ import { useDrop } from "react-dnd";
 
 import { HandleDropType } from "@/types";
 
-interface TileOverlayProps {
+interface TileDropAreaProps {
   children: React.ReactNode;
   id: number;
   handleDrop: (params: HandleDropType) => void;
 }
 
-const TileOverlay: React.FC<TileOverlayProps> = ({
+const TileDropArea: React.FC<TileDropAreaProps> = ({
   children,
   id,
   ...props
@@ -26,11 +26,13 @@ const TileOverlay: React.FC<TileOverlayProps> = ({
     },
   });
 
+  console.log("TileDropArea");
+
   return (
-    <div ref={drop} className={"border-8"}>
+    <div ref={drop} className={"border-8 border-transparent"}>
       {children}
     </div>
   );
 };
 
-export default TileOverlay;
+export default TileDropArea;

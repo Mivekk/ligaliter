@@ -15,6 +15,12 @@ module.exports = {
         home: ['"DynaPuff"', "cursive"],
         main: ['"Mukta"', "sans-serif"],
       },
+      gridTemplateColumns: {
+        19: "repeat(19, minmax(0, 1fr))",
+      },
+      gridTemplateRows: {
+        19: "repeat(19, minmax(0, 1fr))",
+      },
     },
   },
   plugins: [],

@@ -106,7 +106,7 @@ const Board: React.FC<{}> = () => {
   ));
 
   return (
-    <div className="flex gap-[0.125rem] flex-wrap max-w-[49.75rem]">
+    <div className="grid grid-rows-19 grid-cols-19 gap-[0.125rem]">
       {tilesElements}
     </div>
   );

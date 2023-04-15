@@ -13,7 +13,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isValid, playPointCount }) => {
     <>
       <div
         className={
-          "fixed bottom-5 origin-center -translate-x-1/2 left-1/2 w-[34rem] h-20 rounded-xl bg-zinc-600"
+          "fixed bottom-5 origin-center -translate-x-1/2 left-1/2 w-[34rem] h-20 rounded-xl bg-zinc-600/50"
         }
       >
         <PlayerTiles />

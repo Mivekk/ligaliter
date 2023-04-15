@@ -3,7 +3,7 @@ import React, { useContext, useEffect } from "react";
 import { TilesContext } from "@/contexts/tilesContext";
 
 import Tile from "./Tile";
-import TileOverlay from "./TileOverlay";
+import TileDropArea from "./TileDropArea";
 
 import {
   HandleDragType,
@@ -99,7 +99,7 @@ const PlayerTiles: React.FC<{}> = () => {
 
   // map through player tiles and return <Tile /> inside of <TileOverlay />
   const tilesElements = playerTiles.map((item) => (
-    <TileOverlay key={item.id} id={item.id} handleDrop={handleDrop}>
+    <TileDropArea key={item.id} id={item.id} handleDrop={handleDrop}>
       <Tile
         key={item.id}
         id={item.id}
@@ -108,9 +108,9 @@ const PlayerTiles: React.FC<{}> = () => {
         handleDrop={handleDrop}
         handleWrongDrop={handleWrongDrop}
         handleDrag={handleDrag}
-        styles={"rounded-xl bg-yellow-300 border-black"}
+        styles={"rounded-md bg-yellow-300"}
       />
-    </TileOverlay>
+    </TileDropArea>
   ));
 
   return (

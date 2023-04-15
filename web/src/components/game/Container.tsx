@@ -4,7 +4,7 @@ import { useDragLayer } from "react-dnd";
 import { TilesContext } from "@/contexts/tilesContext";
 
 import Board from "./Board";
-import Overlay from "./Overlay";
+import BoardDisplay from "./BoardDisplay";
 // import PlayerMenu from "./PlayerMenu";
 import { TileBagType, TileType } from "@/types";
 import { boardLength, boardSize } from "@/utils/game/constants";
@@ -233,7 +233,7 @@ const Container: React.FC<ContainerProps> = ({ wordList }) => {
   return (
     <>
       <div
-        className={"absolute w-full h-screen bg-main overflow-hidden"}
+        className={"absolute w-full h-screen"}
         onMouseUp={() => setMouseHold(false)}
         onMouseMove={(event) => handleMouseMove(event)}
         style={{ top: boardPosition.yOffset, left: boardPosition.xOffset }}
@@ -243,7 +243,7 @@ const Container: React.FC<ContainerProps> = ({ wordList }) => {
           onWheel={(event) => handleWheel(event)}
           style={{ transform: `scale(${zoom})` }}
         >
-          <Overlay />
+          <BoardDisplay />
 
           <div
             onMouseDown={(event) => handleMouseDown(event)}

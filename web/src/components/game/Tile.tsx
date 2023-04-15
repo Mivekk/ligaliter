@@ -48,6 +48,8 @@ const Tile: React.FC<TileProps> = ({
     },
   });
 
+  console.log("tile");
+
   // if a tile is marked as draggable it has a drag ref
   // drop ref is always there
   // tile has two classnames: its main one and one from props
@@ -57,14 +59,16 @@ const Tile: React.FC<TileProps> = ({
       ref={(node) => {
         draggable ? drag(node!) : null, drop(node!);
       }}
-      className={`w-10 h-10 bg-secondary ${styles}`}
+      className={`relative w-14 h-14 bg-secondary flex basis-[5.26%] justify-center items-center text-2xl ${styles}`}
       style={{
         opacity: letter ? 1.0 : 0.0,
         backgroundColor: draggable ? "yellow" : "orange",
       }}
     >
       {letter}
-      <div className={""}>{letter ? tileBag[`${letter}`].value : null}</div>
+      <div className={"absolute top-0 right-1 text-sm"}>
+        {letter ? tileBag[`${letter}`].value : null}
+      </div>
     </div>
   );
 };

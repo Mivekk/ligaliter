@@ -7,7 +7,9 @@ import React from "react";
 const Game: React.FC<{}> = ({}) => {
   return (
     <TilesContextProvider>
-      <Container wordList={[]} />
+      <div>
+        <Container wordList={[]} />
+      </div>
     </TilesContextProvider>
   );
 };
