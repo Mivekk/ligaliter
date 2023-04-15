@@ -105,7 +105,11 @@ const Board: React.FC<{}> = () => {
     />
   ));
 
-  return <div className={""}>{tilesElements}</div>;
+  return (
+    <div className="flex gap-[0.125rem] flex-wrap max-w-[49.75rem]">
+      {tilesElements}
+    </div>
+  );
 };
 
 export default React.memo(Board);

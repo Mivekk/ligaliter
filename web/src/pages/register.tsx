@@ -1,6 +1,6 @@
 import Button from "@/components/Button";
 import Heading from "@/components/Heading";
-import InputField from "@/components/InputField";
+import InputField from "@/components/lobby/InputField";
 import Wrapper from "@/components/Wrapper";
 import { RegisterDocument } from "@/generated/graphql";
 import { createUrqlClient } from "@/utils/createUrqlClient";

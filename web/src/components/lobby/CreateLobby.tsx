@@ -1,10 +1,10 @@
 import React from "react";
-import Heading from "./Heading";
+import Heading from "../Heading";
 import { v4 } from "uuid";
 import { useRouter } from "next/router";
 import { useMutation } from "urql";
 import { NewLobbyDocument } from "@/generated/graphql";
-import Button from "./Button";
+import Button from "../Button";
 
 const CreateLobby: React.FC<{}> = ({}) => {
   const router = useRouter();

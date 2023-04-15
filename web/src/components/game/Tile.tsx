@@ -57,9 +57,9 @@ const Tile: React.FC<TileProps> = ({
       ref={(node) => {
         draggable ? drag(node!) : null, drop(node!);
       }}
-      className={`${"w-10 h-10 bg-secondary"} ${styles}`}
+      className={`w-10 h-10 bg-secondary ${styles}`}
       style={{
-        opacity: letter ? 1.0 : 1.0,
+        opacity: letter ? 1.0 : 0.0,
         backgroundColor: draggable ? "yellow" : "orange",
       }}
     >

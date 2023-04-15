@@ -54,7 +54,6 @@ const Lobby: React.FC<{}> = ({}) => {
   }
 
   const isOwner = queryData?.lobbyPlayersQuery.owner?.id === meData?.me?.id;
-  console.log(isOwner);
 
   isAuth();
 
