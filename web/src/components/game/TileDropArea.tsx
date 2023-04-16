@@ -26,8 +26,6 @@ const TileDropArea: React.FC<TileDropAreaProps> = ({
     },
   });
 
-  console.log("TileDropArea");
-
   return (
     <div ref={drop} className={"border-8 border-transparent"}>
       {children}

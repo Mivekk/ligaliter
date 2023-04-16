@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useMemo } from "react";
 import { TilesContext } from "@/contexts/tilesContext";
 import Tile from "./Tile";
 
@@ -105,11 +105,7 @@ const Board: React.FC<{}> = () => {
     />
   ));
 
-  return (
-    <div className="grid grid-rows-19 grid-cols-19 gap-[0.125rem]">
-      {tilesElements}
-    </div>
-  );
+  return <div className="grid grid-rows-19 grid-cols-19">{tilesElements}</div>;
 };
 
 export default React.memo(Board);

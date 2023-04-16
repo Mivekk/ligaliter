@@ -31,4 +31,4 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isValid, playPointCount }) => {
   );
 };
 
-export default PlayerMenu;
+export default React.memo(PlayerMenu);
