@@ -12,13 +12,9 @@ import {
   Subscription,
 } from "type-graphql";
 import { User } from "../entities/User";
-import { ApolloContext, LobbyData, LobbyPlayers } from "../types";
+import { ApolloContext, LobbyData, LobbyPlayers, TOPICS } from "../types";
 import { ResponseObject } from "./user";
 import { playerIdToUser } from "../utils/playerIdToUser";
-
-export enum TOPICS {
-  NEW_PLAYER_IN_LOBBY = "NEW_PLAYER_IN_LOBBY",
-}
 
 @ObjectType()
 class LobbyQueryResponseObject {

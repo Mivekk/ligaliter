@@ -1,4 +1,4 @@
-import { TileBagType } from "../types";
+import { TileBagType } from "../../types";
 
 export const generateRandomLetter = (
   tileBag: TileBagType,

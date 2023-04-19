@@ -8,12 +8,12 @@ import {
   NewGameDocument,
   QuitLobbyDocument,
 } from "@/generated/graphql";
+import { createUrqlClient } from "@/utils/createUrqlClient";
 import { isAuth } from "@/utils/isAuth";
+import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/router";
 import React from "react";
 import { useMutation, useQuery, useSubscription } from "urql";
-import { withUrqlClient } from "next-urql";
-import { createUrqlClient } from "@/utils/createUrqlClient";
 
 const Lobby: React.FC<{}> = ({}) => {
   const router = useRouter();
@@ -65,7 +65,7 @@ const Lobby: React.FC<{}> = ({}) => {
         <div className="flex gap-2">
           <Button
             onClick={async () => {
-              const response = await newGame({ uuid: lobbyUUID });
+              await newGame({ uuid: lobbyUUID });
             }}
             disabled={isOwner ? false : true}
           >

@@ -21,15 +21,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LobbyResolver = exports.TOPICS = void 0;
+exports.LobbyResolver = void 0;
 const type_graphql_1 = require("type-graphql");
 const User_1 = require("../entities/User");
+const types_1 = require("../types");
 const user_1 = require("./user");
 const playerIdToUser_1 = require("../utils/playerIdToUser");
-var TOPICS;
-(function (TOPICS) {
-    TOPICS["NEW_PLAYER_IN_LOBBY"] = "NEW_PLAYER_IN_LOBBY";
-})(TOPICS = exports.TOPICS || (exports.TOPICS = {}));
 let LobbyQueryResponseObject = class LobbyQueryResponseObject {
 };
 __decorate([
@@ -214,7 +211,7 @@ __decorate([
 ], LobbyResolver.prototype, "lobbyPlayersQuery", null);
 __decorate([
     (0, type_graphql_1.Subscription)(() => LobbyReponseObject, {
-        topics: TOPICS.NEW_PLAYER_IN_LOBBY,
+        topics: types_1.TOPICS.NEW_PLAYER_IN_LOBBY,
         filter: ({ payload, args }) => payload.uuid === args.uuid,
     }),
     __param(0, (0, type_graphql_1.Root)()),
@@ -227,7 +224,7 @@ __decorate([
     (0, type_graphql_1.Mutation)(() => user_1.ResponseObject),
     __param(0, (0, type_graphql_1.Arg)("uuid")),
     __param(1, (0, type_graphql_1.Ctx)()),
-    __param(2, (0, type_graphql_1.PubSub)(TOPICS.NEW_PLAYER_IN_LOBBY)),
+    __param(2, (0, type_graphql_1.PubSub)(types_1.TOPICS.NEW_PLAYER_IN_LOBBY)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Object, Function]),
     __metadata("design:returntype", Promise)
@@ -236,7 +233,7 @@ __decorate([
     (0, type_graphql_1.Mutation)(() => user_1.ResponseObject),
     __param(0, (0, type_graphql_1.Arg)("uuid")),
     __param(1, (0, type_graphql_1.Ctx)()),
-    __param(2, (0, type_graphql_1.PubSub)(TOPICS.NEW_PLAYER_IN_LOBBY)),
+    __param(2, (0, type_graphql_1.PubSub)(types_1.TOPICS.NEW_PLAYER_IN_LOBBY)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Object, Function]),
     __metadata("design:returntype", Promise)

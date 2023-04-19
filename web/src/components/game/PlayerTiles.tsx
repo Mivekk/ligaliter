@@ -12,8 +12,12 @@ import {
   TileType,
 } from "@/types";
 import { generateRandomLetter } from "@/utils/game/randomLetter";
+import { useQuery } from "urql";
+import { GetTilesDocument } from "@/generated/graphql";
+import { useRouter } from "next/router";
 
 const PlayerTiles: React.FC<{}> = () => {
+  const router = useRouter();
   const {
     playerTiles,
     setPlayerTiles,
@@ -22,18 +26,27 @@ const PlayerTiles: React.FC<{}> = () => {
     tileBag,
     setTileBag,
   } = useContext(TilesContext);
+  const [{ data, fetching }] = useQuery({
+    query: GetTilesDocument,
+    variables: { uuid: router.query.gameId as string },
+  });
 
   // generate random letters on first render
   useEffect(() => {
-    // map through every tile and assign random letter
-    // from utils/randomLetter function
-    setPlayerTiles((prevTiles) => {
-      return prevTiles.map((item) => ({
-        ...item,
-        letter: generateRandomLetter(tileBag, setTileBag),
-      }));
+    if (!data) {
+      return;
+    }
+
+    const tiles: TileType[] = data.getTiles!.map((item) => {
+      return {
+        id: item.id,
+        draggable: item.draggable,
+        letter: item.letter,
+      };
     });
-  }, []);
+
+    setPlayerTiles(tiles);
+  }, [data, fetching]);
 
   // set up function for drag event
   const handleDrag = (params: HandleDragType) => {
@@ -108,7 +121,6 @@ const PlayerTiles: React.FC<{}> = () => {
         handleDrop={handleDrop}
         handleWrongDrop={handleWrongDrop}
         handleDrag={handleDrag}
-        styles={"rounded-md bg-yellow-300"}
       />
     </TileDropArea>
   ));

@@ -22,6 +22,7 @@ const documents = {
     "mutation NewLobby($uuid: String!) {\n  newLobby(uuid: $uuid) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}": types.NewLobbyDocument,
     "mutation QuitLobby($uuid: String!) {\n  quitLobby(uuid: $uuid) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}": types.QuitLobbyDocument,
     "mutation Register($options: RegisterInput!) {\n  register(options: $options) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}": types.RegisterDocument,
+    "query GetTiles($uuid: String!) {\n  getTiles(uuid: $uuid) {\n    id\n    userId\n    letter\n    draggable\n  }\n}": types.GetTilesDocument,
     "query LobbyPlayersQuery($uuid: String!) {\n  lobbyPlayersQuery(uuid: $uuid) {\n    owner {\n      ...UserFields\n    }\n    players {\n      ...UserFields\n    }\n  }\n}": types.LobbyPlayersQueryDocument,
     "query Me {\n  me {\n    ...UserFields\n  }\n}": types.MeDocument,
     "query Users {\n  users {\n    ...UserFields\n  }\n}": types.UsersDocument,
@@ -78,6 +79,10 @@ export function graphql(source: "mutation QuitLobby($uuid: String!) {\n  quitLob
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "mutation Register($options: RegisterInput!) {\n  register(options: $options) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}"): (typeof documents)["mutation Register($options: RegisterInput!) {\n  register(options: $options) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "query GetTiles($uuid: String!) {\n  getTiles(uuid: $uuid) {\n    id\n    userId\n    letter\n    draggable\n  }\n}"): (typeof documents)["query GetTiles($uuid: String!) {\n  getTiles(uuid: $uuid) {\n    id\n    userId\n    letter\n    draggable\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

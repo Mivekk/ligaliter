@@ -8,8 +8,11 @@ import {
   HandleWrongDropType,
   TileType,
 } from "@/types";
+import { useMutation } from "urql";
+import { useRouter } from "next/router";
 
 const Board: React.FC<{}> = () => {
+  const router = useRouter();
   const { boardTiles, setBoardTiles, playerTiles, setPlayerTiles } =
     useContext(TilesContext);
 
@@ -61,7 +64,6 @@ const Board: React.FC<{}> = () => {
 
     toTile.letter = params.letter;
     toTile.draggable = true;
-    toTile.styles = "";
 
     setBoardTiles(newTiles);
   };
@@ -101,7 +103,6 @@ const Board: React.FC<{}> = () => {
       handleDrop={handleDrop}
       handleWrongDrop={handleWrongDrop}
       handleDrag={handleDrag}
-      styles={item.styles}
     />
   ));
 

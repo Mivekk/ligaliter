@@ -3,13 +3,7 @@ import { useDrag, useDrop } from "react-dnd";
 import { TileProps } from "@/types";
 import { TilesContext } from "@/contexts/tilesContext";
 
-const Tile: React.FC<TileProps> = ({
-  id,
-  letter,
-  draggable,
-  styles,
-  ...props
-}) => {
+const Tile: React.FC<TileProps> = ({ id, letter, draggable, ...props }) => {
   const { tileBag } = useContext(TilesContext);
 
   // set up drag hook
@@ -53,7 +47,8 @@ const Tile: React.FC<TileProps> = ({
       ref={(node) => {
         draggable ? drag(node!) : null, drop(node!);
       }}
-      className={`relative w-14 h-14 bg-secondary flex justify-center items-center text-2xl border-[1px] shadow-[0px_2px_black] border-black rounded-lg ${styles}`}
+      className={`relative w-14 h-14 flex justify-center items-center text-2xl
+       border-[1px] shadow-[0px_2px_black] border-black rounded-lg`}
       style={{
         opacity: letter ? 1.0 : 0.0,
         backgroundColor: draggable ? "yellow" : "orange",

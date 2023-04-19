@@ -1,6 +1,26 @@
 import type { Request, Response } from "express";
 import type { Redis } from "ioredis";
 
+export type TileType = {
+  id: number;
+  letter?: string;
+  draggable: boolean;
+  userId: number;
+};
+
+export type PlayerData = {
+  id: number;
+  points: number;
+  tiles: TileType[];
+};
+
+export type GameData = {
+  uuid: string;
+  board: TileType[];
+  players: PlayerData[];
+  activeId: number;
+};
+
 export type ApolloContext = {
   req: Request;
   res: Response;
@@ -10,7 +30,7 @@ export type ApolloContext = {
 export type LobbyData = {
   owner: number;
   createdAt: Date;
-  players: Array<{ id: number }>;
+  players: { id: number }[];
 };
 
 export type LobbyPlayers = {
@@ -18,6 +38,11 @@ export type LobbyPlayers = {
   uuid: string;
   started: boolean;
 };
+
+export enum TOPICS {
+  NEW_PLAYER_IN_LOBBY = "NEW_PLAYER_IN_LOBBY",
+  TILE_UPDATED = "TILE_UPDATED",
+}
 
 declare module "express-session" {
   interface SessionData {

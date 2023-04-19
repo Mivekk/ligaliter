@@ -1,5 +1,5 @@
 import Wrapper from "@/components/Wrapper";
-import Container from "@/components/game/Container";
+import GameContainer from "@/components/game/GameContainer";
 import TilesContextProvider from "@/contexts/tilesContext";
 import { createUrqlClient } from "@/utils/createUrqlClient";
 import { withUrqlClient } from "next-urql";
@@ -26,7 +26,7 @@ const Game: React.FC<{}> = ({}) => {
   return (
     <TilesContextProvider>
       <Wrapper>
-        <Container wordList={wordList} />
+        <GameContainer wordList={wordList} />
       </Wrapper>
     </TilesContextProvider>
   );
