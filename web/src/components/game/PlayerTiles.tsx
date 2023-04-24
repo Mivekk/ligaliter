@@ -1,43 +1,40 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import { TilesContext } from "@/contexts/tilesContext";
 
 import Tile from "./Tile";
 import TileDropArea from "./TileDropArea";
 
+import { GetTilesDocument, MoveTileDocument } from "@/generated/graphql";
 import {
   HandleDragType,
   HandleDropType,
   HandleWrongDropType,
   TileType,
 } from "@/types";
-import { generateRandomLetter } from "@/utils/game/randomLetter";
-import { useQuery } from "urql";
-import { GetTilesDocument } from "@/generated/graphql";
 import { useRouter } from "next/router";
+import { useMutation, useQuery } from "urql";
 
 const PlayerTiles: React.FC<{}> = () => {
   const router = useRouter();
-  const {
-    playerTiles,
-    setPlayerTiles,
-    boardTiles,
-    setBoardTiles,
-    tileBag,
-    setTileBag,
-  } = useContext(TilesContext);
+  const { boardTiles, setBoardTiles } = useContext(TilesContext);
+  const [playerTiles, setPlayerTiles] = useState<TileType[]>([]);
   const [{ data, fetching }] = useQuery({
     query: GetTilesDocument,
     variables: { uuid: router.query.gameId as string },
+    requestPolicy: "network-only",
   });
+  const [, moveTile] = useMutation(MoveTileDocument);
 
   // generate random letters on first render
   useEffect(() => {
-    if (!data) {
+    if (!data?.getTiles) {
       return;
     }
 
-    const tiles: TileType[] = data.getTiles!.map((item) => {
+    console.log(data.getTiles);
+
+    const tiles: TileType[] = data.getTiles.map((item) => {
       return {
         id: item.id,
         draggable: item.draggable,
@@ -96,13 +93,22 @@ const PlayerTiles: React.FC<{}> = () => {
     endTile.draggable = true;
     endTile.letter = params.letter;
 
+    // moveTiles
+    moveTile({
+      input: {
+        uuid: router.query.gameId as string,
+        fromId: fromTile.id,
+        toId: endTile.id,
+      },
+    });
+
     setPlayerTiles(newTiles);
   };
 
   // set up function for drop outside of accepted space
   const handleWrongDrop = (params: HandleWrongDropType) => {
     const newTiles = [...playerTiles];
-    // style is automatically correctly assigned
+
     const curTile = newTiles.find((item) => item.id === params.id) as TileType;
     curTile.letter = params.letter;
     curTile.draggable = true;
@@ -110,7 +116,6 @@ const PlayerTiles: React.FC<{}> = () => {
     setPlayerTiles(newTiles);
   };
 
-  // map through player tiles and return <Tile /> inside of <TileOverlay />
   const tilesElements = playerTiles.map((item) => (
     <TileDropArea key={item.id} id={item.id} handleDrop={handleDrop}>
       <Tile

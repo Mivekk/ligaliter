@@ -22,11 +22,34 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameResolver = void 0;
-const randomPlayerTiles_1 = require("../utils/randomPlayerTiles");
 const type_graphql_1 = require("type-graphql");
+const constants_1 = require("../constants");
 const Game_1 = require("../entities/Game");
 const types_1 = require("../types");
+const isAuth_1 = require("../utils/isAuth");
 const playerIdToUser_1 = require("../utils/playerIdToUser");
+const randomPlayerTiles_1 = require("../utils/randomPlayerTiles");
+let Tile = class Tile {
+};
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", Number)
+], Tile.prototype, "id", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", String)
+], Tile.prototype, "letter", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", Boolean)
+], Tile.prototype, "draggable", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", Number)
+], Tile.prototype, "userId", void 0);
+Tile = __decorate([
+    (0, type_graphql_1.ObjectType)()
+], Tile);
 let MoveTileInput = class MoveTileInput {
 };
 __decorate([
@@ -62,34 +85,10 @@ __decorate([
 GameResponseObject = __decorate([
     (0, type_graphql_1.ObjectType)()
 ], GameResponseObject);
-let Tile = class Tile {
-};
-__decorate([
-    (0, type_graphql_1.Field)(),
-    __metadata("design:type", Number)
-], Tile.prototype, "id", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(),
-    __metadata("design:type", String)
-], Tile.prototype, "letter", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(),
-    __metadata("design:type", Boolean)
-], Tile.prototype, "draggable", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(),
-    __metadata("design:type", Number)
-], Tile.prototype, "userId", void 0);
-Tile = __decorate([
-    (0, type_graphql_1.ObjectType)()
-], Tile);
 let GameResolver = class GameResolver {
     newGame(uuid, { req, redis }, publish) {
         return __awaiter(this, void 0, void 0, function* () {
             const userId = req.session.userId;
-            if (!userId) {
-                return null;
-            }
             const lobbyID = yield redis.get(uuid);
             if (!lobbyID) {
                 return null;
@@ -119,9 +118,6 @@ let GameResolver = class GameResolver {
     getTiles(uuid, { req, redis }) {
         return __awaiter(this, void 0, void 0, function* () {
             const userId = req.session.userId;
-            if (!userId) {
-                return null;
-            }
             const game = yield redis.get(`game-${uuid}`);
             if (!game) {
                 return null;
@@ -140,20 +136,32 @@ let GameResolver = class GameResolver {
     moveTile(input, { req, redis }, _publish) {
         return __awaiter(this, void 0, void 0, function* () {
             const userId = req.session.userId;
-            if (!userId) {
-                return false;
-            }
             const game = yield redis.get(`game-${input.uuid}`);
             if (!game) {
                 return false;
             }
             const gameData = JSON.parse(game);
+            const playerTiles = gameData.players.find((player) => player.id === userId);
+            const fromTiles = input.fromId >= constants_1.BOARD_SIZE ? playerTiles.tiles : gameData.board;
+            const toTiles = input.toId >= constants_1.BOARD_SIZE ? playerTiles.tiles : gameData.board;
+            const fromTile = fromTiles.find((tile) => tile.id === input.fromId);
+            const toTile = toTiles.find((tile) => tile.id === input.toId);
+            console.log("From tile", fromTile, " To tile: ", toTile);
+            if (toTile) {
+                [fromTile.letter, toTile.letter] = [toTile.letter, fromTile.letter];
+            }
+            else {
+                toTiles.push(fromTile);
+                fromTile.id = input.toId;
+                fromTiles.splice(fromTiles.findIndex((tile) => tile === fromTile), 1);
+            }
             yield redis.setex(`game-${input.uuid}`, 86400, JSON.stringify(gameData));
             return true;
         });
     }
 };
 __decorate([
+    (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuth),
     (0, type_graphql_1.Mutation)(() => GameResponseObject, { nullable: true }),
     __param(0, (0, type_graphql_1.Arg)("uuid")),
     __param(1, (0, type_graphql_1.Ctx)()),
@@ -163,6 +171,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], GameResolver.prototype, "newGame", null);
 __decorate([
+    (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuth),
     (0, type_graphql_1.Query)(() => [Tile], { nullable: true }),
     __param(0, (0, type_graphql_1.Arg)("uuid")),
     __param(1, (0, type_graphql_1.Ctx)()),
@@ -171,8 +180,9 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], GameResolver.prototype, "getTiles", null);
 __decorate([
+    (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuth),
     (0, type_graphql_1.Mutation)(() => Boolean),
-    __param(0, (0, type_graphql_1.Arg)("input")),
+    __param(0, (0, type_graphql_1.Arg)("input", () => MoveTileInput)),
     __param(1, (0, type_graphql_1.Ctx)()),
     __param(2, (0, type_graphql_1.PubSub)(types_1.TOPICS.TILE_UPDATED)),
     __metadata("design:type", Function),

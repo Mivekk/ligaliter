@@ -10,9 +10,12 @@ import {
 } from "@/types";
 import { useMutation } from "urql";
 import { useRouter } from "next/router";
+import { MoveTileDocument } from "@/generated/graphql";
 
 const Board: React.FC<{}> = () => {
   const router = useRouter();
+  const gameId = router.query.gameId as string;
+  const [, moveTile] = useMutation(MoveTileDocument);
   const { boardTiles, setBoardTiles, playerTiles, setPlayerTiles } =
     useContext(TilesContext);
 
@@ -43,7 +46,7 @@ const Board: React.FC<{}> = () => {
       return;
     }
 
-    if (toTile.letter !== undefined) {
+    if (toTile !== undefined) {
       if (fromTile !== undefined) {
         // it's a board tile
         fromTile.letter = toTile.letter;
@@ -65,16 +68,26 @@ const Board: React.FC<{}> = () => {
     toTile.letter = params.letter;
     toTile.draggable = true;
 
+    // moveTiles
+    if (fromTile !== undefined) {
+      moveTile({
+        input: {
+          uuid: gameId,
+          fromId: fromTile.id,
+          toId: toTile.id,
+        },
+      });
+    }
+
     setBoardTiles(newTiles);
   };
 
   // set up function for drop outside of accepted space
   const handleWrongDrop = (params: HandleWrongDropType) => {
     const newTiles = [...boardTiles];
-    // style is automatically correctly assigned
+
     let curTile = newTiles.find((item) => item.id === params.id) as TileType;
-    // if it's not undefined it is a board tile
-    // because it's found in boardTiles array
+
     if (curTile !== undefined) {
       curTile.letter = params.letter;
       curTile.draggable = true;

@@ -1,4 +1,3 @@
-import { randomPlayerTiles } from "../utils/randomPlayerTiles";
 import {
   Arg,
   Ctx,
@@ -10,7 +9,9 @@ import {
   Publisher,
   Query,
   Resolver,
+  UseMiddleware,
 } from "type-graphql";
+import { BOARD_SIZE } from "../constants";
 import { Game } from "../entities/Game";
 import {
   ApolloContext,
@@ -20,7 +21,24 @@ import {
   TOPICS,
   TileType,
 } from "../types";
+import { isAuth } from "../utils/isAuth";
 import { playerIdToUser } from "../utils/playerIdToUser";
+import { randomPlayerTiles } from "../utils/randomPlayerTiles";
+
+@ObjectType()
+class Tile {
+  @Field()
+  id: number;
+
+  @Field()
+  letter?: string;
+
+  @Field()
+  draggable: boolean;
+
+  @Field()
+  userId: number;
+}
 
 @InputType()
 class MoveTileInput {
@@ -46,33 +64,16 @@ class GameResponseObject {
   players: PlayerIdsFormat[];
 }
 
-@ObjectType()
-class Tile {
-  @Field()
-  id: number;
-
-  @Field()
-  letter?: string;
-
-  @Field()
-  draggable: boolean;
-
-  @Field()
-  userId: number;
-}
-
 @Resolver()
 export class GameResolver {
+  @UseMiddleware(isAuth)
   @Mutation(() => GameResponseObject, { nullable: true })
   async newGame(
     @Arg("uuid") uuid: string,
     @Ctx() { req, redis }: ApolloContext,
     @PubSub(TOPICS.NEW_PLAYER_IN_LOBBY) publish: Publisher<LobbyPlayers>
   ): Promise<GameResponseObject | null> {
-    const userId = req.session.userId;
-    if (!userId) {
-      return null;
-    }
+    const userId = req.session.userId as number;
 
     const lobbyID = await redis.get(uuid);
     if (!lobbyID) {
@@ -109,15 +110,13 @@ export class GameResolver {
     };
   }
 
+  @UseMiddleware(isAuth)
   @Query(() => [Tile], { nullable: true })
   async getTiles(
     @Arg("uuid") uuid: string,
     @Ctx() { req, redis }: ApolloContext
   ): Promise<Tile[] | null> {
-    const userId = req.session.userId;
-    if (!userId) {
-      return null;
-    }
+    const userId = req.session.userId as number;
 
     const game = await redis.get(`game-${uuid}`);
     if (!game) {
@@ -137,22 +136,46 @@ export class GameResolver {
     return result;
   }
 
+  @UseMiddleware(isAuth)
   @Mutation(() => Boolean)
   async moveTile(
-    @Arg("input") input: MoveTileInput,
+    @Arg("input", () => MoveTileInput) input: MoveTileInput,
     @Ctx() { req, redis }: ApolloContext,
     @PubSub(TOPICS.TILE_UPDATED) _publish: Publisher<TileType>
   ): Promise<boolean> {
-    const userId = req.session.userId;
-    if (!userId) {
-      return false;
-    }
+    const userId = req.session.userId as number;
 
     const game = await redis.get(`game-${input.uuid}`);
     if (!game) {
       return false;
     }
     const gameData = JSON.parse(game) as GameData;
+    const playerTiles = gameData.players.find((player) => player.id === userId);
+
+    const fromTiles =
+      input.fromId >= BOARD_SIZE ? playerTiles!.tiles : gameData.board;
+
+    const toTiles =
+      input.toId >= BOARD_SIZE ? playerTiles!.tiles : gameData.board;
+
+    const fromTile = fromTiles.find((tile) => tile.id === input.fromId)!;
+    const toTile = toTiles.find((tile) => tile.id === input.toId)!;
+
+    console.log("From tile", fromTile, " To tile: ", toTile);
+
+    // switch instead of replace
+    if (toTile) {
+      [fromTile.letter, toTile.letter] = [toTile.letter, fromTile.letter];
+    } else {
+      toTiles.push(fromTile);
+
+      fromTile.id = input.toId;
+
+      fromTiles.splice(
+        fromTiles.findIndex((tile) => tile === fromTile),
+        1
+      );
+    }
 
     await redis.setex(`game-${input.uuid}`, 86400, JSON.stringify(gameData));
 

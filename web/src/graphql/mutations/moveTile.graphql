@@ -1,0 +1,3 @@
+mutation MoveTile($input: MoveTileInput!) {
+  moveTile(input: $input)
+}
