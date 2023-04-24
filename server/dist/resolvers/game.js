@@ -115,7 +115,7 @@ let GameResolver = class GameResolver {
             };
         });
     }
-    getTiles(uuid, { req, redis }) {
+    getTilesQuery(uuid, { req, redis }) {
         return __awaiter(this, void 0, void 0, function* () {
             const userId = req.session.userId;
             const game = yield redis.get(`game-${uuid}`);
@@ -123,17 +123,31 @@ let GameResolver = class GameResolver {
                 return null;
             }
             const gameData = JSON.parse(game);
-            let result = [];
-            gameData.players.forEach((player) => {
-                if (player.id !== userId) {
-                    return;
-                }
-                result = player.tiles;
-            });
-            return result;
+            const result = gameData.players.find((player) => player.id === userId);
+            return result.tiles;
         });
     }
-    moveTile(input, { req, redis }, _publish) {
+    getBoardTiles({ redis }, uuid) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const game = yield redis.get(`game-${uuid}`);
+            if (!game) {
+                return null;
+            }
+            const gameData = JSON.parse(game);
+            return gameData.board;
+        });
+    }
+    getBoardTilesQuery({ redis }, uuid) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const game = yield redis.get(`game-${uuid}`);
+            if (!game) {
+                return null;
+            }
+            const gameData = JSON.parse(game);
+            return gameData.board;
+        });
+    }
+    moveTile(input, { req, redis }, publish) {
         return __awaiter(this, void 0, void 0, function* () {
             const userId = req.session.userId;
             const game = yield redis.get(`game-${input.uuid}`);
@@ -146,7 +160,6 @@ let GameResolver = class GameResolver {
             const toTiles = input.toId >= constants_1.BOARD_SIZE ? playerTiles.tiles : gameData.board;
             const fromTile = fromTiles.find((tile) => tile.id === input.fromId);
             const toTile = toTiles.find((tile) => tile.id === input.toId);
-            console.log("From tile", fromTile, " To tile: ", toTile);
             if (toTile) {
                 [fromTile.letter, toTile.letter] = [toTile.letter, fromTile.letter];
             }
@@ -155,6 +168,7 @@ let GameResolver = class GameResolver {
                 fromTile.id = input.toId;
                 fromTiles.splice(fromTiles.findIndex((tile) => tile === fromTile), 1);
             }
+            yield publish({ uuid: input.uuid, userId });
             yield redis.setex(`game-${input.uuid}`, 86400, JSON.stringify(gameData));
             return true;
         });
@@ -178,7 +192,27 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
-], GameResolver.prototype, "getTiles", null);
+], GameResolver.prototype, "getTilesQuery", null);
+__decorate([
+    (0, type_graphql_1.Subscription)(() => [Tile], {
+        nullable: true,
+        topics: types_1.TOPICS.TILE_UPDATED,
+        filter: ({ args, payload }) => args.uuid === payload.uuid,
+    }),
+    __param(0, (0, type_graphql_1.Ctx)()),
+    __param(1, (0, type_graphql_1.Arg)("uuid")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], GameResolver.prototype, "getBoardTiles", null);
+__decorate([
+    (0, type_graphql_1.Query)(() => [Tile], { nullable: true }),
+    __param(0, (0, type_graphql_1.Ctx)()),
+    __param(1, (0, type_graphql_1.Arg)("uuid")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], GameResolver.prototype, "getBoardTilesQuery", null);
 __decorate([
     (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuth),
     (0, type_graphql_1.Mutation)(() => Boolean),

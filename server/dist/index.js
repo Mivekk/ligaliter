@@ -70,7 +70,14 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         validate: false,
     });
     const redis = new ioredis_1.Redis();
-    const serverCleanup = (0, ws_2.useServer)({ schema, context: () => redis }, wsServer);
+    const serverCleanup = (0, ws_2.useServer)({
+        schema,
+        context: () => __awaiter(void 0, void 0, void 0, function* () {
+            return ({
+                redis,
+            });
+        }),
+    }, wsServer);
     app.use((0, express_session_1.default)({
         name: constants_1.COOKIE_NAME,
         store: new connect_redis_1.default({

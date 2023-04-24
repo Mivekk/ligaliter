@@ -23,10 +23,12 @@ const documents = {
     "mutation NewLobby($uuid: String!) {\n  newLobby(uuid: $uuid) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}": types.NewLobbyDocument,
     "mutation QuitLobby($uuid: String!) {\n  quitLobby(uuid: $uuid) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}": types.QuitLobbyDocument,
     "mutation Register($options: RegisterInput!) {\n  register(options: $options) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}": types.RegisterDocument,
-    "query GetTiles($uuid: String!) {\n  getTiles(uuid: $uuid) {\n    id\n    userId\n    letter\n    draggable\n  }\n}": types.GetTilesDocument,
+    "query GetBoardTilesQuery($uuid: String!) {\n  getBoardTilesQuery(uuid: $uuid) {\n    id\n    letter\n    draggable\n    userId\n  }\n}": types.GetBoardTilesQueryDocument,
+    "query GetTilesQuery($uuid: String!) {\n  getTilesQuery(uuid: $uuid) {\n    id\n    letter\n    draggable\n    userId\n  }\n}": types.GetTilesQueryDocument,
     "query LobbyPlayersQuery($uuid: String!) {\n  lobbyPlayersQuery(uuid: $uuid) {\n    owner {\n      ...UserFields\n    }\n    players {\n      ...UserFields\n    }\n  }\n}": types.LobbyPlayersQueryDocument,
     "query Me {\n  me {\n    ...UserFields\n  }\n}": types.MeDocument,
     "query Users {\n  users {\n    ...UserFields\n  }\n}": types.UsersDocument,
+    "subscription GetBoardTiles($uuid: String!) {\n  getBoardTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    userId\n  }\n}": types.GetBoardTilesDocument,
     "subscription LobbyPlayers($uuid: String!) {\n  lobbyPlayers(uuid: $uuid) {\n    players {\n      ...UserFields\n    }\n    started\n  }\n}": types.LobbyPlayersDocument,
 };
 
@@ -87,7 +89,11 @@ export function graphql(source: "mutation Register($options: RegisterInput!) {\n
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "query GetTiles($uuid: String!) {\n  getTiles(uuid: $uuid) {\n    id\n    userId\n    letter\n    draggable\n  }\n}"): (typeof documents)["query GetTiles($uuid: String!) {\n  getTiles(uuid: $uuid) {\n    id\n    userId\n    letter\n    draggable\n  }\n}"];
+export function graphql(source: "query GetBoardTilesQuery($uuid: String!) {\n  getBoardTilesQuery(uuid: $uuid) {\n    id\n    letter\n    draggable\n    userId\n  }\n}"): (typeof documents)["query GetBoardTilesQuery($uuid: String!) {\n  getBoardTilesQuery(uuid: $uuid) {\n    id\n    letter\n    draggable\n    userId\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "query GetTilesQuery($uuid: String!) {\n  getTilesQuery(uuid: $uuid) {\n    id\n    letter\n    draggable\n    userId\n  }\n}"): (typeof documents)["query GetTilesQuery($uuid: String!) {\n  getTilesQuery(uuid: $uuid) {\n    id\n    letter\n    draggable\n    userId\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -100,6 +106,10 @@ export function graphql(source: "query Me {\n  me {\n    ...UserFields\n  }\n}")
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "query Users {\n  users {\n    ...UserFields\n  }\n}"): (typeof documents)["query Users {\n  users {\n    ...UserFields\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "subscription GetBoardTiles($uuid: String!) {\n  getBoardTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    userId\n  }\n}"): (typeof documents)["subscription GetBoardTiles($uuid: String!) {\n  getBoardTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    userId\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

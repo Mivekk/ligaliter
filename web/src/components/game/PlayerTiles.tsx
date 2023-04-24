@@ -5,7 +5,11 @@ import { TilesContext } from "@/contexts/tilesContext";
 import Tile from "./Tile";
 import TileDropArea from "./TileDropArea";
 
-import { GetTilesDocument, MoveTileDocument } from "@/generated/graphql";
+import {
+  GetTilesQueryDocument,
+  MeDocument,
+  MoveTileDocument,
+} from "@/generated/graphql";
 import {
   HandleDragType,
   HandleDropType,
@@ -14,35 +18,42 @@ import {
 } from "@/types";
 import { useRouter } from "next/router";
 import { useMutation, useQuery } from "urql";
+import { boardSize, playerTilesAmount } from "@/utils/game/constants";
 
 const PlayerTiles: React.FC<{}> = () => {
   const router = useRouter();
+  const gameId = router.query.gameId as string;
+
   const { boardTiles, setBoardTiles } = useContext(TilesContext);
   const [playerTiles, setPlayerTiles] = useState<TileType[]>([]);
+
   const [{ data, fetching }] = useQuery({
-    query: GetTilesDocument,
-    variables: { uuid: router.query.gameId as string },
-    requestPolicy: "network-only",
+    query: GetTilesQueryDocument,
+    variables: { uuid: gameId },
+    requestPolicy: "cache-and-network",
   });
+
   const [, moveTile] = useMutation(MoveTileDocument);
 
   // generate random letters on first render
   useEffect(() => {
-    if (!data?.getTiles) {
+    if (!data?.getTilesQuery) {
       return;
     }
 
-    console.log(data.getTiles);
-
-    const tiles: TileType[] = data.getTiles.map((item) => {
-      return {
-        id: item.id,
-        draggable: item.draggable,
-        letter: item.letter,
+    const newPlayerTiles: TileType[] = [];
+    for (let i = 0; i < playerTilesAmount; i++) {
+      newPlayerTiles[i] = {
+        id: i + boardSize,
+        draggable: true,
       };
+    }
+
+    data.getTilesQuery.forEach((tile) => {
+      newPlayerTiles[tile.id - boardSize] = tile;
     });
 
-    setPlayerTiles(tiles);
+    setPlayerTiles(newPlayerTiles);
   }, [data, fetching]);
 
   // set up function for drag event

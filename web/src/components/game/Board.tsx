@@ -1,23 +1,63 @@
-import React, { useContext, useMemo } from "react";
 import { TilesContext } from "@/contexts/tilesContext";
-import Tile from "./Tile";
-
+import {
+  GetBoardTilesDocument,
+  GetBoardTilesQueryDocument,
+  MoveTileDocument,
+} from "@/generated/graphql";
 import {
   HandleDragType,
   HandleDropType,
   HandleWrongDropType,
   TileType,
 } from "@/types";
-import { useMutation } from "urql";
 import { useRouter } from "next/router";
-import { MoveTileDocument } from "@/generated/graphql";
+import React, { useContext, useEffect } from "react";
+import { useMutation, useQuery, useSubscription } from "urql";
+import Tile from "./Tile";
+import { boardSize } from "@/utils/game/constants";
 
 const Board: React.FC<{}> = () => {
   const router = useRouter();
   const gameId = router.query.gameId as string;
+
   const [, moveTile] = useMutation(MoveTileDocument);
   const { boardTiles, setBoardTiles, playerTiles, setPlayerTiles } =
     useContext(TilesContext);
+
+  const [{ data: queryData }] = useQuery({
+    query: GetBoardTilesQueryDocument,
+    variables: { uuid: gameId },
+  });
+
+  const [{ data: subscriptionData }] = useSubscription({
+    query: GetBoardTilesDocument,
+    variables: { uuid: gameId },
+  });
+
+  // first fetch is query
+  const data = subscriptionData?.getBoardTiles
+    ? subscriptionData.getBoardTiles
+    : queryData?.getBoardTilesQuery;
+
+  useEffect(() => {
+    if (!data) {
+      return;
+    }
+
+    const newTiles: TileType[] = [];
+    for (let i = 0; i < boardSize; i++) {
+      newTiles[i] = {
+        id: i,
+        draggable: false,
+      };
+    }
+
+    data.forEach((tile) => {
+      newTiles[tile.id] = tile;
+    });
+
+    setBoardTiles(newTiles);
+  }, [subscriptionData, queryData]);
 
   // set up function for drag event
   const handleDrag = (params: HandleDragType) => {

@@ -41,7 +41,15 @@ const main = async () => {
 
   const redis = new Redis();
 
-  const serverCleanup = useServer({ schema, context: () => redis }, wsServer);
+  const serverCleanup = useServer(
+    {
+      schema,
+      context: async () => ({
+        redis,
+      }),
+    },
+    wsServer
+  );
 
   app.use(
     session({

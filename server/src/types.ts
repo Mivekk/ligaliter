@@ -44,6 +44,11 @@ export enum TOPICS {
   TILE_UPDATED = "TILE_UPDATED",
 }
 
+export type TileUpdatedPayload = {
+  uuid: string;
+  userId: number;
+};
+
 declare module "express-session" {
   interface SessionData {
     userId: number;

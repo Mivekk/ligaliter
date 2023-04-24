@@ -32,7 +32,6 @@ const Lobby: React.FC<{}> = ({}) => {
   });
 
   const [, quitLobby] = useMutation(QuitLobbyDocument);
-
   const [, newGame] = useMutation(NewGameDocument);
 
   const initialPlayers = queryData?.lobbyPlayersQuery?.players?.map((item) => (

@@ -9,6 +9,7 @@ import {
   Publisher,
   Query,
   Resolver,
+  Subscription,
   UseMiddleware,
 } from "type-graphql";
 import { BOARD_SIZE } from "../constants";
@@ -19,7 +20,7 @@ import {
   LobbyData,
   LobbyPlayers,
   TOPICS,
-  TileType,
+  TileUpdatedPayload,
 } from "../types";
 import { isAuth } from "../utils/isAuth";
 import { playerIdToUser } from "../utils/playerIdToUser";
@@ -112,7 +113,7 @@ export class GameResolver {
 
   @UseMiddleware(isAuth)
   @Query(() => [Tile], { nullable: true })
-  async getTiles(
+  async getTilesQuery(
     @Arg("uuid") uuid: string,
     @Ctx() { req, redis }: ApolloContext
   ): Promise<Tile[] | null> {
@@ -122,18 +123,46 @@ export class GameResolver {
     if (!game) {
       return null;
     }
+
     const gameData = JSON.parse(game) as GameData;
 
-    let result: TileType[] = [];
-    gameData.players.forEach((player) => {
-      if (player.id !== userId) {
-        return;
-      }
+    const result = gameData.players.find((player) => player.id === userId)!;
 
-      result = player.tiles;
-    });
+    return result.tiles;
+  }
 
-    return result;
+  @Subscription(() => [Tile], {
+    nullable: true,
+    topics: TOPICS.TILE_UPDATED,
+    filter: ({ args, payload }) => args.uuid === payload.uuid,
+  })
+  async getBoardTiles(
+    @Ctx() { redis }: ApolloContext,
+    @Arg("uuid") uuid: string
+  ): Promise<Tile[] | null> {
+    const game = await redis.get(`game-${uuid}`);
+    if (!game) {
+      return null;
+    }
+
+    const gameData = JSON.parse(game) as GameData;
+
+    return gameData.board;
+  }
+
+  @Query(() => [Tile], { nullable: true })
+  async getBoardTilesQuery(
+    @Ctx() { redis }: ApolloContext,
+    @Arg("uuid") uuid: string
+  ): Promise<Tile[] | null> {
+    const game = await redis.get(`game-${uuid}`);
+    if (!game) {
+      return null;
+    }
+
+    const gameData = JSON.parse(game) as GameData;
+
+    return gameData.board;
   }
 
   @UseMiddleware(isAuth)
@@ -141,7 +170,7 @@ export class GameResolver {
   async moveTile(
     @Arg("input", () => MoveTileInput) input: MoveTileInput,
     @Ctx() { req, redis }: ApolloContext,
-    @PubSub(TOPICS.TILE_UPDATED) _publish: Publisher<TileType>
+    @PubSub(TOPICS.TILE_UPDATED) publish: Publisher<TileUpdatedPayload>
   ): Promise<boolean> {
     const userId = req.session.userId as number;
 
@@ -149,6 +178,7 @@ export class GameResolver {
     if (!game) {
       return false;
     }
+
     const gameData = JSON.parse(game) as GameData;
     const playerTiles = gameData.players.find((player) => player.id === userId);
 
@@ -159,9 +189,7 @@ export class GameResolver {
       input.toId >= BOARD_SIZE ? playerTiles!.tiles : gameData.board;
 
     const fromTile = fromTiles.find((tile) => tile.id === input.fromId)!;
-    const toTile = toTiles.find((tile) => tile.id === input.toId)!;
-
-    console.log("From tile", fromTile, " To tile: ", toTile);
+    const toTile = toTiles.find((tile) => tile.id === input.toId);
 
     // switch instead of replace
     if (toTile) {
@@ -177,23 +205,10 @@ export class GameResolver {
       );
     }
 
+    await publish({ uuid: input.uuid, userId });
+
     await redis.setex(`game-${input.uuid}`, 86400, JSON.stringify(gameData));
 
     return true;
   }
-
-  // @Subscription(() => [TileType], {
-  //   topics: TOPICS.TILE_UPDATED,
-  //   // payload
-  // })
-  // async tiles(@Arg("uuid") uuid: string) {
-
-  // }
-
-  // mutations:
-  // moveTile(initPos, endPos)
-  // subscriptions:
-  // tiles
-  // queries:
-  // info (move maker, ...)
 }

@@ -103,7 +103,7 @@ export class LobbyResolver {
   ): Promise<LobbyReponseObject> {
     const players = await playerIdToUser(lobbyPlayersPayload.players);
 
-    return { players: players, started: lobbyPlayersPayload.started };
+    return { players, started: lobbyPlayersPayload.started };
   }
 
   @Mutation(() => ResponseObject)

@@ -100,7 +100,7 @@ let LobbyResolver = class LobbyResolver {
     lobbyPlayers(lobbyPlayersPayload, _uuid) {
         return __awaiter(this, void 0, void 0, function* () {
             const players = yield (0, playerIdToUser_1.playerIdToUser)(lobbyPlayersPayload.players);
-            return { players: players, started: lobbyPlayersPayload.started };
+            return { players, started: lobbyPlayersPayload.started };
         });
     }
     joinLobby(uuid, { req, redis }, publish) {
