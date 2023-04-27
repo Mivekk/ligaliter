@@ -78,6 +78,7 @@ const TilesContextProvider: React.FC<TilesContextProviderProps> = ({
     Y: { amount: 2, value: 4 },
     Z: { amount: 1, value: 10 },
     BLANK: { amount: 2, value: 0 },
+    "?": { amount: 0, value: -1 },
   });
 
   return (

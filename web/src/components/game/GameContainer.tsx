@@ -101,7 +101,7 @@ const GameContainer: React.FC<ContainerProps> = ({ wordList }) => {
         style={{ top: boardPosition.yOffset, left: boardPosition.xOffset }}
       >
         <div
-          className={"flex items-center justify-center"}
+          className={"flex items-center justify-center min-w-[1100px]"}
           onWheel={(event) => handleWheel(event)}
           style={{ transform: `scale(${zoom})` }}
         >

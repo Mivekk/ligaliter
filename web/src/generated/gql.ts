@@ -29,6 +29,7 @@ const documents = {
     "query Me {\n  me {\n    ...UserFields\n  }\n}": types.MeDocument,
     "query Users {\n  users {\n    ...UserFields\n  }\n}": types.UsersDocument,
     "subscription GetBoardTiles($uuid: String!) {\n  getBoardTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    userId\n  }\n}": types.GetBoardTilesDocument,
+    "subscription GetTiles($uuid: String!) {\n  getTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    userId\n  }\n}": types.GetTilesDocument,
     "subscription LobbyPlayers($uuid: String!) {\n  lobbyPlayers(uuid: $uuid) {\n    players {\n      ...UserFields\n    }\n    started\n  }\n}": types.LobbyPlayersDocument,
 };
 
@@ -110,6 +111,10 @@ export function graphql(source: "query Users {\n  users {\n    ...UserFields\n  
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "subscription GetBoardTiles($uuid: String!) {\n  getBoardTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    userId\n  }\n}"): (typeof documents)["subscription GetBoardTiles($uuid: String!) {\n  getBoardTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    userId\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "subscription GetTiles($uuid: String!) {\n  getTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    userId\n  }\n}"): (typeof documents)["subscription GetTiles($uuid: String!) {\n  getTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    userId\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

@@ -29,7 +29,5 @@ export type HandleWrongDropType = {
 };
 
 export type TileProps = TileType & {
-  handleDrop: (params: HandleDropType) => void;
-  handleWrongDrop: (params: HandleWrongDropType) => void;
-  handleDrag: (params: HandleDragType) => void;
+  gameId: string;
 };

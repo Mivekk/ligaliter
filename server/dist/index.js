@@ -72,8 +72,10 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const redis = new ioredis_1.Redis();
     const serverCleanup = (0, ws_2.useServer)({
         schema,
-        context: () => __awaiter(void 0, void 0, void 0, function* () {
+        context: ({ connectionParams }) => __awaiter(void 0, void 0, void 0, function* () {
             return ({
+                req: connectionParams === null || connectionParams === void 0 ? void 0 : connectionParams.request,
+                res: connectionParams === null || connectionParams === void 0 ? void 0 : connectionParams.response,
                 redis,
             });
         }),

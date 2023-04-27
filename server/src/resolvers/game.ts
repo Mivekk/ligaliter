@@ -9,6 +9,7 @@ import {
   Publisher,
   Query,
   Resolver,
+  Root,
   Subscription,
   UseMiddleware,
 } from "type-graphql";
@@ -67,15 +68,12 @@ class GameResponseObject {
 
 @Resolver()
 export class GameResolver {
-  @UseMiddleware(isAuth)
   @Mutation(() => GameResponseObject, { nullable: true })
   async newGame(
     @Arg("uuid") uuid: string,
-    @Ctx() { req, redis }: ApolloContext,
+    @Ctx() { redis }: ApolloContext,
     @PubSub(TOPICS.NEW_PLAYER_IN_LOBBY) publish: Publisher<LobbyPlayers>
   ): Promise<GameResponseObject | null> {
-    const userId = req.session.userId as number;
-
     const lobbyID = await redis.get(uuid);
     if (!lobbyID) {
       return null;
@@ -89,7 +87,7 @@ export class GameResolver {
     const playersData = lobbyData.players.map((player) => ({
       id: player.id,
       points: 0,
-      tiles: randomPlayerTiles(userId), // assign random letters
+      tiles: randomPlayerTiles(player.id), // assign random letters
     }));
 
     const data: GameData = {
@@ -127,6 +125,38 @@ export class GameResolver {
     const gameData = JSON.parse(game) as GameData;
 
     const result = gameData.players.find((player) => player.id === userId)!;
+
+    return result.tiles;
+  }
+
+  @Subscription(() => [Tile], {
+    nullable: true,
+    topics: TOPICS.TILE_UPDATED,
+    filter: ({ args, payload, context }) => {
+      if (
+        payload.uuid === args.uuid &&
+        payload.userId === context.req.session.userId
+      ) {
+        return true;
+      }
+      return false;
+    },
+  })
+  async getTiles(
+    @Arg("uuid") uuid: string,
+    @Root() tileUpdatedPayload: TileUpdatedPayload,
+    @Ctx() { redis }: ApolloContext
+  ): Promise<Tile[] | null> {
+    const game = await redis.get(`game-${uuid}`);
+    if (!game) {
+      return null;
+    }
+
+    const gameData = JSON.parse(game) as GameData;
+
+    const result = gameData.players.find(
+      (player) => player.id === tileUpdatedPayload.userId
+    )!;
 
     return result.tiles;
   }

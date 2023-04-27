@@ -44,7 +44,9 @@ const main = async () => {
   const serverCleanup = useServer(
     {
       schema,
-      context: async () => ({
+      context: async ({ connectionParams }) => ({
+        req: connectionParams?.request,
+        res: connectionParams?.response,
         redis,
       }),
     },

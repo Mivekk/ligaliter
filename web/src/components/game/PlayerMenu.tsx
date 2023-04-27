@@ -19,11 +19,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isValid, playPointCount }) => {
         <PlayerTiles />
       </div>
       <div
-        className={`fixed bottom-28 origin-center -translate-x-1/2 left-1/2 text-white text-2xl flex justify-center items-center select-none  ${
-          isValid
-            ? "w-52 h-20 flex-col bg-violet-600 rounded-xl"
-            : "w-52 h-10 bg-gray-400"
-        }`}
+        className={`fixed bottom-28 origin-center -translate-x-1/2 left-1/2`}
       >
         <PlayButton isValid={isValid} playPointCount={playPointCount} />
       </div>

@@ -1,0 +1,8 @@
+subscription GetTiles($uuid: String!) {
+  getTiles(uuid: $uuid) {
+    id
+    letter
+    draggable
+    userId
+  }
+}

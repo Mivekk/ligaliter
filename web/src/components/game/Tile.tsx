@@ -1,10 +1,115 @@
+import { TilesContext } from "@/contexts/tilesContext";
+import { MoveTileDocument } from "@/generated/graphql";
+import {
+  HandleDragType,
+  HandleDropType,
+  HandleWrongDropType,
+  TileProps,
+  TileType,
+} from "@/types";
+import { boardSize } from "@/utils/game/constants";
 import React, { useContext, useEffect } from "react";
 import { useDrag, useDrop } from "react-dnd";
-import { TileProps } from "@/types";
-import { TilesContext } from "@/contexts/tilesContext";
+import { useMutation } from "urql";
 
-const Tile: React.FC<TileProps> = ({ id, letter, draggable, ...props }) => {
-  const { tileBag } = useContext(TilesContext);
+const Tile: React.FC<TileProps> = ({ id, letter, draggable, gameId }) => {
+  const { tileBag, playerTiles, setPlayerTiles, boardTiles, setBoardTiles } =
+    useContext(TilesContext);
+
+  const [, moveTile] = useMutation(MoveTileDocument);
+
+  // set up function for drag event
+  const handleDrag = (params: HandleDragType) => {
+    const newBoardTiles = [...boardTiles];
+    const newPlayerTiles = [...playerTiles];
+
+    const curTile =
+      params.id >= boardSize
+        ? newPlayerTiles.find((item) => item.id === params.id)
+        : newBoardTiles.find((item) => item.id === params.id);
+
+    if (!curTile) {
+      return new Error("tile not found");
+    }
+
+    curTile.letter = undefined;
+    curTile.draggable = false;
+
+    setBoardTiles(newBoardTiles);
+    setPlayerTiles(newPlayerTiles);
+  };
+
+  // set up function for drop event
+  const handleDrop = (params: HandleDropType) => {
+    const newBoardTiles = [...boardTiles];
+    const newPlayerTiles = [...playerTiles];
+
+    const fromTile =
+      params.fromId >= boardSize
+        ? newPlayerTiles.find((tile) => tile.id === params.fromId)
+        : newBoardTiles.find((tile) => tile.id === params.fromId);
+
+    const toTile =
+      params.toId >= boardSize
+        ? newPlayerTiles.find((tile) => tile.id === params.toId)
+        : newBoardTiles.find((tile) => tile.id === params.toId);
+
+    // error handling
+    if (!fromTile || !toTile) {
+      return new Error("tile error");
+    } else if (toTile.letter && !toTile.draggable) {
+      handleWrongDrop({ id: params.fromId, letter: params.letter });
+      return;
+    }
+
+    if (toTile.letter) {
+      [fromTile.letter, toTile.letter] = [toTile.letter, params.letter];
+      fromTile.draggable = true;
+    } else {
+      fromTile.letter = undefined;
+      fromTile.draggable = false;
+
+      toTile.letter = params.letter;
+      toTile.draggable = true;
+    }
+
+    // server moveTiles
+    moveTile({
+      input: {
+        uuid: gameId,
+        fromId: fromTile.id,
+        toId: toTile.id,
+      },
+    });
+
+    setBoardTiles(newBoardTiles);
+    setPlayerTiles(newPlayerTiles);
+  };
+
+  // set up function for drop outside of accepted space
+  const handleWrongDrop = (params: HandleWrongDropType) => {
+    const newTiles = [...boardTiles];
+
+    let curTile = newTiles.find((item) => item.id === params.id) as TileType;
+
+    if (curTile !== undefined) {
+      curTile.letter = params.letter;
+      curTile.draggable = true;
+    } else {
+      // it's a player tile dropped onto a board tile
+      const newPlayerTiles = [...playerTiles];
+
+      curTile = newPlayerTiles.find(
+        (item) => item.id === params.id
+      ) as TileType;
+      curTile.letter = params.letter;
+      curTile.draggable = true;
+
+      setPlayerTiles(newPlayerTiles);
+    }
+
+    setBoardTiles(newTiles);
+  };
 
   // set up drag hook
   const [{ isDragging }, drag] = useDrag({
@@ -18,7 +123,7 @@ const Tile: React.FC<TileProps> = ({ id, letter, draggable, ...props }) => {
     }),
     end: (item, monitor) => {
       if (!monitor.didDrop()) {
-        props.handleWrongDrop({ id: item.id, letter: item.letter! });
+        handleWrongDrop({ id: item.id, letter: item.letter! });
       }
     },
   });
@@ -26,7 +131,7 @@ const Tile: React.FC<TileProps> = ({ id, letter, draggable, ...props }) => {
   // on drag start execute code inside useEffect
   useEffect(() => {
     if (isDragging) {
-      props.handleDrag({ id: id });
+      handleDrag({ id: id });
     }
   }, [isDragging]);
 
@@ -38,7 +143,7 @@ const Tile: React.FC<TileProps> = ({ id, letter, draggable, ...props }) => {
         return;
       }
 
-      props.handleDrop({ fromId: item.id, toId: id, letter: item.letter });
+      handleDrop({ fromId: item.id, toId: id, letter: item.letter });
     },
   });
 
@@ -56,7 +161,9 @@ const Tile: React.FC<TileProps> = ({ id, letter, draggable, ...props }) => {
     >
       {letter}
       <div className={"absolute top-0 right-1 text-sm"}>
-        {letter ? tileBag[`${letter}`].value : null}
+        {letter && tileBag[`${letter}`].value !== -1
+          ? tileBag[`${letter}`].value
+          : null}
       </div>
     </div>
   );

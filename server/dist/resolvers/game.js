@@ -86,9 +86,8 @@ GameResponseObject = __decorate([
     (0, type_graphql_1.ObjectType)()
 ], GameResponseObject);
 let GameResolver = class GameResolver {
-    newGame(uuid, { req, redis }, publish) {
+    newGame(uuid, { redis }, publish) {
         return __awaiter(this, void 0, void 0, function* () {
-            const userId = req.session.userId;
             const lobbyID = yield redis.get(uuid);
             if (!lobbyID) {
                 return null;
@@ -98,7 +97,7 @@ let GameResolver = class GameResolver {
             const playersData = lobbyData.players.map((player) => ({
                 id: player.id,
                 points: 0,
-                tiles: (0, randomPlayerTiles_1.randomPlayerTiles)(userId),
+                tiles: (0, randomPlayerTiles_1.randomPlayerTiles)(player.id),
             }));
             const data = {
                 uuid,
@@ -124,6 +123,17 @@ let GameResolver = class GameResolver {
             }
             const gameData = JSON.parse(game);
             const result = gameData.players.find((player) => player.id === userId);
+            return result.tiles;
+        });
+    }
+    getTiles(uuid, tileUpdatedPayload, { redis }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const game = yield redis.get(`game-${uuid}`);
+            if (!game) {
+                return null;
+            }
+            const gameData = JSON.parse(game);
+            const result = gameData.players.find((player) => player.id === tileUpdatedPayload.userId);
             return result.tiles;
         });
     }
@@ -175,7 +185,6 @@ let GameResolver = class GameResolver {
     }
 };
 __decorate([
-    (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuth),
     (0, type_graphql_1.Mutation)(() => GameResponseObject, { nullable: true }),
     __param(0, (0, type_graphql_1.Arg)("uuid")),
     __param(1, (0, type_graphql_1.Ctx)()),
@@ -193,6 +202,25 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], GameResolver.prototype, "getTilesQuery", null);
+__decorate([
+    (0, type_graphql_1.Subscription)(() => [Tile], {
+        nullable: true,
+        topics: types_1.TOPICS.TILE_UPDATED,
+        filter: ({ args, payload, context }) => {
+            if (payload.uuid === args.uuid &&
+                payload.userId === context.req.session.userId) {
+                return true;
+            }
+            return false;
+        },
+    }),
+    __param(0, (0, type_graphql_1.Arg)("uuid")),
+    __param(1, (0, type_graphql_1.Root)()),
+    __param(2, (0, type_graphql_1.Ctx)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object, Object]),
+    __metadata("design:returntype", Promise)
+], GameResolver.prototype, "getTiles", null);
 __decorate([
     (0, type_graphql_1.Subscription)(() => [Tile], {
         nullable: true,
