@@ -21,6 +21,7 @@ const documents = {
     "mutation MoveTile($input: MoveTileInput!) {\n  moveTile(input: $input)\n}": types.MoveTileDocument,
     "mutation NewGame($uuid: String!) {\n  newGame(uuid: $uuid) {\n    players {\n      id\n    }\n  }\n}": types.NewGameDocument,
     "mutation NewLobby($uuid: String!) {\n  newLobby(uuid: $uuid) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}": types.NewLobbyDocument,
+    "mutation PlayTurn($input: PlayTurnInput!) {\n  playTurn(input: $input)\n}": types.PlayTurnDocument,
     "mutation QuitLobby($uuid: String!) {\n  quitLobby(uuid: $uuid) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}": types.QuitLobbyDocument,
     "mutation Register($options: RegisterInput!) {\n  register(options: $options) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}": types.RegisterDocument,
     "query GetBoardTilesQuery($uuid: String!) {\n  getBoardTilesQuery(uuid: $uuid) {\n    id\n    letter\n    draggable\n    userId\n  }\n}": types.GetBoardTilesQueryDocument,
@@ -29,7 +30,6 @@ const documents = {
     "query Me {\n  me {\n    ...UserFields\n  }\n}": types.MeDocument,
     "query Users {\n  users {\n    ...UserFields\n  }\n}": types.UsersDocument,
     "subscription GetBoardTiles($uuid: String!) {\n  getBoardTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    userId\n  }\n}": types.GetBoardTilesDocument,
-    "subscription GetTiles($uuid: String!) {\n  getTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    userId\n  }\n}": types.GetTilesDocument,
     "subscription LobbyPlayers($uuid: String!) {\n  lobbyPlayers(uuid: $uuid) {\n    players {\n      ...UserFields\n    }\n    started\n  }\n}": types.LobbyPlayersDocument,
 };
 
@@ -82,6 +82,10 @@ export function graphql(source: "mutation NewLobby($uuid: String!) {\n  newLobby
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "mutation PlayTurn($input: PlayTurnInput!) {\n  playTurn(input: $input)\n}"): (typeof documents)["mutation PlayTurn($input: PlayTurnInput!) {\n  playTurn(input: $input)\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "mutation QuitLobby($uuid: String!) {\n  quitLobby(uuid: $uuid) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}"): (typeof documents)["mutation QuitLobby($uuid: String!) {\n  quitLobby(uuid: $uuid) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -111,10 +115,6 @@ export function graphql(source: "query Users {\n  users {\n    ...UserFields\n  
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "subscription GetBoardTiles($uuid: String!) {\n  getBoardTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    userId\n  }\n}"): (typeof documents)["subscription GetBoardTiles($uuid: String!) {\n  getBoardTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    userId\n  }\n}"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(source: "subscription GetTiles($uuid: String!) {\n  getTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    userId\n  }\n}"): (typeof documents)["subscription GetTiles($uuid: String!) {\n  getTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    userId\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

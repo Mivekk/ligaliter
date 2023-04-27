@@ -22,6 +22,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameResolver = void 0;
+const initialTileBag_1 = require("../utils/initialTileBag");
 const type_graphql_1 = require("type-graphql");
 const constants_1 = require("../constants");
 const Game_1 = require("../entities/Game");
@@ -85,6 +86,19 @@ __decorate([
 GameResponseObject = __decorate([
     (0, type_graphql_1.ObjectType)()
 ], GameResponseObject);
+let PlayTurnInput = class PlayTurnInput {
+};
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", String)
+], PlayTurnInput.prototype, "uuid", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", Number)
+], PlayTurnInput.prototype, "points", void 0);
+PlayTurnInput = __decorate([
+    (0, type_graphql_1.InputType)()
+], PlayTurnInput);
 let GameResolver = class GameResolver {
     newGame(uuid, { redis }, publish) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -102,6 +116,7 @@ let GameResolver = class GameResolver {
             const data = {
                 uuid,
                 board: [],
+                tileBag: initialTileBag_1.initialTileBag,
                 players: playersData,
                 activeId: startingPlayer.id,
             };
@@ -123,17 +138,6 @@ let GameResolver = class GameResolver {
             }
             const gameData = JSON.parse(game);
             const result = gameData.players.find((player) => player.id === userId);
-            return result.tiles;
-        });
-    }
-    getTiles(uuid, tileUpdatedPayload, { redis }) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const game = yield redis.get(`game-${uuid}`);
-            if (!game) {
-                return null;
-            }
-            const gameData = JSON.parse(game);
-            const result = gameData.players.find((player) => player.id === tileUpdatedPayload.userId);
             return result.tiles;
         });
     }
@@ -178,8 +182,32 @@ let GameResolver = class GameResolver {
                 fromTile.id = input.toId;
                 fromTiles.splice(fromTiles.findIndex((tile) => tile === fromTile), 1);
             }
-            yield publish({ uuid: input.uuid, userId });
             yield redis.setex(`game-${input.uuid}`, 86400, JSON.stringify(gameData));
+            yield publish({ uuid: input.uuid, userId });
+            return true;
+        });
+    }
+    playTurn(input, { req, redis }, publish) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const userId = req.session.userId;
+            const game = yield redis.get(`game-${input.uuid}`);
+            if (!game) {
+                return false;
+            }
+            const gameData = JSON.parse(game);
+            const player = gameData.players.find((player) => player.id === userId);
+            if (!player) {
+                return false;
+            }
+            player.points += input.points;
+            gameData.activeId =
+                gameData.players[(gameData.players.findIndex((el) => el.id === gameData.activeId) + 1) %
+                    gameData.players.length].id;
+            gameData.board.forEach((tile) => {
+                tile.draggable = false;
+            });
+            yield redis.setex(`game-${input.uuid}`, 86400, JSON.stringify(gameData));
+            yield publish({ uuid: input.uuid, userId });
             return true;
         });
     }
@@ -202,25 +230,6 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], GameResolver.prototype, "getTilesQuery", null);
-__decorate([
-    (0, type_graphql_1.Subscription)(() => [Tile], {
-        nullable: true,
-        topics: types_1.TOPICS.TILE_UPDATED,
-        filter: ({ args, payload, context }) => {
-            if (payload.uuid === args.uuid &&
-                payload.userId === context.req.session.userId) {
-                return true;
-            }
-            return false;
-        },
-    }),
-    __param(0, (0, type_graphql_1.Arg)("uuid")),
-    __param(1, (0, type_graphql_1.Root)()),
-    __param(2, (0, type_graphql_1.Ctx)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object, Object]),
-    __metadata("design:returntype", Promise)
-], GameResolver.prototype, "getTiles", null);
 __decorate([
     (0, type_graphql_1.Subscription)(() => [Tile], {
         nullable: true,
@@ -251,6 +260,16 @@ __decorate([
     __metadata("design:paramtypes", [MoveTileInput, Object, Function]),
     __metadata("design:returntype", Promise)
 ], GameResolver.prototype, "moveTile", null);
+__decorate([
+    (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuth),
+    (0, type_graphql_1.Mutation)(() => Boolean),
+    __param(0, (0, type_graphql_1.Arg)("input")),
+    __param(1, (0, type_graphql_1.Ctx)()),
+    __param(2, (0, type_graphql_1.PubSub)(types_1.TOPICS.TILE_UPDATED)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [PlayTurnInput, Object, Function]),
+    __metadata("design:returntype", Promise)
+], GameResolver.prototype, "playTurn", null);
 GameResolver = __decorate([
     (0, type_graphql_1.Resolver)()
 ], GameResolver);

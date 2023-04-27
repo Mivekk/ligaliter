@@ -14,9 +14,14 @@ export type PlayerData = {
   tiles: TileType[];
 };
 
+export type TileBagType = {
+  [key: string]: { amount: number; value: number };
+};
+
 export type GameData = {
   uuid: string;
   board: TileType[];
+  tileBag: TileBagType;
   players: PlayerData[];
   activeId: number;
 };

@@ -1,7 +1,8 @@
-import React, { useContext } from "react";
 import { TilesContext } from "@/contexts/tilesContext";
-
-import { generateRandomLetter } from "@/utils/game/randomLetter";
+import { PlayTurnDocument } from "@/generated/graphql";
+import { useRouter } from "next/router";
+import React, { useContext } from "react";
+import { useMutation } from "urql";
 
 interface PlayButtonProps {
   isValid: boolean;
@@ -9,35 +10,17 @@ interface PlayButtonProps {
 }
 
 const PlayButton: React.FC<PlayButtonProps> = ({ isValid, playPointCount }) => {
-  const { boardTiles, setBoardTiles, setPlayerTiles, tileBag, setTileBag } =
-    useContext(TilesContext);
+  const router = useRouter();
+  const gameId = router.query.gameId as string;
+
+  const [, playTurn] = useMutation(PlayTurnDocument);
 
   const handleOnClick = () => {
-    const newTiles = [...boardTiles];
+    if (!isValid) {
+      return;
+    }
 
-    newTiles.map((item) => {
-      if (item.draggable) {
-        item.draggable = false;
-      }
-    });
-
-    // map through every empty tile and assign random letter
-    // from utils/randomLetter function
-    setPlayerTiles((prevTiles) => {
-      return prevTiles.map((item) => {
-        if (item.letter === undefined) {
-          return {
-            ...item,
-            letter: generateRandomLetter(tileBag, setTileBag),
-            draggable: true,
-          };
-        } else {
-          return item;
-        }
-      });
-    });
-
-    setBoardTiles(newTiles);
+    playTurn({ input: { uuid: gameId, points: playPointCount } });
   };
 
   return (
