@@ -34,6 +34,7 @@ const TilesContextProvider: React.FC<TilesContextProviderProps> = ({
       tmpTiles[i] = {
         id: i,
         draggable: false,
+        placed: false,
       };
     }
     return tmpTiles;
@@ -45,6 +46,7 @@ const TilesContextProvider: React.FC<TilesContextProviderProps> = ({
       tmpTiles[i] = {
         id: i + boardSize,
         draggable: true,
+        placed: false,
       };
     }
     return tmpTiles;

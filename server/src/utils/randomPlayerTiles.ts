@@ -9,6 +9,7 @@ export const randomPlayerTiles = (userId: number): TileType[] => {
       id: BOARD_LENGTH * BOARD_LENGTH + i,
       userId,
       draggable: true,
+      placed: false,
       letter: alphabet[Math.floor(Math.random() * alphabet.length)],
     });
   }

@@ -2,6 +2,7 @@ export type TileType = {
   id: number;
   letter?: string;
   draggable: boolean;
+  placed: boolean;
 };
 
 export type DraggedItemType = {

@@ -3,6 +3,7 @@ query GetBoardTilesQuery($uuid: String!) {
     id
     letter
     draggable
+    placed
     userId
   }
 }

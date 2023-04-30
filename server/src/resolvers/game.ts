@@ -26,6 +26,8 @@ import {
 import { isAuth } from "../utils/isAuth";
 import { playerIdToUser } from "../utils/playerIdToUser";
 import { randomPlayerTiles } from "../utils/randomPlayerTiles";
+import { GAME_EXPIRATION_TIME } from "../constants";
+import { User } from "../entities/User";
 
 @ObjectType()
 class Tile {
@@ -37,6 +39,9 @@ class Tile {
 
   @Field()
   draggable: boolean;
+
+  @Field()
+  placed: boolean;
 
   @Field()
   userId: number;
@@ -75,6 +80,15 @@ class PlayTurnInput {
   points: number;
 }
 
+@ObjectType()
+class MakingTurnResponseObject {
+  @Field()
+  id: number;
+
+  @Field()
+  activePlayer: string;
+}
+
 @Resolver()
 export class GameResolver {
   @Mutation(() => GameResponseObject, { nullable: true })
@@ -107,7 +121,11 @@ export class GameResolver {
       activeId: startingPlayer.id,
     };
 
-    await redis.setex(`game-${uuid}`, 86400, JSON.stringify(data));
+    await redis.setex(
+      `game-${uuid}`,
+      GAME_EXPIRATION_TIME,
+      JSON.stringify(data)
+    );
 
     const players = await playerIdToUser(lobbyData.players);
     await Game.create({ players }).save();
@@ -213,7 +231,11 @@ export class GameResolver {
       );
     }
 
-    await redis.setex(`game-${input.uuid}`, 86400, JSON.stringify(gameData));
+    await redis.setex(
+      `game-${input.uuid}`,
+      GAME_EXPIRATION_TIME,
+      JSON.stringify(gameData)
+    );
 
     await publish({ uuid: input.uuid, userId });
 
@@ -250,12 +272,37 @@ export class GameResolver {
 
     gameData.board.forEach((tile) => {
       tile.draggable = false;
+      tile.placed = true;
     });
 
-    await redis.setex(`game-${input.uuid}`, 86400, JSON.stringify(gameData));
+    await redis.setex(
+      `game-${input.uuid}`,
+      GAME_EXPIRATION_TIME,
+      JSON.stringify(gameData)
+    );
 
     await publish({ uuid: input.uuid, userId });
 
     return true;
+  }
+
+  @Query(() => MakingTurnResponseObject, { nullable: true })
+  async makingTurn(
+    @Arg("uuid") uuid: string,
+    @Ctx() { redis }: ApolloContext
+  ): Promise<MakingTurnResponseObject | null> {
+    const game = await redis.get(`game-${uuid}`);
+    if (!game) {
+      return null;
+    }
+
+    const gameData = JSON.parse(game) as GameData;
+
+    const user = (await User.findOneBy({ id: gameData.activeId })) as User;
+
+    return {
+      id: gameData.activeId,
+      activePlayer: user.username,
+    };
   }
 }

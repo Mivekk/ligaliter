@@ -44,13 +44,14 @@ const Board: React.FC<{}> = () => {
       newTiles[i] = {
         id: i,
         draggable: false,
+        placed: false,
       };
     }
 
     data.forEach((tile) => {
       newTiles[tile.id] = tile;
 
-      if (meData?.me && tile.userId !== meData.me.id) {
+      if (meData?.me && tile.userId !== meData.me.id && !tile.placed) {
         tile.letter = "?";
         tile.draggable = false;
       }
@@ -65,6 +66,7 @@ const Board: React.FC<{}> = () => {
       id={item.id}
       letter={item.letter}
       draggable={item.draggable}
+      placed={item.placed}
       gameId={gameId}
     />
   ));

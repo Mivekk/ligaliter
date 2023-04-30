@@ -30,6 +30,7 @@ const PlayerTiles: React.FC<{}> = () => {
       newPlayerTiles[i] = {
         id: i + boardSize,
         draggable: false,
+        placed: false,
       };
     }
 
@@ -48,6 +49,7 @@ const PlayerTiles: React.FC<{}> = () => {
         id={item.id}
         letter={item.letter}
         draggable={item.draggable}
+        placed={item.placed}
         gameId={gameId}
       />
     </TileDropArea>

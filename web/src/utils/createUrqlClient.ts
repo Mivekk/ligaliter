@@ -1,5 +1,10 @@
 import { createClient as createWSClient } from "graphql-ws";
-import { dedupExchange, fetchExchange, subscriptionExchange } from "urql";
+import {
+  debugExchange,
+  dedupExchange,
+  fetchExchange,
+  subscriptionExchange,
+} from "urql";
 import { customCacheExchange } from "./customCacheExchange";
 
 const isServerSide = typeof window === "undefined";
@@ -16,6 +21,7 @@ export const createUrqlClient = (ssrExchange: any) => ({
     credentials: "include" as const,
   },
   exchanges: [
+    debugExchange,
     dedupExchange,
     customCacheExchange,
     ssrExchange,

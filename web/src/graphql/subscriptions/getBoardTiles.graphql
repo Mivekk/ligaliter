@@ -3,6 +3,7 @@ subscription GetBoardTiles($uuid: String!) {
     id
     letter
     draggable
+    placed
     userId
   }
 }

@@ -1,0 +1,6 @@
+query MakingTurn($uuid: String!) {
+  makingTurn(uuid: $uuid) {
+    id
+    activePlayer
+  }
+}

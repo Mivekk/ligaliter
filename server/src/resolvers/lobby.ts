@@ -15,6 +15,7 @@ import { User } from "../entities/User";
 import { ApolloContext, LobbyData, LobbyPlayers, TOPICS } from "../types";
 import { ResponseObject } from "./user";
 import { playerIdToUser } from "../utils/playerIdToUser";
+import { LOBBY_EXPIRATION_TIME } from "../constants";
 
 @ObjectType()
 class LobbyQueryResponseObject {
@@ -67,7 +68,7 @@ export class LobbyResolver {
       players: [{ id: userId }],
     };
 
-    await redis.setex(uuid, 3600, JSON.stringify(data));
+    await redis.setex(uuid, LOBBY_EXPIRATION_TIME, JSON.stringify(data));
 
     return {
       user,
@@ -155,7 +156,7 @@ export class LobbyResolver {
 
     lobbyData.players.push({ id: userId });
 
-    await redis.setex(uuid, 3600, JSON.stringify(lobbyData));
+    await redis.setex(uuid, LOBBY_EXPIRATION_TIME, JSON.stringify(lobbyData));
 
     await publish({ players: lobbyData.players, uuid, started: false });
 
@@ -205,7 +206,7 @@ export class LobbyResolver {
     lobbyData.players = lobbyData.players.filter((item) => item.id !== userId);
 
     if (lobbyData.players.length > 0) {
-      await redis.setex(uuid, 3600, JSON.stringify(lobbyData));
+      await redis.setex(uuid, LOBBY_EXPIRATION_TIME, JSON.stringify(lobbyData));
 
       await publish({ players: lobbyData.players, uuid, started: false });
     } else {

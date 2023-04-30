@@ -27,6 +27,7 @@ const User_1 = require("../entities/User");
 const types_1 = require("../types");
 const user_1 = require("./user");
 const playerIdToUser_1 = require("../utils/playerIdToUser");
+const constants_1 = require("../constants");
 let LobbyQueryResponseObject = class LobbyQueryResponseObject {
 };
 __decorate([
@@ -79,7 +80,7 @@ let LobbyResolver = class LobbyResolver {
                 createdAt: new Date(),
                 players: [{ id: userId }],
             };
-            yield redis.setex(uuid, 3600, JSON.stringify(data));
+            yield redis.setex(uuid, constants_1.LOBBY_EXPIRATION_TIME, JSON.stringify(data));
             return {
                 user,
             };
@@ -142,7 +143,7 @@ let LobbyResolver = class LobbyResolver {
                 };
             }
             lobbyData.players.push({ id: userId });
-            yield redis.setex(uuid, 3600, JSON.stringify(lobbyData));
+            yield redis.setex(uuid, constants_1.LOBBY_EXPIRATION_TIME, JSON.stringify(lobbyData));
             yield publish({ players: lobbyData.players, uuid, started: false });
             return {
                 user,
@@ -181,7 +182,7 @@ let LobbyResolver = class LobbyResolver {
             const lobbyData = JSON.parse(lobby);
             lobbyData.players = lobbyData.players.filter((item) => item.id !== userId);
             if (lobbyData.players.length > 0) {
-                yield redis.setex(uuid, 3600, JSON.stringify(lobbyData));
+                yield redis.setex(uuid, constants_1.LOBBY_EXPIRATION_TIME, JSON.stringify(lobbyData));
                 yield publish({ players: lobbyData.players, uuid, started: false });
             }
             else {

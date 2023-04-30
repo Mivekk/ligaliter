@@ -1,5 +1,5 @@
 import { TilesContext } from "@/contexts/tilesContext";
-import { MoveTileDocument } from "@/generated/graphql";
+import { MakingTurnDocument, MoveTileDocument } from "@/generated/graphql";
 import {
   HandleDragType,
   HandleDropType,
@@ -10,9 +10,15 @@ import {
 import { boardSize } from "@/utils/game/constants";
 import React, { useContext, useEffect } from "react";
 import { useDrag, useDrop } from "react-dnd";
-import { useMutation } from "urql";
+import { useMutation, useQuery } from "urql";
 
-const Tile: React.FC<TileProps> = ({ id, letter, draggable, gameId }) => {
+const Tile: React.FC<TileProps> = ({
+  id,
+  letter,
+  draggable,
+  placed,
+  gameId,
+}) => {
   const { tileBag, playerTiles, setPlayerTiles, boardTiles, setBoardTiles } =
     useContext(TilesContext);
 
@@ -156,7 +162,7 @@ const Tile: React.FC<TileProps> = ({ id, letter, draggable, gameId }) => {
        border-[1px] shadow-[0px_2px_black] border-black rounded-lg`}
       style={{
         opacity: letter ? 1.0 : 0.0,
-        backgroundColor: draggable ? "yellow" : "orange",
+        backgroundColor: placed ? "orange" : draggable ? "yellow" : "lightgrey",
       }}
     >
       {letter}

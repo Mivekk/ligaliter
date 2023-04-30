@@ -1,7 +1,6 @@
-import { TilesContext } from "@/contexts/tilesContext";
 import { PlayTurnDocument } from "@/generated/graphql";
 import { useRouter } from "next/router";
-import React, { useContext } from "react";
+import React from "react";
 import { useMutation } from "urql";
 
 interface PlayButtonProps {

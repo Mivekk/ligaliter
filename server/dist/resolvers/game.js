@@ -30,6 +30,8 @@ const types_1 = require("../types");
 const isAuth_1 = require("../utils/isAuth");
 const playerIdToUser_1 = require("../utils/playerIdToUser");
 const randomPlayerTiles_1 = require("../utils/randomPlayerTiles");
+const constants_2 = require("../constants");
+const User_1 = require("../entities/User");
 let Tile = class Tile {
 };
 __decorate([
@@ -44,6 +46,10 @@ __decorate([
     (0, type_graphql_1.Field)(),
     __metadata("design:type", Boolean)
 ], Tile.prototype, "draggable", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", Boolean)
+], Tile.prototype, "placed", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
     __metadata("design:type", Number)
@@ -99,6 +105,19 @@ __decorate([
 PlayTurnInput = __decorate([
     (0, type_graphql_1.InputType)()
 ], PlayTurnInput);
+let MakingTurnResponseObject = class MakingTurnResponseObject {
+};
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", Number)
+], MakingTurnResponseObject.prototype, "id", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", String)
+], MakingTurnResponseObject.prototype, "activePlayer", void 0);
+MakingTurnResponseObject = __decorate([
+    (0, type_graphql_1.ObjectType)()
+], MakingTurnResponseObject);
 let GameResolver = class GameResolver {
     newGame(uuid, { redis }, publish) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -120,7 +139,7 @@ let GameResolver = class GameResolver {
                 players: playersData,
                 activeId: startingPlayer.id,
             };
-            yield redis.setex(`game-${uuid}`, 86400, JSON.stringify(data));
+            yield redis.setex(`game-${uuid}`, constants_2.GAME_EXPIRATION_TIME, JSON.stringify(data));
             const players = yield (0, playerIdToUser_1.playerIdToUser)(lobbyData.players);
             yield Game_1.Game.create({ players }).save();
             yield publish({ players: lobbyData.players, uuid, started: true });
@@ -182,7 +201,7 @@ let GameResolver = class GameResolver {
                 fromTile.id = input.toId;
                 fromTiles.splice(fromTiles.findIndex((tile) => tile === fromTile), 1);
             }
-            yield redis.setex(`game-${input.uuid}`, 86400, JSON.stringify(gameData));
+            yield redis.setex(`game-${input.uuid}`, constants_2.GAME_EXPIRATION_TIME, JSON.stringify(gameData));
             yield publish({ uuid: input.uuid, userId });
             return true;
         });
@@ -205,10 +224,25 @@ let GameResolver = class GameResolver {
                     gameData.players.length].id;
             gameData.board.forEach((tile) => {
                 tile.draggable = false;
+                tile.placed = true;
             });
-            yield redis.setex(`game-${input.uuid}`, 86400, JSON.stringify(gameData));
+            yield redis.setex(`game-${input.uuid}`, constants_2.GAME_EXPIRATION_TIME, JSON.stringify(gameData));
             yield publish({ uuid: input.uuid, userId });
             return true;
+        });
+    }
+    makingTurn(uuid, { redis }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const game = yield redis.get(`game-${uuid}`);
+            if (!game) {
+                return null;
+            }
+            const gameData = JSON.parse(game);
+            const user = (yield User_1.User.findOneBy({ id: gameData.activeId }));
+            return {
+                id: gameData.activeId,
+                activePlayer: user.username,
+            };
         });
     }
 };
@@ -270,6 +304,14 @@ __decorate([
     __metadata("design:paramtypes", [PlayTurnInput, Object, Function]),
     __metadata("design:returntype", Promise)
 ], GameResolver.prototype, "playTurn", null);
+__decorate([
+    (0, type_graphql_1.Query)(() => MakingTurnResponseObject, { nullable: true }),
+    __param(0, (0, type_graphql_1.Arg)("uuid")),
+    __param(1, (0, type_graphql_1.Ctx)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], GameResolver.prototype, "makingTurn", null);
 GameResolver = __decorate([
     (0, type_graphql_1.Resolver)()
 ], GameResolver);
