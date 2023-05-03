@@ -12,7 +12,6 @@ exports.AppDataSource = new typeorm_1.DataSource({
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     synchronize: true,
-    logging: true,
     entities: [User_1.User, Game_1.Game],
     ssl: true,
 });

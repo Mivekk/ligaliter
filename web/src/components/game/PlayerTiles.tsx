@@ -1,5 +1,4 @@
 import { TilesContext } from "@/contexts/tilesContext";
-import { GetTilesQueryDocument } from "@/generated/graphql";
 import { TileType } from "@/types";
 import { boardSize, playerTilesAmount } from "@/utils/game/constants";
 import { useRouter } from "next/router";
@@ -7,6 +6,7 @@ import React, { useContext, useEffect } from "react";
 import { useQuery } from "urql";
 import Tile from "./Tile";
 import TileDropArea from "./TileDropArea";
+import { GetPlayerTilesDocument } from "@/generated/graphql";
 
 const PlayerTiles: React.FC<{}> = () => {
   const router = useRouter();
@@ -15,13 +15,13 @@ const PlayerTiles: React.FC<{}> = () => {
   const { playerTiles, setPlayerTiles } = useContext(TilesContext);
 
   const [{ data: queryData, fetching }] = useQuery({
-    query: GetTilesQueryDocument,
+    query: GetPlayerTilesDocument,
     variables: { uuid: gameId },
   });
 
   // generate random letters on first render
   useEffect(() => {
-    if (!queryData?.getTilesQuery) {
+    if (!queryData?.getPlayerTiles) {
       return;
     }
 
@@ -34,7 +34,7 @@ const PlayerTiles: React.FC<{}> = () => {
       };
     }
 
-    queryData?.getTilesQuery.forEach((tile) => {
+    queryData?.getPlayerTiles.forEach((tile) => {
       newPlayerTiles[tile.id - boardSize].letter = tile.letter;
       newPlayerTiles[tile.id - boardSize].draggable = tile.draggable;
     });

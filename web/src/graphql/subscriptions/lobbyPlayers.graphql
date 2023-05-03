@@ -1,8 +1,0 @@
-subscription LobbyPlayers($uuid: String!) {
-  lobbyPlayers(uuid: $uuid) {
-    players {
-      ...UserFields
-    }
-    started
-  }
-}

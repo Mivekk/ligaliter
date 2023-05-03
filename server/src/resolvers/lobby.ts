@@ -11,11 +11,12 @@ import {
   Root,
   Subscription,
 } from "type-graphql";
+import { LOBBY_EXPIRATION_TIME } from "../constants";
 import { User } from "../entities/User";
 import { ApolloContext, LobbyData, LobbyPlayers, TOPICS } from "../types";
-import { ResponseObject } from "./user";
+import { fetchLobbyData } from "../utils/fetchLobbyData";
 import { playerIdToUser } from "../utils/playerIdToUser";
-import { LOBBY_EXPIRATION_TIME } from "../constants";
+import { ResponseObject } from "./user";
 
 @ObjectType()
 class LobbyQueryResponseObject {
@@ -76,16 +77,14 @@ export class LobbyResolver {
   }
 
   @Query(() => LobbyQueryResponseObject)
-  async lobbyPlayersQuery(
+  async getLobbyPlayers(
     @Arg("uuid") uuid: string,
     @Ctx() { redis }: ApolloContext
   ): Promise<LobbyQueryResponseObject> {
-    const lobby = await redis.get(uuid);
-    if (!lobby) {
+    const lobbyData = await fetchLobbyData(uuid, redis);
+    if (!lobbyData) {
       return { players: null, owner: null };
     }
-
-    const lobbyData = JSON.parse(lobby) as LobbyData;
 
     const players = await playerIdToUser(lobbyData.players);
 
@@ -98,7 +97,7 @@ export class LobbyResolver {
     topics: TOPICS.NEW_PLAYER_IN_LOBBY,
     filter: ({ payload, args }) => payload.uuid === args.uuid,
   })
-  async lobbyPlayers(
+  async updateLobbyPlayers(
     @Root() lobbyPlayersPayload: LobbyPlayers,
     @Arg("uuid") _uuid: string
   ): Promise<LobbyReponseObject> {
@@ -133,8 +132,8 @@ export class LobbyResolver {
       };
     }
 
-    const lobby = await redis.get(uuid);
-    if (!lobby) {
+    const lobbyData = await fetchLobbyData(uuid, redis);
+    if (!lobbyData) {
       return {
         error: {
           field: "uuid",
@@ -142,8 +141,6 @@ export class LobbyResolver {
         },
       };
     }
-
-    const lobbyData = JSON.parse(lobby) as LobbyData;
 
     if (lobbyData.players.find((item) => item.id === user.id)) {
       return {
@@ -191,8 +188,8 @@ export class LobbyResolver {
       };
     }
 
-    const lobby = await redis.get(uuid);
-    if (!lobby) {
+    const lobbyData = await fetchLobbyData(uuid, redis);
+    if (!lobbyData) {
       return {
         error: {
           field: "uuid",
@@ -200,8 +197,6 @@ export class LobbyResolver {
         },
       };
     }
-
-    const lobbyData = JSON.parse(lobby) as LobbyData;
 
     lobbyData.players = lobbyData.players.filter((item) => item.id !== userId);
 

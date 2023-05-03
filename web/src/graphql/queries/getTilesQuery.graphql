@@ -1,9 +1,0 @@
-query GetTilesQuery($uuid: String!) {
-  getTilesQuery(uuid: $uuid) {
-    id
-    letter
-    draggable
-    placed
-    userId
-  }
-}

@@ -2,6 +2,8 @@ import React from "react";
 
 import PlayerTiles from "./PlayerTiles";
 import PlayButton from "./PlayButton";
+import SkipButton from "./SkipButton";
+import SwapButton from "./SwapButton";
 
 interface PlayerMenuProps {
   isValid: boolean;
@@ -18,10 +20,16 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isValid, playPointCount }) => {
       >
         <PlayerTiles />
       </div>
-      <div
-        className={`fixed bottom-28 origin-center -translate-x-1/2 left-1/2`}
-      >
-        <PlayButton isValid={isValid} playPointCount={playPointCount} />
+      <div className="fixed bottom-28 flex gap-2 origin-center -translate-x-1/2 left-1/2">
+        <div>
+          <SwapButton />
+        </div>
+        <div>
+          <PlayButton isValid={isValid} playPointCount={playPointCount} />
+        </div>
+        <div>
+          <SkipButton />
+        </div>
       </div>
     </>
   );

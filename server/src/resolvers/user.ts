@@ -1,35 +1,17 @@
-import { User } from "../entities/User";
-import {
-  Resolver,
-  Query,
-  Mutation,
-  Arg,
-  InputType,
-  Field,
-  ObjectType,
-  Ctx,
-} from "type-graphql";
 import argon2 from "argon2";
-import { ApolloContext } from "../types";
+import {
+  Arg,
+  Ctx,
+  Field,
+  InputType,
+  Mutation,
+  ObjectType,
+  Query,
+  Resolver,
+} from "type-graphql";
 import { COOKIE_NAME } from "../constants";
-
-@ObjectType()
-class FieldError {
-  @Field()
-  field: string;
-
-  @Field()
-  message: string;
-}
-
-@ObjectType()
-export class ResponseObject {
-  @Field(() => FieldError, { nullable: true })
-  error?: FieldError;
-
-  @Field(() => User, { nullable: true })
-  user?: User;
-}
+import { User } from "../entities/User";
+import { ApolloContext } from "../types";
 
 @InputType()
 class LoginInput {
@@ -44,6 +26,24 @@ class LoginInput {
 class RegisterInput extends LoginInput {
   @Field()
   email: string;
+}
+
+@ObjectType()
+export class FieldError {
+  @Field()
+  field: string;
+
+  @Field()
+  message: string;
+}
+
+@ObjectType()
+export class ResponseObject {
+  @Field(() => FieldError, { nullable: true })
+  error?: FieldError;
+
+  @Field(() => User, { nullable: true })
+  user?: User;
 }
 
 @Resolver()

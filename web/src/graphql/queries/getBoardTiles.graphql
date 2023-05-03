@@ -1,4 +1,4 @@
-subscription GetBoardTiles($uuid: String!) {
+query GetBoardTiles($uuid: String!) {
   getBoardTiles(uuid: $uuid) {
     id
     letter

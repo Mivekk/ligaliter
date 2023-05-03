@@ -2,11 +2,11 @@ import Button from "@/components/Button";
 import Heading from "@/components/Heading";
 import Wrapper from "@/components/Wrapper";
 import {
-  LobbyPlayersDocument,
-  LobbyPlayersQueryDocument,
+  GetLobbyPlayersDocument,
   MeDocument,
   NewGameDocument,
   QuitLobbyDocument,
+  UpdateLobbyPlayersDocument,
 } from "@/generated/graphql";
 import { createUrqlClient } from "@/utils/createUrqlClient";
 import { isAuth } from "@/utils/isAuth";
@@ -22,25 +22,25 @@ const Lobby: React.FC<{}> = ({}) => {
   const [{ data: meData }] = useQuery({ query: MeDocument });
 
   const [{ data: queryData }] = useQuery({
-    query: LobbyPlayersQueryDocument,
+    query: GetLobbyPlayersDocument,
     variables: { uuid: lobbyUUID },
   });
 
   const [{ data: subscriptionData }] = useSubscription({
-    query: LobbyPlayersDocument,
+    query: UpdateLobbyPlayersDocument,
     variables: { uuid: lobbyUUID },
   });
 
   const [, quitLobby] = useMutation(QuitLobbyDocument);
   const [, newGame] = useMutation(NewGameDocument);
 
-  const initialPlayers = queryData?.lobbyPlayersQuery?.players?.map((item) => (
+  const initialPlayers = queryData?.getLobbyPlayers?.players?.map((item) => (
     <div key={item.id} className="text-xl">
       {item.username}
     </div>
   ));
 
-  const subsequentPlayers = subscriptionData?.lobbyPlayers?.players?.map(
+  const subsequentPlayers = subscriptionData?.updateLobbyPlayers?.players?.map(
     (item) => (
       <div key={item.id} className="text-xl">
         {item.username}
@@ -48,11 +48,11 @@ const Lobby: React.FC<{}> = ({}) => {
     )
   );
 
-  if (subscriptionData?.lobbyPlayers.started) {
+  if (subscriptionData?.updateLobbyPlayers.started) {
     router.push(`/game/${lobbyUUID}`);
   }
 
-  const isOwner = queryData?.lobbyPlayersQuery.owner?.id === meData?.me?.id;
+  const isOwner = queryData?.getLobbyPlayers.owner?.id === meData?.me?.id;
 
   isAuth();
 

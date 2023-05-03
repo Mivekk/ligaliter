@@ -1,0 +1,14 @@
+subscription UpdatePlayerStats($uuid: String!) {
+  updatePlayerStats(uuid: $uuid) {
+    id
+    activePlayer {
+      id
+      username
+    }
+    players {
+      id
+      username
+      points
+    }
+  }
+}

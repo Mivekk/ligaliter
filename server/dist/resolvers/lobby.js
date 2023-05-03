@@ -23,11 +23,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LobbyResolver = void 0;
 const type_graphql_1 = require("type-graphql");
+const constants_1 = require("../constants");
 const User_1 = require("../entities/User");
 const types_1 = require("../types");
-const user_1 = require("./user");
+const fetchLobbyData_1 = require("../utils/fetchLobbyData");
 const playerIdToUser_1 = require("../utils/playerIdToUser");
-const constants_1 = require("../constants");
+const user_1 = require("./user");
 let LobbyQueryResponseObject = class LobbyQueryResponseObject {
 };
 __decorate([
@@ -86,19 +87,18 @@ let LobbyResolver = class LobbyResolver {
             };
         });
     }
-    lobbyPlayersQuery(uuid, { redis }) {
+    getLobbyPlayers(uuid, { redis }) {
         return __awaiter(this, void 0, void 0, function* () {
-            const lobby = yield redis.get(uuid);
-            if (!lobby) {
+            const lobbyData = yield (0, fetchLobbyData_1.fetchLobbyData)(uuid, redis);
+            if (!lobbyData) {
                 return { players: null, owner: null };
             }
-            const lobbyData = JSON.parse(lobby);
             const players = yield (0, playerIdToUser_1.playerIdToUser)(lobbyData.players);
             const owner = players.find((item) => item.id === lobbyData.owner);
             return { players, owner };
         });
     }
-    lobbyPlayers(lobbyPlayersPayload, _uuid) {
+    updateLobbyPlayers(lobbyPlayersPayload, _uuid) {
         return __awaiter(this, void 0, void 0, function* () {
             const players = yield (0, playerIdToUser_1.playerIdToUser)(lobbyPlayersPayload.players);
             return { players, started: lobbyPlayersPayload.started };
@@ -124,8 +124,8 @@ let LobbyResolver = class LobbyResolver {
                     },
                 };
             }
-            const lobby = yield redis.get(uuid);
-            if (!lobby) {
+            const lobbyData = yield (0, fetchLobbyData_1.fetchLobbyData)(uuid, redis);
+            if (!lobbyData) {
                 return {
                     error: {
                         field: "uuid",
@@ -133,7 +133,6 @@ let LobbyResolver = class LobbyResolver {
                     },
                 };
             }
-            const lobbyData = JSON.parse(lobby);
             if (lobbyData.players.find((item) => item.id === user.id)) {
                 return {
                     error: {
@@ -170,8 +169,8 @@ let LobbyResolver = class LobbyResolver {
                     },
                 };
             }
-            const lobby = yield redis.get(uuid);
-            if (!lobby) {
+            const lobbyData = yield (0, fetchLobbyData_1.fetchLobbyData)(uuid, redis);
+            if (!lobbyData) {
                 return {
                     error: {
                         field: "uuid",
@@ -179,7 +178,6 @@ let LobbyResolver = class LobbyResolver {
                     },
                 };
             }
-            const lobbyData = JSON.parse(lobby);
             lobbyData.players = lobbyData.players.filter((item) => item.id !== userId);
             if (lobbyData.players.length > 0) {
                 yield redis.setex(uuid, constants_1.LOBBY_EXPIRATION_TIME, JSON.stringify(lobbyData));
@@ -209,7 +207,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
-], LobbyResolver.prototype, "lobbyPlayersQuery", null);
+], LobbyResolver.prototype, "getLobbyPlayers", null);
 __decorate([
     (0, type_graphql_1.Subscription)(() => LobbyReponseObject, {
         topics: types_1.TOPICS.NEW_PLAYER_IN_LOBBY,
@@ -220,7 +218,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", Promise)
-], LobbyResolver.prototype, "lobbyPlayers", null);
+], LobbyResolver.prototype, "updateLobbyPlayers", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => user_1.ResponseObject),
     __param(0, (0, type_graphql_1.Arg)("uuid")),

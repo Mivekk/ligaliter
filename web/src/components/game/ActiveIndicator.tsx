@@ -1,27 +1,33 @@
-import { MakingTurnDocument } from "@/generated/graphql";
+import {
+  GetPlayerStatsDocument,
+  UpdatePlayerStatsDocument,
+} from "@/generated/graphql";
 import { useRouter } from "next/router";
-import React, { useEffect, useMemo } from "react";
-import { useQuery } from "urql";
+import React from "react";
+import { useQuery, useSubscription } from "urql";
 
 const ActiveIndicator: React.FC<{}> = ({}) => {
   const router = useRouter();
   const gameId = router.query.gameId as string;
 
-  const [{ data, fetching }] = useQuery({
-    query: MakingTurnDocument,
+  const [{ data: queryData }] = useQuery({
+    query: GetPlayerStatsDocument,
     variables: { uuid: gameId },
   });
 
-  useEffect(() => {
-    console.log(data);
-  }, [data, fetching]);
+  const [{ data: subscriptionData }] = useSubscription({
+    query: UpdatePlayerStatsDocument,
+    variables: { uuid: gameId },
+  });
+
+  const data = subscriptionData?.updatePlayerStats || queryData?.getPlayerStats;
 
   return (
     <div
-      className="fixed top-14 origin-center -translate-x-1/2 left-1/2 w-[14rem] 
+      className="fixed top-14 origin-center -translate-x-1/2 left-1/2 w-[14rem] shadow-lg
         h-10 text-xl rounded-b-xl bg-darker2 z-30 text-white flex justify-center items-center"
     >
-      {!fetching ? data?.makingTurn?.activePlayer : "..."}
+      {data?.activePlayer.username}
     </div>
   );
 };

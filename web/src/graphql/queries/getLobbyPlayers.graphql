@@ -1,5 +1,5 @@
-query LobbyPlayersQuery($uuid: String!) {
-  lobbyPlayersQuery(uuid: $uuid) {
+query GetLobbyPlayers($uuid: String!) {
+  getLobbyPlayers(uuid: $uuid) {
     owner {
       ...UserFields
     }

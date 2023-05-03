@@ -1,0 +1,9 @@
+subscription UpdateBoardTiles($uuid: String!) {
+  updateBoardTiles(uuid: $uuid) {
+    id
+    letter
+    draggable
+    placed
+    userId
+  }
+}

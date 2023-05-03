@@ -1,5 +1,10 @@
 import { TilesContext } from "@/contexts/tilesContext";
-import { MakingTurnDocument, MoveTileDocument } from "@/generated/graphql";
+import {
+  GetPlayerStatsDocument,
+  MeDocument,
+  MoveTileDocument,
+  UpdatePlayerStatsDocument,
+} from "@/generated/graphql";
 import {
   HandleDragType,
   HandleDropType,
@@ -10,7 +15,7 @@ import {
 import { boardSize } from "@/utils/game/constants";
 import React, { useContext, useEffect } from "react";
 import { useDrag, useDrop } from "react-dnd";
-import { useMutation, useQuery } from "urql";
+import { useMutation, useQuery, useSubscription } from "urql";
 
 const Tile: React.FC<TileProps> = ({
   id,
@@ -23,6 +28,20 @@ const Tile: React.FC<TileProps> = ({
     useContext(TilesContext);
 
   const [, moveTile] = useMutation(MoveTileDocument);
+
+  const [{ data: meData }] = useQuery({ query: MeDocument });
+
+  const [{ data: queryData }] = useQuery({
+    query: GetPlayerStatsDocument,
+    variables: { uuid: gameId },
+  });
+
+  const [{ data: subscriptionData }] = useSubscription({
+    query: UpdatePlayerStatsDocument,
+    variables: { uuid: gameId },
+  });
+
+  const data = subscriptionData?.updatePlayerStats || queryData?.getPlayerStats;
 
   // set up function for drag event
   const handleDrag = (params: HandleDragType) => {
@@ -63,7 +82,10 @@ const Tile: React.FC<TileProps> = ({
     // error handling
     if (!fromTile || !toTile) {
       return new Error("tile error");
-    } else if (toTile.letter && !toTile.draggable) {
+    } else if (
+      (toTile.letter && !toTile.draggable) ||
+      (data?.activePlayer.id !== meData?.me?.id && params.toId < boardSize)
+    ) {
       handleWrongDrop({ id: params.fromId, letter: params.letter });
       return;
     }

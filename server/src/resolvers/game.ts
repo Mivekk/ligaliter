@@ -1,4 +1,3 @@
-import { initialTileBag } from "../utils/initialTileBag";
 import {
   Arg,
   Ctx,
@@ -10,11 +9,13 @@ import {
   Publisher,
   Query,
   Resolver,
+  Root,
   Subscription,
   UseMiddleware,
 } from "type-graphql";
-import { BOARD_SIZE } from "../constants";
+import { BOARD_SIZE, GAME_EXPIRATION_TIME } from "../constants";
 import { Game } from "../entities/Game";
+import { User } from "../entities/User";
 import {
   ApolloContext,
   GameData,
@@ -23,11 +24,38 @@ import {
   TOPICS,
   TileUpdatedPayload,
 } from "../types";
+import { fetchGameData } from "../utils/fetchGameData";
+import { initialTileBag } from "../utils/initialTileBag";
 import { isAuth } from "../utils/isAuth";
 import { playerIdToUser } from "../utils/playerIdToUser";
 import { randomPlayerTiles } from "../utils/randomPlayerTiles";
-import { GAME_EXPIRATION_TIME } from "../constants";
-import { User } from "../entities/User";
+
+@InputType()
+class MoveTileInput {
+  @Field()
+  uuid: string;
+
+  @Field()
+  fromId: number;
+
+  @Field()
+  toId: number;
+}
+
+@InputType()
+class PlayTurnInput {
+  @Field()
+  uuid: string;
+
+  @Field()
+  points: number;
+}
+
+@ObjectType()
+class IdsFormat {
+  @Field()
+  id: number;
+}
 
 @ObjectType()
 class Tile {
@@ -47,46 +75,34 @@ class Tile {
   userId: number;
 }
 
-@InputType()
-class MoveTileInput {
-  @Field()
-  uuid: string;
-
-  @Field()
-  fromId: number;
-
-  @Field()
-  toId: number;
-}
-
-@ObjectType()
-class PlayerIdsFormat {
-  @Field()
-  id: number;
-}
-
 @ObjectType()
 class GameResponseObject {
-  @Field(() => [PlayerIdsFormat])
-  players: PlayerIdsFormat[];
+  @Field(() => [IdsFormat])
+  players: IdsFormat[];
 }
 
-@InputType()
-class PlayTurnInput {
-  @Field()
-  uuid: string;
+@ObjectType()
+class PlayerStats {
+  @Field(() => Number)
+  id: number;
 
-  @Field()
+  @Field(() => String)
+  username: string;
+
+  @Field(() => Number)
   points: number;
 }
 
 @ObjectType()
-class MakingTurnResponseObject {
-  @Field()
+class GameInfoResponseObject {
+  @Field(() => Number)
   id: number;
 
-  @Field()
-  activePlayer: string;
+  @Field(() => User)
+  activePlayer: User;
+
+  @Field(() => [PlayerStats])
+  players: PlayerStats[];
 }
 
 @Resolver()
@@ -139,22 +155,53 @@ export class GameResolver {
 
   @UseMiddleware(isAuth)
   @Query(() => [Tile], { nullable: true })
-  async getTilesQuery(
+  async getPlayerTiles(
     @Arg("uuid") uuid: string,
     @Ctx() { req, redis }: ApolloContext
   ): Promise<Tile[] | null> {
     const userId = req.session.userId!;
-
-    const game = await redis.get(`game-${uuid}`);
-    if (!game) {
+    const gameData = await fetchGameData(uuid, redis);
+    if (!gameData) {
       return null;
     }
-
-    const gameData = JSON.parse(game) as GameData;
 
     const result = gameData.players.find((player) => player.id === userId)!;
 
     return result.tiles;
+  }
+
+  @UseMiddleware(isAuth)
+  @Subscription(() => [Tile], {
+    nullable: true,
+    topics: TOPICS.END_TURN,
+    filter: ({ args, payload }) => args.uuid == payload.uuid,
+  })
+  async updatePlayerTiles(
+    @Arg("uuid") uuid: string,
+    @Ctx() { req, redis }: ApolloContext
+  ): Promise<Tile[] | null> {
+    const userId = req.session.userId!;
+    const gameData = await fetchGameData(uuid, redis);
+    if (!gameData) {
+      return null;
+    }
+
+    const result = gameData.players.find((player) => player.id === userId)!;
+
+    return result.tiles;
+  }
+
+  @Query(() => [Tile], { nullable: true })
+  async getBoardTiles(
+    @Arg("uuid") uuid: string,
+    @Ctx() { redis }: ApolloContext
+  ): Promise<Tile[] | null> {
+    const gameData = await fetchGameData(uuid, redis);
+    if (!gameData) {
+      return null;
+    }
+
+    return gameData.board;
   }
 
   @Subscription(() => [Tile], {
@@ -162,31 +209,14 @@ export class GameResolver {
     topics: TOPICS.TILE_UPDATED,
     filter: ({ args, payload }) => args.uuid === payload.uuid,
   })
-  async getBoardTiles(
-    @Ctx() { redis }: ApolloContext,
-    @Arg("uuid") uuid: string
+  async updateBoardTiles(
+    @Arg("uuid") uuid: string,
+    @Ctx() { redis }: ApolloContext
   ): Promise<Tile[] | null> {
-    const game = await redis.get(`game-${uuid}`);
-    if (!game) {
+    const gameData = await fetchGameData(uuid, redis);
+    if (!gameData) {
       return null;
     }
-
-    const gameData = JSON.parse(game) as GameData;
-
-    return gameData.board;
-  }
-
-  @Query(() => [Tile], { nullable: true })
-  async getBoardTilesQuery(
-    @Ctx() { redis }: ApolloContext,
-    @Arg("uuid") uuid: string
-  ): Promise<Tile[] | null> {
-    const game = await redis.get(`game-${uuid}`);
-    if (!game) {
-      return null;
-    }
-
-    const gameData = JSON.parse(game) as GameData;
 
     return gameData.board;
   }
@@ -199,13 +229,11 @@ export class GameResolver {
     @PubSub(TOPICS.TILE_UPDATED) publish: Publisher<TileUpdatedPayload>
   ): Promise<boolean> {
     const userId = req.session.userId!;
-
-    const game = await redis.get(`game-${input.uuid}`);
-    if (!game) {
+    const gameData = await fetchGameData(input.uuid, redis);
+    if (!gameData) {
       return false;
     }
 
-    const gameData = JSON.parse(game) as GameData;
     const playerTiles = gameData.players.find((player) => player.id === userId);
 
     const fromTiles =
@@ -217,7 +245,7 @@ export class GameResolver {
     const fromTile = fromTiles.find((tile) => tile.id === input.fromId)!;
     const toTile = toTiles.find((tile) => tile.id === input.toId);
 
-    // switch instead of replace
+    // switch tiles instead of replace
     if (toTile) {
       [fromTile.letter, toTile.letter] = [toTile.letter, fromTile.letter];
     } else {
@@ -250,13 +278,11 @@ export class GameResolver {
     @PubSub(TOPICS.TILE_UPDATED) publish: Publisher<TileUpdatedPayload>
   ): Promise<boolean> {
     const userId = req.session.userId!;
-
-    const game = await redis.get(`game-${input.uuid}`);
-    if (!game) {
+    const gameData = await fetchGameData(input.uuid, redis);
+    if (!gameData) {
       return false;
     }
 
-    const gameData = JSON.parse(game) as GameData;
     const player = gameData.players.find((player) => player.id === userId);
     if (!player) {
       return false;
@@ -286,23 +312,82 @@ export class GameResolver {
     return true;
   }
 
-  @Query(() => MakingTurnResponseObject, { nullable: true })
-  async makingTurn(
+  @UseMiddleware(isAuth)
+  @Query(() => GameInfoResponseObject, { nullable: true })
+  async getPlayerStats(
     @Arg("uuid") uuid: string,
-    @Ctx() { redis }: ApolloContext
-  ): Promise<MakingTurnResponseObject | null> {
-    const game = await redis.get(`game-${uuid}`);
-    if (!game) {
+    @Ctx() { req, redis }: ApolloContext
+  ): Promise<GameInfoResponseObject | null> {
+    const userId = req.session.userId!;
+    const gameData = await fetchGameData(uuid, redis);
+    if (!gameData) {
       return null;
     }
 
-    const gameData = JSON.parse(game) as GameData;
+    const activePlayer = await User.findOneBy({ id: gameData.activeId });
+    if (!activePlayer) {
+      return null;
+    }
 
-    const user = (await User.findOneBy({ id: gameData.activeId })) as User;
+    const players = (await Promise.all(
+      gameData.players.map(
+        async (player) => await User.findOneBy({ id: player.id })
+      )
+    ).then((res) => res.filter((player) => player !== null))) as User[];
+
+    const playerStats: PlayerStats[] = players.map((player) => {
+      return {
+        id: player.id,
+        username: player.username,
+        points: gameData.players.find((item) => item.id === player.id)!.points,
+      };
+    });
 
     return {
-      id: gameData.activeId,
-      activePlayer: user.username,
+      id: userId,
+      activePlayer,
+      players: playerStats,
+    };
+  }
+
+  @Subscription(() => GameInfoResponseObject, {
+    nullable: true,
+    topics: TOPICS.TILE_UPDATED,
+    filter: ({ args, payload }) => args.uuid === payload.uuid,
+  })
+  async updatePlayerStats(
+    @Root() tileUpdatedPayload: TileUpdatedPayload,
+    @Arg("uuid") uuid: string,
+    @Ctx() { redis }: ApolloContext
+  ): Promise<GameInfoResponseObject | null> {
+    const gameData = await fetchGameData(uuid, redis);
+    if (!gameData) {
+      return null;
+    }
+
+    const activePlayer = await User.findOneBy({ id: gameData.activeId });
+    if (!activePlayer) {
+      return null;
+    }
+
+    const players = (await Promise.all(
+      gameData.players.map(
+        async (player) => await User.findOneBy({ id: player.id })
+      )
+    ).then((res) => res.filter((player) => player !== null))) as User[];
+
+    const playerStats: PlayerStats[] = players.map((player) => {
+      return {
+        id: player.id,
+        username: player.username,
+        points: gameData.players.find((item) => item.id === player.id)!.points,
+      };
+    });
+
+    return {
+      id: tileUpdatedPayload.userId,
+      activePlayer,
+      players: playerStats,
     };
   }
 }

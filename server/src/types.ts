@@ -48,6 +48,7 @@ export type LobbyPlayers = {
 export enum TOPICS {
   NEW_PLAYER_IN_LOBBY = "NEW_PLAYER_IN_LOBBY",
   TILE_UPDATED = "TILE_UPDATED",
+  END_TURN = "END_TURN",
 }
 
 export type TileUpdatedPayload = {

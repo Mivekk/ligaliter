@@ -1,0 +1,9 @@
+query GetPlayerTiles($uuid: String!) {
+  getPlayerTiles(uuid: $uuid) {
+    id
+    letter
+    draggable
+    placed
+    userId
+  }
+}

@@ -1,0 +1,8 @@
+subscription UpdateLobbyPlayers($uuid: String!) {
+  updateLobbyPlayers(uuid: $uuid) {
+    players {
+      ...UserFields
+    }
+    started
+  }
+}

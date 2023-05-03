@@ -1,8 +1,8 @@
 import { TilesContext } from "@/contexts/tilesContext";
 import {
   GetBoardTilesDocument,
-  GetBoardTilesQueryDocument,
   MeDocument,
+  UpdateBoardTilesDocument,
 } from "@/generated/graphql";
 import { TileType } from "@/types";
 import { boardSize } from "@/utils/game/constants";
@@ -20,19 +20,17 @@ const Board: React.FC<{}> = () => {
   const [{ data: meData }] = useQuery({ query: MeDocument });
 
   const [{ data: queryData }] = useQuery({
-    query: GetBoardTilesQueryDocument,
-    variables: { uuid: gameId },
-  });
-
-  const [{ data: subscriptionData }] = useSubscription({
     query: GetBoardTilesDocument,
     variables: { uuid: gameId },
   });
 
+  const [{ data: subscriptionData }] = useSubscription({
+    query: UpdateBoardTilesDocument,
+    variables: { uuid: gameId },
+  });
+
   // first fetch is query
-  const data = subscriptionData?.getBoardTiles
-    ? subscriptionData.getBoardTiles
-    : queryData?.getBoardTilesQuery;
+  const data = subscriptionData?.updateBoardTiles || queryData?.getBoardTiles;
 
   useEffect(() => {
     if (!data) {

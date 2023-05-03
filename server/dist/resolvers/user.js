@@ -24,38 +24,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserResolver = exports.ResponseObject = void 0;
-const User_1 = require("../entities/User");
-const type_graphql_1 = require("type-graphql");
+exports.UserResolver = exports.ResponseObject = exports.FieldError = void 0;
 const argon2_1 = __importDefault(require("argon2"));
+const type_graphql_1 = require("type-graphql");
 const constants_1 = require("../constants");
-let FieldError = class FieldError {
-};
-__decorate([
-    (0, type_graphql_1.Field)(),
-    __metadata("design:type", String)
-], FieldError.prototype, "field", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(),
-    __metadata("design:type", String)
-], FieldError.prototype, "message", void 0);
-FieldError = __decorate([
-    (0, type_graphql_1.ObjectType)()
-], FieldError);
-let ResponseObject = class ResponseObject {
-};
-__decorate([
-    (0, type_graphql_1.Field)(() => FieldError, { nullable: true }),
-    __metadata("design:type", FieldError)
-], ResponseObject.prototype, "error", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(() => User_1.User, { nullable: true }),
-    __metadata("design:type", User_1.User)
-], ResponseObject.prototype, "user", void 0);
-ResponseObject = __decorate([
-    (0, type_graphql_1.ObjectType)()
-], ResponseObject);
-exports.ResponseObject = ResponseObject;
+const User_1 = require("../entities/User");
 let LoginInput = class LoginInput {
 };
 __decorate([
@@ -78,6 +51,34 @@ __decorate([
 RegisterInput = __decorate([
     (0, type_graphql_1.InputType)()
 ], RegisterInput);
+let FieldError = class FieldError {
+};
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", String)
+], FieldError.prototype, "field", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", String)
+], FieldError.prototype, "message", void 0);
+FieldError = __decorate([
+    (0, type_graphql_1.ObjectType)()
+], FieldError);
+exports.FieldError = FieldError;
+let ResponseObject = class ResponseObject {
+};
+__decorate([
+    (0, type_graphql_1.Field)(() => FieldError, { nullable: true }),
+    __metadata("design:type", FieldError)
+], ResponseObject.prototype, "error", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(() => User_1.User, { nullable: true }),
+    __metadata("design:type", User_1.User)
+], ResponseObject.prototype, "user", void 0);
+ResponseObject = __decorate([
+    (0, type_graphql_1.ObjectType)()
+], ResponseObject);
+exports.ResponseObject = ResponseObject;
 let UserResolver = class UserResolver {
     me({ req }) {
         return __awaiter(this, void 0, void 0, function* () {

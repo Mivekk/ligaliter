@@ -1,0 +1,14 @@
+query GetPlayerStats($uuid: String!) {
+  getPlayerStats(uuid: $uuid) {
+    id
+    activePlayer {
+      id
+      username
+    }
+    players {
+      id
+      username
+      points
+    }
+  }
+}

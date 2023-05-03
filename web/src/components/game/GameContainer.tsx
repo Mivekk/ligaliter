@@ -8,6 +8,7 @@ import Board from "./Board";
 import BoardDisplay from "./BoardDisplay";
 import PlayerMenu from "./PlayerMenu";
 import ActiveIndicator from "./ActiveIndicator";
+import ActivePlayers from "./ActivePlayers";
 
 interface ContainerProps {
   wordList: string[];
@@ -117,6 +118,8 @@ const GameContainer: React.FC<ContainerProps> = ({ wordList }) => {
         </div>
 
         <ActiveIndicator />
+
+        <ActivePlayers />
 
         <PlayerMenu isValid={isValid} playPointCount={playPointCount} />
       </div>

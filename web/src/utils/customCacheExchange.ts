@@ -3,7 +3,6 @@ import {
   MeDocument,
   LogoutMutation,
   RegisterMutation,
-  PlayTurnMutation,
 } from "@/generated/graphql";
 import { cacheExchange } from "@urql/exchange-graphcache";
 
@@ -24,11 +23,6 @@ export const customCacheExchange = cacheExchange({
         cache.updateQuery({ query: MeDocument }, () => {
           return { me: result.register.user };
         });
-      },
-      playTurn: (result: PlayTurnMutation, _args, cache, _info) => {
-        console.log("invalidated");
-
-        cache.invalidate({ __typename: "MakingTurnResponseObject" });
       },
     },
   },

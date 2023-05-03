@@ -24,14 +24,15 @@ const documents = {
     "mutation PlayTurn($input: PlayTurnInput!) {\n  playTurn(input: $input)\n}": types.PlayTurnDocument,
     "mutation QuitLobby($uuid: String!) {\n  quitLobby(uuid: $uuid) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}": types.QuitLobbyDocument,
     "mutation Register($options: RegisterInput!) {\n  register(options: $options) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}": types.RegisterDocument,
-    "query GetBoardTilesQuery($uuid: String!) {\n  getBoardTilesQuery(uuid: $uuid) {\n    id\n    letter\n    draggable\n    placed\n    userId\n  }\n}": types.GetBoardTilesQueryDocument,
-    "query GetTilesQuery($uuid: String!) {\n  getTilesQuery(uuid: $uuid) {\n    id\n    letter\n    draggable\n    placed\n    userId\n  }\n}": types.GetTilesQueryDocument,
-    "query LobbyPlayersQuery($uuid: String!) {\n  lobbyPlayersQuery(uuid: $uuid) {\n    owner {\n      ...UserFields\n    }\n    players {\n      ...UserFields\n    }\n  }\n}": types.LobbyPlayersQueryDocument,
-    "query MakingTurn($uuid: String!) {\n  makingTurn(uuid: $uuid) {\n    id\n    activePlayer\n  }\n}": types.MakingTurnDocument,
+    "query GetBoardTiles($uuid: String!) {\n  getBoardTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    placed\n    userId\n  }\n}": types.GetBoardTilesDocument,
+    "query GetLobbyPlayers($uuid: String!) {\n  getLobbyPlayers(uuid: $uuid) {\n    owner {\n      ...UserFields\n    }\n    players {\n      ...UserFields\n    }\n  }\n}": types.GetLobbyPlayersDocument,
+    "query GetPlayerStats($uuid: String!) {\n  getPlayerStats(uuid: $uuid) {\n    id\n    activePlayer {\n      id\n      username\n    }\n    players {\n      id\n      username\n      points\n    }\n  }\n}": types.GetPlayerStatsDocument,
+    "query GetPlayerTiles($uuid: String!) {\n  getPlayerTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    placed\n    userId\n  }\n}": types.GetPlayerTilesDocument,
     "query Me {\n  me {\n    ...UserFields\n  }\n}": types.MeDocument,
     "query Users {\n  users {\n    ...UserFields\n  }\n}": types.UsersDocument,
-    "subscription GetBoardTiles($uuid: String!) {\n  getBoardTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    placed\n    userId\n  }\n}": types.GetBoardTilesDocument,
-    "subscription LobbyPlayers($uuid: String!) {\n  lobbyPlayers(uuid: $uuid) {\n    players {\n      ...UserFields\n    }\n    started\n  }\n}": types.LobbyPlayersDocument,
+    "subscription UpdateBoardTiles($uuid: String!) {\n  updateBoardTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    placed\n    userId\n  }\n}": types.UpdateBoardTilesDocument,
+    "subscription UpdateLobbyPlayers($uuid: String!) {\n  updateLobbyPlayers(uuid: $uuid) {\n    players {\n      ...UserFields\n    }\n    started\n  }\n}": types.UpdateLobbyPlayersDocument,
+    "subscription UpdatePlayerStats($uuid: String!) {\n  updatePlayerStats(uuid: $uuid) {\n    id\n    activePlayer {\n      id\n      username\n    }\n    players {\n      id\n      username\n      points\n    }\n  }\n}": types.UpdatePlayerStatsDocument,
 };
 
 /**
@@ -95,19 +96,19 @@ export function graphql(source: "mutation Register($options: RegisterInput!) {\n
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "query GetBoardTilesQuery($uuid: String!) {\n  getBoardTilesQuery(uuid: $uuid) {\n    id\n    letter\n    draggable\n    placed\n    userId\n  }\n}"): (typeof documents)["query GetBoardTilesQuery($uuid: String!) {\n  getBoardTilesQuery(uuid: $uuid) {\n    id\n    letter\n    draggable\n    placed\n    userId\n  }\n}"];
+export function graphql(source: "query GetBoardTiles($uuid: String!) {\n  getBoardTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    placed\n    userId\n  }\n}"): (typeof documents)["query GetBoardTiles($uuid: String!) {\n  getBoardTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    placed\n    userId\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "query GetTilesQuery($uuid: String!) {\n  getTilesQuery(uuid: $uuid) {\n    id\n    letter\n    draggable\n    placed\n    userId\n  }\n}"): (typeof documents)["query GetTilesQuery($uuid: String!) {\n  getTilesQuery(uuid: $uuid) {\n    id\n    letter\n    draggable\n    placed\n    userId\n  }\n}"];
+export function graphql(source: "query GetLobbyPlayers($uuid: String!) {\n  getLobbyPlayers(uuid: $uuid) {\n    owner {\n      ...UserFields\n    }\n    players {\n      ...UserFields\n    }\n  }\n}"): (typeof documents)["query GetLobbyPlayers($uuid: String!) {\n  getLobbyPlayers(uuid: $uuid) {\n    owner {\n      ...UserFields\n    }\n    players {\n      ...UserFields\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "query LobbyPlayersQuery($uuid: String!) {\n  lobbyPlayersQuery(uuid: $uuid) {\n    owner {\n      ...UserFields\n    }\n    players {\n      ...UserFields\n    }\n  }\n}"): (typeof documents)["query LobbyPlayersQuery($uuid: String!) {\n  lobbyPlayersQuery(uuid: $uuid) {\n    owner {\n      ...UserFields\n    }\n    players {\n      ...UserFields\n    }\n  }\n}"];
+export function graphql(source: "query GetPlayerStats($uuid: String!) {\n  getPlayerStats(uuid: $uuid) {\n    id\n    activePlayer {\n      id\n      username\n    }\n    players {\n      id\n      username\n      points\n    }\n  }\n}"): (typeof documents)["query GetPlayerStats($uuid: String!) {\n  getPlayerStats(uuid: $uuid) {\n    id\n    activePlayer {\n      id\n      username\n    }\n    players {\n      id\n      username\n      points\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "query MakingTurn($uuid: String!) {\n  makingTurn(uuid: $uuid) {\n    id\n    activePlayer\n  }\n}"): (typeof documents)["query MakingTurn($uuid: String!) {\n  makingTurn(uuid: $uuid) {\n    id\n    activePlayer\n  }\n}"];
+export function graphql(source: "query GetPlayerTiles($uuid: String!) {\n  getPlayerTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    placed\n    userId\n  }\n}"): (typeof documents)["query GetPlayerTiles($uuid: String!) {\n  getPlayerTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    placed\n    userId\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -119,11 +120,15 @@ export function graphql(source: "query Users {\n  users {\n    ...UserFields\n  
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "subscription GetBoardTiles($uuid: String!) {\n  getBoardTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    placed\n    userId\n  }\n}"): (typeof documents)["subscription GetBoardTiles($uuid: String!) {\n  getBoardTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    placed\n    userId\n  }\n}"];
+export function graphql(source: "subscription UpdateBoardTiles($uuid: String!) {\n  updateBoardTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    placed\n    userId\n  }\n}"): (typeof documents)["subscription UpdateBoardTiles($uuid: String!) {\n  updateBoardTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    placed\n    userId\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "subscription LobbyPlayers($uuid: String!) {\n  lobbyPlayers(uuid: $uuid) {\n    players {\n      ...UserFields\n    }\n    started\n  }\n}"): (typeof documents)["subscription LobbyPlayers($uuid: String!) {\n  lobbyPlayers(uuid: $uuid) {\n    players {\n      ...UserFields\n    }\n    started\n  }\n}"];
+export function graphql(source: "subscription UpdateLobbyPlayers($uuid: String!) {\n  updateLobbyPlayers(uuid: $uuid) {\n    players {\n      ...UserFields\n    }\n    started\n  }\n}"): (typeof documents)["subscription UpdateLobbyPlayers($uuid: String!) {\n  updateLobbyPlayers(uuid: $uuid) {\n    players {\n      ...UserFields\n    }\n    started\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "subscription UpdatePlayerStats($uuid: String!) {\n  updatePlayerStats(uuid: $uuid) {\n    id\n    activePlayer {\n      id\n      username\n    }\n    players {\n      id\n      username\n      points\n    }\n  }\n}"): (typeof documents)["subscription UpdatePlayerStats($uuid: String!) {\n  updatePlayerStats(uuid: $uuid) {\n    id\n    activePlayer {\n      id\n      username\n    }\n    players {\n      id\n      username\n      points\n    }\n  }\n}"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};
