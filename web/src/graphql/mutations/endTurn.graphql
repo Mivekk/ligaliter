@@ -1,0 +1,3 @@
+mutation EndTurn($input: PlayTurnInput!) {
+  endTurn(input: $input)
+}

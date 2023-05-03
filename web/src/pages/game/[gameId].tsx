@@ -2,6 +2,7 @@ import Wrapper from "@/components/Wrapper";
 import GameContainer from "@/components/game/GameContainer";
 import TilesContextProvider from "@/contexts/tilesContext";
 import { createUrqlClient } from "@/utils/createUrqlClient";
+import { isAuth } from "@/utils/isAuth";
 import { withUrqlClient } from "next-urql";
 import React, { useEffect, useState } from "react";
 
@@ -22,6 +23,8 @@ const Game: React.FC<{}> = ({}) => {
 
     fetchData();
   }, []);
+
+  isAuth();
 
   return (
     <TilesContextProvider>

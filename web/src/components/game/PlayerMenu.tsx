@@ -1,16 +1,37 @@
 import React from "react";
 
-import PlayerTiles from "./PlayerTiles";
+import { MeDocument } from "@/generated/graphql";
+import { useQuery } from "urql";
+import PassButton from "./PassButton";
 import PlayButton from "./PlayButton";
-import SkipButton from "./SkipButton";
+import PlayerTiles from "./PlayerTiles";
 import SwapButton from "./SwapButton";
 
 interface PlayerMenuProps {
+  data:
+    | {
+        activePlayer: {
+          id: number;
+          username: string;
+        };
+      }
+    | null
+    | undefined;
   isValid: boolean;
   playPointCount: number;
 }
 
-const PlayerMenu: React.FC<PlayerMenuProps> = ({ isValid, playPointCount }) => {
+const PlayerMenu: React.FC<PlayerMenuProps> = ({
+  data,
+  isValid,
+  playPointCount,
+}) => {
+  const [{ data: meData }] = useQuery({
+    query: MeDocument,
+  });
+
+  const isMyTurn = meData?.me?.id === data?.activePlayer.id;
+
   return (
     <>
       <div
@@ -20,19 +41,19 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isValid, playPointCount }) => {
       >
         <PlayerTiles />
       </div>
-      <div className="fixed bottom-28 flex gap-2 origin-center -translate-x-1/2 left-1/2">
+      <div className="fixed bottom-28 flex items-end gap-2 origin-center -translate-x-1/2 left-1/2">
         <div>
-          <SwapButton />
+          <SwapButton myTurn={isMyTurn} />
         </div>
         <div>
           <PlayButton isValid={isValid} playPointCount={playPointCount} />
         </div>
         <div>
-          <SkipButton />
+          <PassButton myTurn={isMyTurn} />
         </div>
       </div>
     </>
   );
 };
 
-export default React.memo(PlayerMenu);
+export default PlayerMenu;

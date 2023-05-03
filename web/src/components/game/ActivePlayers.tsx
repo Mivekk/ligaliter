@@ -1,28 +1,20 @@
-import { useRouter } from "next/router";
-import React, { useEffect } from "react";
-import { useQuery, useSubscription } from "urql";
+import React from "react";
 import Heading from "../Heading";
-import {
-  GetPlayerStatsDocument,
-  UpdatePlayerStatsDocument,
-} from "@/generated/graphql";
 
-const ActivePlayers: React.FC<{}> = () => {
-  const router = useRouter();
-  const gameId = router.query.gameId as string;
+interface ActivePlayersProps {
+  data:
+    | {
+        players: {
+          id: number;
+          username: string;
+          points: number;
+        }[];
+      }
+    | null
+    | undefined;
+}
 
-  const [{ data: queryData }] = useQuery({
-    query: GetPlayerStatsDocument,
-    variables: { uuid: gameId },
-  });
-
-  const [{ data: subscriptionData }] = useSubscription({
-    query: UpdatePlayerStatsDocument,
-    variables: { uuid: gameId },
-  });
-
-  const data = subscriptionData?.updatePlayerStats || queryData?.getPlayerStats;
-
+const ActivePlayers: React.FC<ActivePlayersProps> = ({ data }) => {
   const players = data?.players.map((item) => (
     <div key={item.id}>
       {item.username} {item.points}

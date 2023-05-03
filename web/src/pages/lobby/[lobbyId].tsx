@@ -34,19 +34,14 @@ const Lobby: React.FC<{}> = ({}) => {
   const [, quitLobby] = useMutation(QuitLobbyDocument);
   const [, newGame] = useMutation(NewGameDocument);
 
-  const initialPlayers = queryData?.getLobbyPlayers?.players?.map((item) => (
+  const data =
+    subscriptionData?.updateLobbyPlayers || queryData?.getLobbyPlayers;
+
+  const players = data?.players?.map((item) => (
     <div key={item.id} className="text-xl">
       {item.username}
     </div>
   ));
-
-  const subsequentPlayers = subscriptionData?.updateLobbyPlayers?.players?.map(
-    (item) => (
-      <div key={item.id} className="text-xl">
-        {item.username}
-      </div>
-    )
-  );
 
   if (subscriptionData?.updateLobbyPlayers.started) {
     router.push(`/game/${lobbyUUID}`);
@@ -60,13 +55,15 @@ const Lobby: React.FC<{}> = ({}) => {
     <Wrapper>
       <div className="flex flex-col items-center justify-center w-[50rem] h-[26rem] bg-secondary rounded-md gap-2.5 shadow-xl">
         <Heading>Players:</Heading>
-        {subsequentPlayers ? subsequentPlayers : initialPlayers}
+        {players}
         <div className="flex gap-2">
           <Button
             onClick={async () => {
               await newGame({ uuid: lobbyUUID });
             }}
-            disabled={isOwner ? false : true}
+            disabled={
+              data?.players && isOwner && data.players.length > 1 ? false : true
+            }
           >
             Start game
           </Button>

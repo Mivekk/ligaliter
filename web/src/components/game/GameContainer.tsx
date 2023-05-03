@@ -9,6 +9,12 @@ import BoardDisplay from "./BoardDisplay";
 import PlayerMenu from "./PlayerMenu";
 import ActiveIndicator from "./ActiveIndicator";
 import ActivePlayers from "./ActivePlayers";
+import { useRouter } from "next/router";
+import { useQuery, useSubscription } from "urql";
+import {
+  GetPlayerStatsDocument,
+  UpdatePlayerStatsDocument,
+} from "@/generated/graphql";
 
 interface ContainerProps {
   wordList: string[];
@@ -24,6 +30,25 @@ type BoardOffsetType = {
 };
 
 const GameContainer: React.FC<ContainerProps> = ({ wordList }) => {
+  const router = useRouter();
+  const gameId = router.query.gameId as string;
+
+  const [{ data: queryData }] = useQuery({
+    query: GetPlayerStatsDocument,
+    variables: { uuid: gameId },
+  });
+
+  const [{ data: subscriptionData }] = useSubscription({
+    query: UpdatePlayerStatsDocument,
+    variables: { uuid: gameId },
+  });
+
+  const data = subscriptionData?.updatePlayerStats || queryData?.getPlayerStats;
+
+  useEffect(() => {
+    console.log(data);
+  }, [data]);
+
   const { boardTiles, tileBag } = useContext(TilesContext);
   const [playPointCount, setPlayPointCount] = useState(0);
   const [isValid, setIsValid] = useState(false);
@@ -117,11 +142,15 @@ const GameContainer: React.FC<ContainerProps> = ({ wordList }) => {
           </div>
         </div>
 
-        <ActiveIndicator />
+        <ActiveIndicator data={data} />
 
-        <ActivePlayers />
+        <ActivePlayers data={data} />
 
-        <PlayerMenu isValid={isValid} playPointCount={playPointCount} />
+        <PlayerMenu
+          data={data}
+          isValid={isValid}
+          playPointCount={playPointCount}
+        />
       </div>
     </>
   );

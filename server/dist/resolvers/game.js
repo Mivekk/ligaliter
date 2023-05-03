@@ -234,7 +234,7 @@ let GameResolver = class GameResolver {
             return true;
         });
     }
-    playTurn(input, { req, redis }, publish) {
+    endTurn(input, { req, redis }, publish) {
         return __awaiter(this, void 0, void 0, function* () {
             const userId = req.session.userId;
             const gameData = yield (0, fetchGameData_1.fetchGameData)(input.uuid, redis);
@@ -249,6 +249,20 @@ let GameResolver = class GameResolver {
             gameData.activeId =
                 gameData.players[(gameData.players.findIndex((el) => el.id === gameData.activeId) + 1) %
                     gameData.players.length].id;
+            gameData.board = gameData.board.filter((tile) => {
+                if (input.points !== 0 || tile.placed) {
+                    return true;
+                }
+                let freeId = -1;
+                for (let i = constants_1.BOARD_SIZE; i < constants_1.BOARD_SIZE + constants_1.MAX_PLAYER_TILES; i++) {
+                    if (!player.tiles.find((item) => item.id === i)) {
+                        freeId = i;
+                        break;
+                    }
+                }
+                player.tiles.push(Object.assign(Object.assign({}, tile), { id: freeId }));
+                return false;
+            });
             gameData.board.forEach((tile) => {
                 tile.draggable = false;
                 tile.placed = true;
@@ -332,7 +346,7 @@ __decorate([
     (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuth),
     (0, type_graphql_1.Subscription)(() => [Tile], {
         nullable: true,
-        topics: types_1.TOPICS.END_TURN,
+        topics: [types_1.TOPICS.TILE_UPDATED, types_1.TOPICS.END_TURN],
         filter: ({ args, payload }) => args.uuid == payload.uuid,
     }),
     __param(0, (0, type_graphql_1.Arg)("uuid")),
@@ -352,7 +366,7 @@ __decorate([
 __decorate([
     (0, type_graphql_1.Subscription)(() => [Tile], {
         nullable: true,
-        topics: types_1.TOPICS.TILE_UPDATED,
+        topics: [types_1.TOPICS.TILE_UPDATED, types_1.TOPICS.END_TURN],
         filter: ({ args, payload }) => args.uuid === payload.uuid,
     }),
     __param(0, (0, type_graphql_1.Arg)("uuid")),
@@ -376,11 +390,11 @@ __decorate([
     (0, type_graphql_1.Mutation)(() => Boolean),
     __param(0, (0, type_graphql_1.Arg)("input")),
     __param(1, (0, type_graphql_1.Ctx)()),
-    __param(2, (0, type_graphql_1.PubSub)(types_1.TOPICS.TILE_UPDATED)),
+    __param(2, (0, type_graphql_1.PubSub)(types_1.TOPICS.END_TURN)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [PlayTurnInput, Object, Function]),
     __metadata("design:returntype", Promise)
-], GameResolver.prototype, "playTurn", null);
+], GameResolver.prototype, "endTurn", null);
 __decorate([
     (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuth),
     (0, type_graphql_1.Query)(() => GameInfoResponseObject, { nullable: true }),
@@ -393,7 +407,7 @@ __decorate([
 __decorate([
     (0, type_graphql_1.Subscription)(() => GameInfoResponseObject, {
         nullable: true,
-        topics: types_1.TOPICS.TILE_UPDATED,
+        topics: types_1.TOPICS.END_TURN,
         filter: ({ args, payload }) => args.uuid === payload.uuid,
     }),
     __param(0, (0, type_graphql_1.Root)()),

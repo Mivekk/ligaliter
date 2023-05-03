@@ -1,4 +1,4 @@
-import { PlayTurnDocument } from "@/generated/graphql";
+import { EndTurnDocument } from "@/generated/graphql";
 import { useRouter } from "next/router";
 import React from "react";
 import { useMutation } from "urql";
@@ -12,14 +12,14 @@ const PlayButton: React.FC<PlayButtonProps> = ({ isValid, playPointCount }) => {
   const router = useRouter();
   const gameId = router.query.gameId as string;
 
-  const [, playTurn] = useMutation(PlayTurnDocument);
+  const [, endTurn] = useMutation(EndTurnDocument);
 
   const handleOnClick = () => {
     if (!isValid) {
       return;
     }
 
-    playTurn({ input: { uuid: gameId, points: playPointCount } });
+    endTurn({ input: { uuid: gameId, points: playPointCount } });
   };
 
   return (

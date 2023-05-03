@@ -15,13 +15,13 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
 const documents = {
     "fragment ErrorFields on FieldError {\n  field\n  message\n}": types.ErrorFieldsFragmentDoc,
     "fragment UserFields on User {\n  id\n  username\n  email\n  created_at\n  updated_at\n}": types.UserFieldsFragmentDoc,
+    "mutation EndTurn($input: PlayTurnInput!) {\n  endTurn(input: $input)\n}": types.EndTurnDocument,
     "mutation JoinLobby($uuid: String!) {\n  joinLobby(uuid: $uuid) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}": types.JoinLobbyDocument,
     "mutation Login($options: LoginInput!) {\n  login(options: $options) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}": types.LoginDocument,
     "mutation Logout {\n  logout\n}": types.LogoutDocument,
     "mutation MoveTile($input: MoveTileInput!) {\n  moveTile(input: $input)\n}": types.MoveTileDocument,
     "mutation NewGame($uuid: String!) {\n  newGame(uuid: $uuid) {\n    players {\n      id\n    }\n  }\n}": types.NewGameDocument,
     "mutation NewLobby($uuid: String!) {\n  newLobby(uuid: $uuid) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}": types.NewLobbyDocument,
-    "mutation PlayTurn($input: PlayTurnInput!) {\n  playTurn(input: $input)\n}": types.PlayTurnDocument,
     "mutation QuitLobby($uuid: String!) {\n  quitLobby(uuid: $uuid) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}": types.QuitLobbyDocument,
     "mutation Register($options: RegisterInput!) {\n  register(options: $options) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}": types.RegisterDocument,
     "query GetBoardTiles($uuid: String!) {\n  getBoardTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    placed\n    userId\n  }\n}": types.GetBoardTilesDocument,
@@ -60,6 +60,10 @@ export function graphql(source: "fragment UserFields on User {\n  id\n  username
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "mutation EndTurn($input: PlayTurnInput!) {\n  endTurn(input: $input)\n}"): (typeof documents)["mutation EndTurn($input: PlayTurnInput!) {\n  endTurn(input: $input)\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "mutation JoinLobby($uuid: String!) {\n  joinLobby(uuid: $uuid) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}"): (typeof documents)["mutation JoinLobby($uuid: String!) {\n  joinLobby(uuid: $uuid) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -81,10 +85,6 @@ export function graphql(source: "mutation NewGame($uuid: String!) {\n  newGame(u
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "mutation NewLobby($uuid: String!) {\n  newLobby(uuid: $uuid) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}"): (typeof documents)["mutation NewLobby($uuid: String!) {\n  newLobby(uuid: $uuid) {\n    error {\n      ...ErrorFields\n    }\n    user {\n      ...UserFields\n    }\n  }\n}"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(source: "mutation PlayTurn($input: PlayTurnInput!) {\n  playTurn(input: $input)\n}"): (typeof documents)["mutation PlayTurn($input: PlayTurnInput!) {\n  playTurn(input: $input)\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

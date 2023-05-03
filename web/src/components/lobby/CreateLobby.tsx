@@ -17,7 +17,7 @@ const CreateLobby: React.FC<{}> = ({}) => {
       </div>
       <Button
         onClick={async () => {
-          const uuid = v4().slice(0, 6);
+          const uuid = v4().slice(0, 4);
 
           const lobby = await newLobby({ uuid });
           if (!lobby) {

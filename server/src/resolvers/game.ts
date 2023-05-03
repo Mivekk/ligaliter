@@ -13,7 +13,11 @@ import {
   Subscription,
   UseMiddleware,
 } from "type-graphql";
-import { BOARD_SIZE, GAME_EXPIRATION_TIME } from "../constants";
+import {
+  BOARD_SIZE,
+  GAME_EXPIRATION_TIME,
+  MAX_PLAYER_TILES,
+} from "../constants";
 import { Game } from "../entities/Game";
 import { User } from "../entities/User";
 import {
@@ -173,7 +177,7 @@ export class GameResolver {
   @UseMiddleware(isAuth)
   @Subscription(() => [Tile], {
     nullable: true,
-    topics: TOPICS.END_TURN,
+    topics: [TOPICS.TILE_UPDATED, TOPICS.END_TURN],
     filter: ({ args, payload }) => args.uuid == payload.uuid,
   })
   async updatePlayerTiles(
@@ -206,7 +210,7 @@ export class GameResolver {
 
   @Subscription(() => [Tile], {
     nullable: true,
-    topics: TOPICS.TILE_UPDATED,
+    topics: [TOPICS.TILE_UPDATED, TOPICS.END_TURN],
     filter: ({ args, payload }) => args.uuid === payload.uuid,
   })
   async updateBoardTiles(
@@ -272,10 +276,10 @@ export class GameResolver {
 
   @UseMiddleware(isAuth)
   @Mutation(() => Boolean)
-  async playTurn(
+  async endTurn(
     @Arg("input") input: PlayTurnInput,
     @Ctx() { req, redis }: ApolloContext,
-    @PubSub(TOPICS.TILE_UPDATED) publish: Publisher<TileUpdatedPayload>
+    @PubSub(TOPICS.END_TURN) publish: Publisher<TileUpdatedPayload>
   ): Promise<boolean> {
     const userId = req.session.userId!;
     const gameData = await fetchGameData(input.uuid, redis);
@@ -295,6 +299,24 @@ export class GameResolver {
         (gameData.players.findIndex((el) => el.id === gameData.activeId) + 1) %
           gameData.players.length
       ].id;
+
+    gameData.board = gameData.board.filter((tile) => {
+      if (input.points !== 0 || tile.placed) {
+        return true;
+      }
+
+      let freeId = -1;
+      for (let i = BOARD_SIZE; i < BOARD_SIZE + MAX_PLAYER_TILES; i++) {
+        if (!player.tiles.find((item) => item.id === i)) {
+          freeId = i;
+          break;
+        }
+      }
+
+      player.tiles.push({ ...tile, id: freeId });
+
+      return false;
+    });
 
     gameData.board.forEach((tile) => {
       tile.draggable = false;
@@ -352,7 +374,7 @@ export class GameResolver {
 
   @Subscription(() => GameInfoResponseObject, {
     nullable: true,
-    topics: TOPICS.TILE_UPDATED,
+    topics: TOPICS.END_TURN,
     filter: ({ args, payload }) => args.uuid === payload.uuid,
   })
   async updatePlayerStats(
