@@ -3,6 +3,7 @@ import {
   MeDocument,
   LogoutMutation,
   RegisterMutation,
+  EndTurnMutation,
 } from "@/generated/graphql";
 import { cacheExchange } from "@urql/exchange-graphcache";
 
@@ -22,6 +23,11 @@ export const customCacheExchange = cacheExchange({
       register: (result: RegisterMutation, _args, cache, _info) => {
         cache.updateQuery({ query: MeDocument }, () => {
           return { me: result.register.user };
+        });
+      },
+      endTurn: (result: EndTurnMutation, args: any, cache, info) => {
+        cache.invalidate("Query", "getPlayerTiles", {
+          uuid: args.input.uuid,
         });
       },
     },

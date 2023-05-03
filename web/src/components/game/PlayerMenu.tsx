@@ -30,7 +30,10 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
     query: MeDocument,
   });
 
-  const isMyTurn = meData?.me?.id === data?.activePlayer.id;
+  const isMyTurn =
+    meData?.me && data?.activePlayer
+      ? meData?.me?.id === data?.activePlayer.id
+      : false;
 
   return (
     <>

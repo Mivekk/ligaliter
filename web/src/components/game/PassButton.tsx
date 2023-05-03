@@ -13,6 +13,10 @@ const PassButton: React.FC<PassButtonProps> = ({ myTurn }) => {
   const [, endTurn] = useMutation(EndTurnDocument);
 
   const handleOnClick = () => {
+    if (!myTurn) {
+      return;
+    }
+
     endTurn({ input: { uuid: gameId, points: 0 } });
   };
 

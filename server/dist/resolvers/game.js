@@ -180,17 +180,6 @@ let GameResolver = class GameResolver {
             return result.tiles;
         });
     }
-    updatePlayerTiles(uuid, { req, redis }) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const userId = req.session.userId;
-            const gameData = yield (0, fetchGameData_1.fetchGameData)(uuid, redis);
-            if (!gameData) {
-                return null;
-            }
-            const result = gameData.players.find((player) => player.id === userId);
-            return result.tiles;
-        });
-    }
     getBoardTiles(uuid, { redis }) {
         return __awaiter(this, void 0, void 0, function* () {
             const gameData = yield (0, fetchGameData_1.fetchGameData)(uuid, redis);
@@ -342,19 +331,6 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], GameResolver.prototype, "getPlayerTiles", null);
-__decorate([
-    (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuth),
-    (0, type_graphql_1.Subscription)(() => [Tile], {
-        nullable: true,
-        topics: [types_1.TOPICS.TILE_UPDATED, types_1.TOPICS.END_TURN],
-        filter: ({ args, payload }) => args.uuid == payload.uuid,
-    }),
-    __param(0, (0, type_graphql_1.Arg)("uuid")),
-    __param(1, (0, type_graphql_1.Ctx)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
-    __metadata("design:returntype", Promise)
-], GameResolver.prototype, "updatePlayerTiles", null);
 __decorate([
     (0, type_graphql_1.Query)(() => [Tile], { nullable: true }),
     __param(0, (0, type_graphql_1.Arg)("uuid")),

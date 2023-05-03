@@ -45,10 +45,6 @@ const GameContainer: React.FC<ContainerProps> = ({ wordList }) => {
 
   const data = subscriptionData?.updatePlayerStats || queryData?.getPlayerStats;
 
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
-
   const { boardTiles, tileBag } = useContext(TilesContext);
   const [playPointCount, setPlayPointCount] = useState(0);
   const [isValid, setIsValid] = useState(false);

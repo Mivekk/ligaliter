@@ -174,27 +174,6 @@ export class GameResolver {
     return result.tiles;
   }
 
-  @UseMiddleware(isAuth)
-  @Subscription(() => [Tile], {
-    nullable: true,
-    topics: [TOPICS.TILE_UPDATED, TOPICS.END_TURN],
-    filter: ({ args, payload }) => args.uuid == payload.uuid,
-  })
-  async updatePlayerTiles(
-    @Arg("uuid") uuid: string,
-    @Ctx() { req, redis }: ApolloContext
-  ): Promise<Tile[] | null> {
-    const userId = req.session.userId!;
-    const gameData = await fetchGameData(uuid, redis);
-    if (!gameData) {
-      return null;
-    }
-
-    const result = gameData.players.find((player) => player.id === userId)!;
-
-    return result.tiles;
-  }
-
   @Query(() => [Tile], { nullable: true })
   async getBoardTiles(
     @Arg("uuid") uuid: string,
