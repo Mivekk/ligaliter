@@ -9,7 +9,7 @@ import {
   UpdateLobbyPlayersDocument,
 } from "@/generated/graphql";
 import { createUrqlClient } from "@/utils/createUrqlClient";
-import { isAuth } from "@/utils/isAuth";
+import { useAuth } from "@/utils/useAuth";
 import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/router";
 import React from "react";
@@ -49,7 +49,7 @@ const Lobby: React.FC<{}> = ({}) => {
 
   const isOwner = queryData?.getLobbyPlayers.owner?.id === meData?.me?.id;
 
-  isAuth();
+  useAuth();
 
   return (
     <Wrapper>
