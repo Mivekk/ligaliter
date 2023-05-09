@@ -1,22 +1,17 @@
 import { createClient as createWSClient } from "graphql-ws";
-import {
-  debugExchange,
-  dedupExchange,
-  fetchExchange,
-  subscriptionExchange,
-} from "urql";
+import { dedupExchange, fetchExchange, subscriptionExchange } from "urql";
 import { customCacheExchange } from "./customCacheExchange";
 
 const isServerSide = typeof window === "undefined";
 
 const wsClient = !isServerSide
   ? createWSClient({
-      url: "ws://localhost:4000/graphql",
+      url: "ws://" + process.env.GRAPHQL_ENDPOINT,
     })
   : null;
 
 export const createUrqlClient = (ssrExchange: any) => ({
-  url: "http://localhost:4000/graphql",
+  url: "http://" + process.env.GRAPHQL_ENDPOINT,
   fetchOptions: {
     credentials: "include" as const,
   },
