@@ -58,7 +58,7 @@ const Login: React.FC<{}> = ({}) => {
               <div className="flex justify-between">
                 <Button type="submit">Login</Button>
                 <div>
-                  <div>Don't have an account?</div>
+                  <div>Dont have an account?</div>
                   <Link href="/register" className="text-utility">
                     Click here to register!
                   </Link>
