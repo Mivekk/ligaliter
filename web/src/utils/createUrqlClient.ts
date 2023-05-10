@@ -6,12 +6,12 @@ const isServerSide = typeof window === "undefined";
 
 const wsClient = !isServerSide
   ? createWSClient({
-      url: "ws://" + process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT,
+      url: process.env.NEXT_PUBLIC_WEBSOCKET_ENDPOINT!,
     })
   : null;
 
 export const createUrqlClient = (ssrExchange: any) => ({
-  url: "http://" + process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT,
+  url: process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT!,
   fetchOptions: {
     credentials: "include" as const,
   },
