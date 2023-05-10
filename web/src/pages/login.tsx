@@ -17,7 +17,10 @@ const Login: React.FC<{}> = ({}) => {
 
   return (
     <Wrapper>
-      <div className="flex flex-col items-center justify-center w-[26rem] h-[22rem] bg-secondary rounded-md shadow-xl">
+      <div
+        className="flex flex-col items-center justify-center sm:w-[26rem] w-[22rem] 
+          sm:h-[22rem] h-[21rem] bg-secondary rounded-md shadow-xl"
+      >
         <Heading>Login</Heading>
         <Formik
           initialValues={{ username: "", password: "" }}
@@ -35,8 +38,8 @@ const Login: React.FC<{}> = ({}) => {
             }
           }}
         >
-          {({ values, handleChange, errors, isSubmitting }) => (
-            <Form className="flex flex-col gap-4 mt-8">
+          {({ values, handleChange, errors }) => (
+            <Form className="flex flex-col sm:gap-4 gap-2 sm:mt-8 mt-3">
               <InputField
                 type="text"
                 name="username"
@@ -55,11 +58,19 @@ const Login: React.FC<{}> = ({}) => {
                 onChange={handleChange}
                 error={errors.password}
               />
-              <div className="flex justify-between">
+              <div className="flex flex-col sm:flex-row sm:justify-between justify-center items-center gap-2">
                 <Button type="submit">Login</Button>
                 <div>
-                  <div>Dont have an account?</div>
-                  <Link href="/register" className="text-utility">
+                  <div>
+                    Dont have an account?{" "}
+                    <Link href="/register" className="text-utility sm:hidden">
+                      Click here to register!
+                    </Link>
+                  </div>
+                  <Link
+                    href="/register"
+                    className="text-utility hidden sm:block"
+                  >
                     Click here to register!
                   </Link>
                 </div>

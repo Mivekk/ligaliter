@@ -1,15 +1,9 @@
-import { MeDocument } from "@/generated/graphql";
-import { useQuery } from "urql";
-import { useRouter } from "next/router";
-import { withUrqlClient } from "next-urql";
 import { createUrqlClient } from "@/utils/createUrqlClient";
+import { withUrqlClient } from "next-urql";
+import { useRouter } from "next/router";
 
 const Index: React.FC<{}> = ({}) => {
   const router = useRouter();
-  const [{ data, fetching }] = useQuery({
-    query: MeDocument,
-    requestPolicy: "cache-and-network",
-  });
 
   return (
     <div className="flex flex-col w-full h-screen items-center justify-center bg-main">
@@ -20,11 +14,7 @@ const Index: React.FC<{}> = ({}) => {
       <button
         className="w-[14rem] h-[3.5rem] bg-utility hover:opacity-75 text-white text-lg rounded-xl mt-10 font-normal -translate-y-8"
         onClick={() => {
-          if (data?.me && !fetching) {
-            router.push("/home");
-          } else if (!data?.me && !fetching) {
-            router.push("/login");
-          }
+          router.push("/home");
         }}
       >
         Get started!

@@ -72,10 +72,8 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const redis = new ioredis_1.Redis();
     const serverCleanup = (0, ws_2.useServer)({
         schema,
-        context: ({ connectionParams }) => __awaiter(void 0, void 0, void 0, function* () {
+        context: () => __awaiter(void 0, void 0, void 0, function* () {
             return ({
-                req: connectionParams === null || connectionParams === void 0 ? void 0 : connectionParams.request,
-                res: connectionParams === null || connectionParams === void 0 ? void 0 : connectionParams.response,
                 redis,
             });
         }),
@@ -90,7 +88,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             maxAge: 1000 * 60 * 60 * 24 * 365,
             httpOnly: true,
             sameSite: "lax",
-            secure: false,
+            secure: process.env.PRODUCTION === "true",
         },
         secret: process.env.COOKIE_SECRET,
         resave: false,
@@ -118,7 +116,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     yield apolloServer.start();
     app.use("/graphql", (0, cors_1.default)({
         credentials: true,
-        origin: ["http://localhost:3000"],
+        origin: ["http://localhost:3000", "https://www.ligaliter.com"],
     }), (0, body_parser_1.json)(), (0, express4_1.expressMiddleware)(apolloServer, {
         context: ({ req, res }) => __awaiter(void 0, void 0, void 0, function* () {
             return ({

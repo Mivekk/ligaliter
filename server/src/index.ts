@@ -44,9 +44,7 @@ const main = async () => {
   const serverCleanup = useServer(
     {
       schema,
-      context: async ({ connectionParams }) => ({
-        req: connectionParams?.request,
-        res: connectionParams?.response,
+      context: async () => ({
         redis,
       }),
     },
@@ -64,7 +62,7 @@ const main = async () => {
         maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year
         httpOnly: true,
         sameSite: "lax",
-        secure: false,
+        secure: process.env.PRODUCTION === "true",
       },
       secret: process.env.COOKIE_SECRET,
       resave: false,
@@ -93,7 +91,7 @@ const main = async () => {
     "/graphql",
     cors({
       credentials: true,
-      origin: ["http://localhost:3000"],
+      origin: ["http://localhost:3000", "https://www.ligaliter.com"],
     }),
     json(),
     expressMiddleware(apolloServer, {

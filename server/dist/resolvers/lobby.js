@@ -63,7 +63,7 @@ let LobbyResolver = class LobbyResolver {
                 return {
                     error: {
                         field: "session",
-                        message: "session expired",
+                        message: "You must be logged in to create a lobby!",
                     },
                 };
             }
@@ -111,7 +111,7 @@ let LobbyResolver = class LobbyResolver {
                 return {
                     error: {
                         field: "session",
-                        message: "session expired",
+                        message: "You must be logged in to join a lobby!",
                     },
                 };
             }

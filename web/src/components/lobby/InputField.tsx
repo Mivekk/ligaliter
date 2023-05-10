@@ -9,7 +9,7 @@ const InputField: React.FC<InputFieldProps> = ({ error, ...props }) => {
   return (
     <div>
       <div>{props.label}</div>
-      <input {...props} className="w-96 h-9 p-2" />
+      <input {...props} className="sm:w-[24rem] w-[20.5rem] h-9 p-2" />
       <div className="text-red-600">{error}</div>
     </div>
   );
