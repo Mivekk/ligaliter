@@ -61,7 +61,7 @@ const fs_1 = __importDefault(require("fs"));
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     yield data_source_1.AppDataSource.initialize();
     const app = (0, express_1.default)();
-    const port = constants_1.__prod__ ? 443 : 4000;
+    const port = 4000;
     const expressServer = constants_1.__prod__
         ? (0, https_1.createServer)({
             key: __dirname + fs_1.default.readFileSync("/../privkey.pem"),

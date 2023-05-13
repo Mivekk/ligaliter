@@ -10,11 +10,11 @@ const Home: React.FC<{}> = ({}) => {
 
   return (
     <Wrapper>
-      <div className="flex flex-col justify-center items-center w-[26rem] h-[18rem] bg-secondary rounded-md shadow-xl">
-        <div className="flex absolute w-[26rem] h-[18rem] justify-between items-start -translate-y-6">
+      <div className="flex flex-col items-center sm:w-[26rem] w-[22.5rem] h-[18rem] bg-secondary rounded-md shadow-x">
+        <div className="flex sm:w-[26rem] w-[22.5rem] justify-between -translate-y-6">
           <button
             onClick={() => setIsCreatingLobby(true)}
-            className={`w-[14rem] h-10 bg-secondary rounded-xl flex items-start justify-center ${
+            className={`w-full h-10 bg-secondary rounded-xl flex justify-center ${
               isCreatingLobby ? null : "opacity-75"
             }`}
           >
@@ -22,14 +22,14 @@ const Home: React.FC<{}> = ({}) => {
           </button>
           <button
             onClick={() => setIsCreatingLobby(false)}
-            className={`w-[14rem] h-10 bg-secondary rounded-xl flex items-start justify-center ${
+            className={`w-full h-10 bg-secondary rounded-xl flex justify-center ${
               isCreatingLobby ? "opacity-75" : null
             }`}
           >
             Join
           </button>
         </div>
-        <div className="z-10">
+        <div className="z-10 mt-auto mb-auto -translate-y-6">
           {isCreatingLobby ? <CreateLobby /> : <JoinLobby />}
         </div>
       </div>

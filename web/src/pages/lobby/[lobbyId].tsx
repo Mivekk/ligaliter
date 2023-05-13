@@ -53,7 +53,7 @@ const Lobby: React.FC<{}> = ({}) => {
 
   return (
     <Wrapper>
-      <div className="flex flex-col items-center justify-center w-[50rem] h-[26rem] bg-secondary rounded-md gap-2.5 shadow-xl">
+      <div className="flex flex-col items-center justify-center md:w-[50rem] w-[22.5rem] h-[26rem] bg-secondary rounded-md gap-2.5 shadow-xl">
         <Heading>Players:</Heading>
         {players}
         <div className="flex gap-2">
