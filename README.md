@@ -4,7 +4,7 @@ Scrabble online inspired by Discord's Letter League.
 
 Available (soon) on https://www.ligaliter.com
 
-Built fully on top of AWS infrastructure (RDS, ElastiCache, EC2, Route 53, Cognito, Amplify)
+Built fully on top of AWS infrastructure (RDS, ElastiCache, EC2, Route 53, Amplify). In the future: Adding CI/CD pipeline to EC2 instance, adding AWS Cognito for login.
 
 Used following technologies:
 

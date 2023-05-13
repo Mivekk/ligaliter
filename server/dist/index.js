@@ -64,8 +64,8 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const port = 4000;
     const expressServer = constants_1.__prod__
         ? (0, https_1.createServer)({
-            key: __dirname + fs_1.default.readFileSync("/../privkey.pem"),
-            cert: __dirname + fs_1.default.readFileSync("/../fullchain.pem"),
+            key: fs_1.default.readFileSync(__dirname + "/../privkey.pem"),
+            cert: fs_1.default.readFileSync(__dirname + "/../fullchain.pem"),
         }, app)
         : (0, http_1.createServer)(app);
     const wsServer = new ws_1.WebSocketServer({

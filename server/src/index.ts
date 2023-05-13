@@ -32,8 +32,8 @@ const main = async () => {
   const expressServer = __prod__
     ? createHttpsServer(
         {
-          key: __dirname + fs.readFileSync("/../privkey.pem"),
-          cert: __dirname + fs.readFileSync("/../fullchain.pem"),
+          key: fs.readFileSync(__dirname + "/../privkey.pem"),
+          cert: fs.readFileSync(__dirname + "/../fullchain.pem"),
         },
         app
       )
