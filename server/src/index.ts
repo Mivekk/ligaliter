@@ -8,7 +8,7 @@ import { expressMiddleware } from "@apollo/server/express4";
 import { buildSchema } from "type-graphql";
 import { UserResolver } from "./resolvers/user";
 import { json } from "body-parser";
-import { COOKIE_NAME } from "./constants";
+import { COOKIE_NAME, __prod__ } from "./constants";
 import { Redis } from "ioredis";
 import { ApolloContext } from "./types";
 import RedisStore from "connect-redis";
@@ -16,10 +16,12 @@ import session from "express-session";
 import cors from "cors";
 import { LobbyResolver } from "./resolvers/lobby";
 import { GameResolver } from "./resolvers/game";
-import { createServer } from "http";
+import { createServer as createHttpServer } from "http";
+import { createServer as createHttpsServer } from "https";
 import { WebSocketServer } from "ws";
 import { useServer } from "graphql-ws/lib/use/ws";
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
+import fs from "fs";
 
 const main = async () => {
   await AppDataSource.initialize();
@@ -27,10 +29,18 @@ const main = async () => {
   const app = express();
   const port = 4000;
 
-  const httpServer = createServer(app);
+  const expressServer = __prod__
+    ? createHttpsServer(
+        {
+          key: __dirname + fs.readFileSync("/../privkey.pem"),
+          cert: __dirname + fs.readFileSync("/../fullchain.pem"),
+        },
+        app
+      )
+    : createHttpServer(app);
 
   const wsServer = new WebSocketServer({
-    server: httpServer,
+    server: expressServer,
     path: "/graphql",
   });
 
@@ -39,7 +49,12 @@ const main = async () => {
     validate: false,
   });
 
-  const redis = new Redis();
+  const redis = __prod__
+    ? new Redis({
+        port: Number(process.env.REDIS_PORT),
+        host: process.env.REDIS_HOSTNAME,
+      })
+    : new Redis();
 
   const serverCleanup = useServer(
     {
@@ -62,7 +77,7 @@ const main = async () => {
         maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year
         httpOnly: true,
         sameSite: "lax",
-        secure: process.env.PRODUCTION === "true",
+        secure: __prod__,
       },
       secret: process.env.COOKIE_SECRET,
       resave: false,
@@ -73,7 +88,7 @@ const main = async () => {
   const apolloServer = new ApolloServer<ApolloContext>({
     schema,
     plugins: [
-      ApolloServerPluginDrainHttpServer({ httpServer }),
+      ApolloServerPluginDrainHttpServer({ httpServer: expressServer }),
       {
         async serverWillStart() {
           return {
@@ -103,7 +118,7 @@ const main = async () => {
     })
   );
 
-  httpServer.listen(port, () => {
+  expressServer.listen(port, () => {
     console.log("> Started server on port", port);
   });
 };

@@ -13,6 +13,8 @@ exports.AppDataSource = new typeorm_1.DataSource({
     database: process.env.DB_NAME,
     synchronize: true,
     entities: [User_1.User, Game_1.Game],
-    ssl: true,
+    ssl: {
+        rejectUnauthorized: false,
+    },
 });
 //# sourceMappingURL=data-source.js.map

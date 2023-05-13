@@ -1,6 +1,7 @@
 import { DataSource } from "typeorm";
 import { Game } from "./entities/Game";
 import { User } from "./entities/User";
+import { __prod__ } from "./constants";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -11,5 +12,7 @@ export const AppDataSource = new DataSource({
   database: process.env.DB_NAME,
   synchronize: true,
   entities: [User, Game],
-  ssl: true,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });

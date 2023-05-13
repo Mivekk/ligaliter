@@ -65,13 +65,15 @@ declare module "express-session" {
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
+      NODE_ENV: string;
+      REDIS_PORT: string;
+      REDIS_HOSTNAME: string;
       DB_HOSTNAME: string;
       DB_PORT: string;
       DB_USERNAME: string;
       DB_PASSWORD: string;
       DB_NAME: string;
       COOKIE_SECRET: string;
-      PRODUCTION: string;
     }
   }
 }

@@ -53,23 +53,35 @@ const cors_1 = __importDefault(require("cors"));
 const lobby_1 = require("./resolvers/lobby");
 const game_1 = require("./resolvers/game");
 const http_1 = require("http");
+const https_1 = require("https");
 const ws_1 = require("ws");
 const ws_2 = require("graphql-ws/lib/use/ws");
 const drainHttpServer_1 = require("@apollo/server/plugin/drainHttpServer");
+const fs_1 = __importDefault(require("fs"));
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     yield data_source_1.AppDataSource.initialize();
     const app = (0, express_1.default)();
-    const port = 4000;
-    const httpServer = (0, http_1.createServer)(app);
+    const port = constants_1.__prod__ ? 443 : 4000;
+    const expressServer = constants_1.__prod__
+        ? (0, https_1.createServer)({
+            key: __dirname + fs_1.default.readFileSync("/../privkey.pem"),
+            cert: __dirname + fs_1.default.readFileSync("/../fullchain.pem"),
+        }, app)
+        : (0, http_1.createServer)(app);
     const wsServer = new ws_1.WebSocketServer({
-        server: httpServer,
+        server: expressServer,
         path: "/graphql",
     });
     const schema = yield (0, type_graphql_1.buildSchema)({
         resolvers: [user_1.UserResolver, lobby_1.LobbyResolver, game_1.GameResolver],
         validate: false,
     });
-    const redis = new ioredis_1.Redis();
+    const redis = constants_1.__prod__
+        ? new ioredis_1.Redis({
+            port: Number(process.env.REDIS_PORT),
+            host: process.env.REDIS_HOSTNAME,
+        })
+        : new ioredis_1.Redis();
     const serverCleanup = (0, ws_2.useServer)({
         schema,
         context: () => __awaiter(void 0, void 0, void 0, function* () {
@@ -88,7 +100,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             maxAge: 1000 * 60 * 60 * 24 * 365,
             httpOnly: true,
             sameSite: "lax",
-            secure: process.env.PRODUCTION === "true",
+            secure: constants_1.__prod__,
         },
         secret: process.env.COOKIE_SECRET,
         resave: false,
@@ -97,7 +109,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const apolloServer = new server_1.ApolloServer({
         schema,
         plugins: [
-            (0, drainHttpServer_1.ApolloServerPluginDrainHttpServer)({ httpServer }),
+            (0, drainHttpServer_1.ApolloServerPluginDrainHttpServer)({ httpServer: expressServer }),
             {
                 serverWillStart() {
                     return __awaiter(this, void 0, void 0, function* () {
@@ -126,7 +138,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             });
         }),
     }));
-    httpServer.listen(port, () => {
+    expressServer.listen(port, () => {
         console.log("> Started server on port", port);
     });
 });
