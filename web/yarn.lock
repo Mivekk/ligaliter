@@ -1242,12 +1242,12 @@
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.7.5.tgz#5f19d2b85a98e9558036f6a3cacc8819420f05cf"
   integrity sha512-JCB8C6SnDoQf0cNycqd/35A7MjcnK+ZTqE7judS6o7utxUCg6imJg3QK2qzHKszlTjcj2cn+NwMB2i96ubpj7w==
 
-"@types/react-dnd-html5-backend@^3.0.2":
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/@types/react-dnd-html5-backend/-/react-dnd-html5-backend-3.0.2.tgz#f3cc8307cb9563a2896cb9fb48a09660a0e209c9"
-  integrity sha512-sLKCHGGoXrxbx3QX9Jerg51dRjeUKD+c+HL59ZTkut5GevxJFC8PxsVpcoMchBRd9X+GUyrsaBSXGteWCpMISw==
+"@types/react-dnd-touch-backend@^0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@types/react-dnd-touch-backend/-/react-dnd-touch-backend-0.5.0.tgz#76d6cf3645c9e65342a4504577dea23ec2a4a088"
+  integrity sha512-4IOQ+RSnUmJAq1jM01Fvl3Y7+SXphRCTnat6bAkyfBrncGLOPL4OWv68n1FCKMvBUXmdXcDh7YCwb8uFGnbCnQ==
   dependencies:
-    react-dnd-html5-backend "*"
+    react-dnd-touch-backend "*"
 
 "@types/react-dnd@^3.0.2":
   version "3.0.2"
@@ -4109,11 +4109,12 @@ quick-lru@^5.1.1:
   resolved "https://registry.yarnpkg.com/quick-lru/-/quick-lru-5.1.1.tgz#366493e6b3e42a3a6885e2e99d18f80fb7a8c932"
   integrity sha512-WuyALRjWPDGtt/wzJiadO5AXY+8hZ80hVpe6MyivgraREW751X3SbhRvG3eLKOYN+8VEvqLcf3wdnt44Z4S4SA==
 
-react-dnd-html5-backend@*, react-dnd-html5-backend@^16.0.1:
+react-dnd-touch-backend@*, react-dnd-touch-backend@^16.0.1:
   version "16.0.1"
-  resolved "https://registry.yarnpkg.com/react-dnd-html5-backend/-/react-dnd-html5-backend-16.0.1.tgz#87faef15845d512a23b3c08d29ecfd34871688b6"
-  integrity sha512-Wu3dw5aDJmOGw8WjH1I1/yTH+vlXEL4vmjk5p+MHxP8HuHJS1lAGeIdG/hze1AvNeXWo/JgULV87LyQOr+r5jw==
+  resolved "https://registry.yarnpkg.com/react-dnd-touch-backend/-/react-dnd-touch-backend-16.0.1.tgz#e73f8169e2b9fac0f687970f875cac0a4d02d6e2"
+  integrity sha512-NonoCABzzjyWGZuDxSG77dbgMZ2Wad7eQiCd/ECtsR2/NBLTjGksPUx9UPezZ1nQ/L7iD130Tz3RUshL/ClKLA==
   dependencies:
+    "@react-dnd/invariant" "^4.0.1"
     dnd-core "^16.0.1"
 
 react-dnd@*, react-dnd@^16.0.1:

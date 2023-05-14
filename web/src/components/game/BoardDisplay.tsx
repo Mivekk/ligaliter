@@ -14,7 +14,11 @@ const BoardDisplay: React.FC<{}> = () => {
     );
   }
 
-  return <div className="grid grid-rows-19 grid-cols-19">{tilesElements}</div>;
+  return (
+    <div className="min-w-[1063px]">
+      <div className="grid grid-rows-19 grid-cols-19">{tilesElements}</div>
+    </div>
+  );
 };
 
 export default React.memo(BoardDisplay);

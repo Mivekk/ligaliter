@@ -9,7 +9,7 @@ const Wrapper: React.FC<WrapperProps> = ({ children }) => {
   return (
     <>
       <NavBar />
-      <div className="flex w-full h-screen items-center justify-center bg-main">
+      <div className="flex w-full h-screen items-center justify-center bg-main overflow-hidden">
         {children}
       </div>
     </>
