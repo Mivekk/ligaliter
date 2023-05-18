@@ -154,21 +154,19 @@ const GameContainer: React.FC<ContainerProps> = ({ wordList }) => {
         style={{ top: boardPosition.yOffset, left: boardPosition.xOffset }}
       >
         <div
-          className={
-            "flex items-center justify-center min-w-[1100px] overflow-hidden"
-          }
+          className={"flex items-center justify-center min-w-[1100px]"}
           onWheel={(event) => handleWheel(event)}
           style={{ transform: `scale(${zoom})` }}
         >
-          <BoardDisplay />
-
           <div
             onMouseDown={(event) => handleMouseDown(event)}
             onTouchStart={(event) => handleTouchDown(event)}
-            className="absolute overflow-hidden"
+            className="absolute"
           >
-            <Board />
+            <BoardDisplay />
           </div>
+
+          <Board />
         </div>
 
         <ActiveIndicator data={data} />

@@ -30,6 +30,7 @@ const Tile: React.FC<TileProps> = ({
     setPlayerTiles,
     boardTiles,
     setBoardTiles,
+    isDragging: isDropzone,
     setIsDragging,
   } = useContext(TilesContext);
 
@@ -194,6 +195,7 @@ const Tile: React.FC<TileProps> = ({
       className={`relative w-14 h-14 flex justify-center items-center text-2xl
        border-[1px] shadow-[0px_2px_black] border-black rounded-lg`}
       style={{
+        zIndex: letter || isDropzone ? 50 : -50,
         opacity: letter ? 1.0 : 0.0,
         backgroundColor: placed ? "orange" : draggable ? "yellow" : "lightgrey",
       }}

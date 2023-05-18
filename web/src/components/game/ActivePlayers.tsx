@@ -15,16 +15,18 @@ interface ActivePlayersProps {
 }
 
 const ActivePlayers: React.FC<ActivePlayersProps> = ({ data }) => {
-  const players = data?.players.map((item) => (
-    <div key={item.id}>
-      {item.username} {item.points}
-    </div>
-  ));
+  const players = data?.players
+    .sort((a, b) => (a.points < b.points ? 1 : -1))
+    .map((item) => (
+      <div key={item.id}>
+        {item.username} {item.points}
+      </div>
+    ));
 
   return (
     <div
       className="fixed flex flex-col items-center z-40 bg-darker1 text-white rounded-xl 
-         w-52 h-40 top-20 right-8 shadow-lg"
+         w-52 h-fit pb-2 top-20 right-8 shadow-lg"
     >
       <Heading>Players</Heading>
       {players}
