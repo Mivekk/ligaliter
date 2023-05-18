@@ -16,7 +16,7 @@ const NavBar: React.FC<NavBarProps> = ({ warnOnLeave }) => {
   return (
     <>
       <div
-        className="flex absolute flex-row items-center justify-between px-6 
+        className="flex absolute bg-darker1 flex-row items-center justify-between px-6 
           w-full h-14 text-md text-black z-20"
       >
         <button

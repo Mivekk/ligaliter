@@ -24,8 +24,14 @@ const Tile: React.FC<TileProps> = ({
   placed,
   gameId,
 }) => {
-  const { tileBag, playerTiles, setPlayerTiles, boardTiles, setBoardTiles } =
-    useContext(TilesContext);
+  const {
+    tileBag,
+    playerTiles,
+    setPlayerTiles,
+    boardTiles,
+    setBoardTiles,
+    setIsDragging,
+  } = useContext(TilesContext);
 
   const [, moveTile] = useMutation(MoveTileDocument);
 
@@ -45,6 +51,7 @@ const Tile: React.FC<TileProps> = ({
 
   // set up function for drag event
   const handleDrag = (params: HandleDragType) => {
+    setIsDragging(true);
     const newBoardTiles = [...boardTiles];
     const newPlayerTiles = [...playerTiles];
 
@@ -66,6 +73,7 @@ const Tile: React.FC<TileProps> = ({
 
   // set up function for drop event
   const handleDrop = (params: HandleDropType) => {
+    setIsDragging(false);
     const newBoardTiles = [...boardTiles];
     const newPlayerTiles = [...playerTiles];
 
@@ -116,6 +124,7 @@ const Tile: React.FC<TileProps> = ({
 
   // set up function for drop outside of accepted space
   const handleWrongDrop = (params: HandleWrongDropType) => {
+    setIsDragging(false);
     const newTiles = [...boardTiles];
 
     let curTile = newTiles.find((item) => item.id === params.id) as TileType;
@@ -146,9 +155,11 @@ const Tile: React.FC<TileProps> = ({
       id: id,
       letter: letter,
     },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
+    collect: (monitor) => {
+      return {
+        isDragging: monitor.isDragging(),
+      };
+    },
     end: (item, monitor) => {
       if (!monitor.didDrop()) {
         handleWrongDrop({ id: item.id, letter: item.letter! });

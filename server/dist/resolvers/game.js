@@ -252,6 +252,18 @@ let GameResolver = class GameResolver {
                 player.tiles.push(Object.assign(Object.assign({}, tile), { id: freeId }));
                 return false;
             });
+            for (let i = constants_1.BOARD_SIZE; i < constants_1.BOARD_SIZE + constants_1.MAX_PLAYER_TILES; i++) {
+                if (!player.tiles.find((item) => item.id === i)) {
+                    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                    player.tiles.push({
+                        id: i,
+                        userId,
+                        draggable: true,
+                        placed: false,
+                        letter: alphabet[Math.floor(Math.random() * alphabet.length)],
+                    });
+                }
+            }
             gameData.board.forEach((tile) => {
                 tile.draggable = false;
                 tile.placed = true;

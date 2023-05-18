@@ -17,8 +17,7 @@ const TileDropArea: React.FC<TileDropAreaProps> = ({
   gameId,
   id,
 }) => {
-  const { boardTiles, setBoardTiles, playerTiles, setPlayerTiles } =
-    useContext(TilesContext);
+  const { boardTiles, playerTiles, setPlayerTiles } = useContext(TilesContext);
 
   const [, moveTile] = useMutation(MoveTileDocument);
 

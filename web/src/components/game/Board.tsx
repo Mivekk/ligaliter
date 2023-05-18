@@ -70,7 +70,7 @@ const Board: React.FC<{}> = () => {
   ));
 
   return (
-    <div className="absolute min-w-[1063px]">
+    <div className="min-w-[1063px]">
       <div className="grid grid-rows-19 grid-cols-19">{tilesElements}</div>
     </div>
   );

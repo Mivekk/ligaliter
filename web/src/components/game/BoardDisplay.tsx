@@ -15,7 +15,7 @@ const BoardDisplay: React.FC<{}> = () => {
   }
 
   return (
-    <div className="min-w-[1063px]">
+    <div className="min-w-[1063px]" style={{ backfaceVisibility: "hidden" }}>
       <div className="grid grid-rows-19 grid-cols-19">{tilesElements}</div>
     </div>
   );

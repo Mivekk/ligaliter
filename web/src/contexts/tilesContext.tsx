@@ -10,6 +10,8 @@ type ContextType = {
   setPlayerTiles: React.Dispatch<React.SetStateAction<TileType[]>>;
   tileBag: TileBagType;
   setTileBag: React.Dispatch<React.SetStateAction<TileBagType>>;
+  isDragging: boolean;
+  setIsDragging: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export const TilesContext = createContext<ContextType>({
@@ -19,6 +21,8 @@ export const TilesContext = createContext<ContextType>({
   setPlayerTiles: () => {},
   tileBag: {},
   setTileBag: () => {},
+  isDragging: false,
+  setIsDragging: () => {},
 });
 
 interface TilesContextProviderProps {
@@ -39,6 +43,8 @@ const TilesContextProvider: React.FC<TilesContextProviderProps> = ({
     }
     return tmpTiles;
   });
+
+  const [isDragging, setIsDragging] = useState(false);
 
   const [playerTiles, setPlayerTiles] = useState<TileType[]>(() => {
     const tmpTiles: TileType[] = [];
@@ -92,6 +98,8 @@ const TilesContextProvider: React.FC<TilesContextProviderProps> = ({
         setPlayerTiles,
         tileBag,
         setTileBag,
+        isDragging,
+        setIsDragging,
       }}
     >
       {children}
