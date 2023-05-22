@@ -277,14 +277,6 @@ export class GameResolver {
       player.points += input.points;
     }
 
-    // swap button
-    if (input.points === -1) {
-      player.tiles = player.tiles.map((tile) => ({
-        ...tile,
-        letter: getNewLetter(gameData.tileBag, true),
-      }));
-    }
-
     // next player turn
     gameData.activeId =
       gameData.players[
@@ -292,9 +284,9 @@ export class GameResolver {
           gameData.players.length
       ].id;
 
-    // pass button
+    // return tiles to player tiles
     gameData.board = gameData.board.filter((tile) => {
-      if (input.points !== 0 || tile.placed) {
+      if (input.points > 0 || tile.placed) {
         return true;
       }
 
@@ -310,6 +302,14 @@ export class GameResolver {
 
       return false;
     });
+
+    // swap button
+    if (input.points === -1) {
+      player.tiles = player.tiles.map((tile) => ({
+        ...tile,
+        letter: getNewLetter(gameData.tileBag, true),
+      }));
+    }
 
     // refill all missing tiles
     for (let i = BOARD_SIZE; i < BOARD_SIZE + MAX_PLAYER_TILES; i++) {

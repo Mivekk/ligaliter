@@ -43,7 +43,7 @@ export const checkWords = (
     let currentId = wordStartId;
     // if wordStartId is not max to the right
     if (currentId % boardLength !== boardLength - 1) {
-      while (boardTiles[currentId].letter !== undefined) {
+      while (boardTiles[currentId]?.letter !== undefined) {
         // push every letter to final word
         possibleWord.push(boardTiles[currentId].letter!);
         // add value of that letter to the horizontal sum
@@ -88,7 +88,7 @@ export const checkWords = (
     // if word is not on the bottom
     currentId = wordStartId;
     if (currentId <= boardSize - boardLength) {
-      while (boardTiles[currentId].letter !== undefined) {
+      while (boardTiles[currentId]?.letter !== undefined) {
         // push every letter to final word
         possibleWord.push(boardTiles[currentId].letter!);
         // add value of that letter to the vertical sum

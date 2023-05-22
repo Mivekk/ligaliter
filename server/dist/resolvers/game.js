@@ -238,14 +238,11 @@ let GameResolver = class GameResolver {
             if (input.points > 0) {
                 player.points += input.points;
             }
-            if (input.points === -1) {
-                player.tiles = player.tiles.map((tile) => (Object.assign(Object.assign({}, tile), { letter: (0, getNewLetter_1.getNewLetter)(gameData.tileBag, true) })));
-            }
             gameData.activeId =
                 gameData.players[(gameData.players.findIndex((el) => el.id === gameData.activeId) + 1) %
                     gameData.players.length].id;
             gameData.board = gameData.board.filter((tile) => {
-                if (input.points !== 0 || tile.placed) {
+                if (input.points > 0 || tile.placed) {
                     return true;
                 }
                 let freeId = -1;
@@ -258,6 +255,9 @@ let GameResolver = class GameResolver {
                 player.tiles.push(Object.assign(Object.assign({}, tile), { id: freeId }));
                 return false;
             });
+            if (input.points === -1) {
+                player.tiles = player.tiles.map((tile) => (Object.assign(Object.assign({}, tile), { letter: (0, getNewLetter_1.getNewLetter)(gameData.tileBag, true) })));
+            }
             for (let i = constants_1.BOARD_SIZE; i < constants_1.BOARD_SIZE + constants_1.MAX_PLAYER_TILES; i++) {
                 if (!player.tiles.find((item) => item.id === i)) {
                     player.tiles.push({
