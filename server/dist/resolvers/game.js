@@ -32,6 +32,7 @@ const initialTileBag_1 = require("../utils/initialTileBag");
 const isAuth_1 = require("../utils/isAuth");
 const playerIdToUser_1 = require("../utils/playerIdToUser");
 const randomPlayerTiles_1 = require("../utils/randomPlayerTiles");
+const getNewLetter_1 = require("../utils/getNewLetter");
 let MoveTileInput = class MoveTileInput {
 };
 __decorate([
@@ -234,7 +235,12 @@ let GameResolver = class GameResolver {
             if (!player) {
                 return false;
             }
-            player.points += input.points;
+            if (input.points > 0) {
+                player.points += input.points;
+            }
+            if (input.points === -1) {
+                player.tiles = player.tiles.map((tile) => (Object.assign(Object.assign({}, tile), { letter: (0, getNewLetter_1.getNewLetter)(gameData.tileBag, true) })));
+            }
             gameData.activeId =
                 gameData.players[(gameData.players.findIndex((el) => el.id === gameData.activeId) + 1) %
                     gameData.players.length].id;
@@ -254,13 +260,12 @@ let GameResolver = class GameResolver {
             });
             for (let i = constants_1.BOARD_SIZE; i < constants_1.BOARD_SIZE + constants_1.MAX_PLAYER_TILES; i++) {
                 if (!player.tiles.find((item) => item.id === i)) {
-                    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
                     player.tiles.push({
                         id: i,
                         userId,
                         draggable: true,
                         placed: false,
-                        letter: alphabet[Math.floor(Math.random() * alphabet.length)],
+                        letter: (0, getNewLetter_1.getNewLetter)(gameData.tileBag, false),
                     });
                 }
             }

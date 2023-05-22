@@ -146,39 +146,39 @@ const GameContainer: React.FC<ContainerProps> = ({ wordList }) => {
   return (
     <Wrapper>
       <div
-        className={"absolute w-full h-screen"}
+        className="relative w-full h-screen flex justify-center items-center m-0 p-0 z-0"
         onMouseUp={() => setMouseHold(false)}
         onTouchEnd={() => setTouchHold(false)}
         onMouseMove={(event) => handleMouseMove(event)}
         onTouchMove={(event) => handleTouchMove(event)}
-        style={{ top: boardPosition.yOffset, left: boardPosition.xOffset }}
+        onWheel={(event) => handleWheel(event)}
+        style={{
+          top: boardPosition.yOffset,
+          left: boardPosition.xOffset,
+          transform: `scale(${zoom})`,
+        }}
       >
-        <div
-          className={"flex items-center justify-center min-w-[1100px]"}
-          onWheel={(event) => handleWheel(event)}
-          style={{ transform: `scale(${zoom})` }}
-        >
+        <div className="flex flex-wrap w-fit h-fit m-0 p-0 origin-center">
           <div
+            className="absolute"
             onMouseDown={(event) => handleMouseDown(event)}
             onTouchStart={(event) => handleTouchDown(event)}
-            className="absolute"
           >
             <BoardDisplay />
           </div>
-
           <Board />
         </div>
-
-        <ActiveIndicator data={data} />
-
-        <ActivePlayers data={data} />
-
-        <PlayerMenu
-          data={data}
-          isValid={isValid}
-          playPointCount={playPointCount}
-        />
       </div>
+
+      <ActiveIndicator data={data} />
+
+      <ActivePlayers data={data} />
+
+      <PlayerMenu
+        data={data}
+        isValid={isValid}
+        playPointCount={playPointCount}
+      />
     </Wrapper>
   );
 };

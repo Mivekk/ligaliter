@@ -15,6 +15,7 @@ import {
 import { boardSize } from "@/utils/game/constants";
 import React, { useContext, useEffect } from "react";
 import { useDrag, useDrop } from "react-dnd";
+import { usePreview } from "react-dnd-preview";
 import { useMutation, useQuery, useSubscription } from "urql";
 
 const Tile: React.FC<TileProps> = ({

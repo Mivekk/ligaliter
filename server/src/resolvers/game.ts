@@ -33,6 +33,7 @@ import { initialTileBag } from "../utils/initialTileBag";
 import { isAuth } from "../utils/isAuth";
 import { playerIdToUser } from "../utils/playerIdToUser";
 import { randomPlayerTiles } from "../utils/randomPlayerTiles";
+import { getNewLetter } from "../utils/getNewLetter";
 
 @InputType()
 class MoveTileInput {
@@ -271,14 +272,27 @@ export class GameResolver {
       return false;
     }
 
-    player.points += input.points;
+    // input.points can be -1 when swap button
+    if (input.points > 0) {
+      player.points += input.points;
+    }
 
+    // swap button
+    if (input.points === -1) {
+      player.tiles = player.tiles.map((tile) => ({
+        ...tile,
+        letter: getNewLetter(gameData.tileBag, true),
+      }));
+    }
+
+    // next player turn
     gameData.activeId =
       gameData.players[
         (gameData.players.findIndex((el) => el.id === gameData.activeId) + 1) %
           gameData.players.length
       ].id;
 
+    // pass button
     gameData.board = gameData.board.filter((tile) => {
       if (input.points !== 0 || tile.placed) {
         return true;
@@ -297,15 +311,15 @@ export class GameResolver {
       return false;
     });
 
+    // refill all missing tiles
     for (let i = BOARD_SIZE; i < BOARD_SIZE + MAX_PLAYER_TILES; i++) {
       if (!player.tiles.find((item) => item.id === i)) {
-        const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         player.tiles.push({
           id: i,
           userId,
           draggable: true,
           placed: false,
-          letter: alphabet[Math.floor(Math.random() * alphabet.length)],
+          letter: getNewLetter(gameData.tileBag, false),
         });
       }
     }

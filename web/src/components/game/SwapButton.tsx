@@ -1,12 +1,24 @@
+import { EndTurnDocument } from "@/generated/graphql";
+import { useRouter } from "next/router";
 import React from "react";
+import { useMutation } from "urql";
 
 interface SwapButtonProps {
   myTurn: boolean | undefined;
 }
 
 const SwapButton: React.FC<SwapButtonProps> = ({ myTurn }) => {
+  const router = useRouter();
+  const gameId = router.query.gameId as string;
+
+  const [, endTurn] = useMutation(EndTurnDocument);
+
   const handleOnClick = () => {
-    console.log("swap");
+    if (!myTurn) {
+      return;
+    }
+
+    endTurn({ input: { uuid: gameId, points: -1 } });
   };
 
   return (

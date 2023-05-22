@@ -76,6 +76,7 @@ const Lobby: React.FC<{}> = ({}) => {
             Leave lobby
           </Button>
         </div>
+        <div className="text-xl">Lobby ID: {lobbyUUID}</div>
       </div>
     </Wrapper>
   );
