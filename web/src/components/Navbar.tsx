@@ -17,7 +17,7 @@ const NavBar: React.FC<NavBarProps> = ({ warnOnLeave }) => {
     <>
       <div
         className="flex absolute bg-darker1 flex-row items-center justify-between px-6
-          w-full h-14 text-md text-black z-20"
+          w-full sm:h-14 h-8 text-md text-black z-20"
       >
         <button
           onClick={() => router.push("/home")}

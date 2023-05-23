@@ -204,7 +204,7 @@ const Tile: React.FC<TileProps> = ({
           ref={(node) => {
             draggable ? drag(node!) : null, drop(node!);
           }}
-          className={`relative w-14 h-14 flex justify-center items-center text-2xl
+          className={`relative sm:w-14 sm:h-14 w-[50px] h-[50px] flex justify-center items-center text-2xl
        border-[1px] shadow-[0px_2px_black] border-black rounded-lg`}
           style={{
             zIndex: letter || isDropzone ? 50 : -50,

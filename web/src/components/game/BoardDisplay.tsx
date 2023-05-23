@@ -9,13 +9,18 @@ const BoardDisplay: React.FC<{}> = () => {
     tilesElements.push(
       <div
         key={i}
-        className={"w-14 h-14 bg-secondary border-[1px] border-white"}
+        className={
+          "sm:w-14 sm:h-14 w-[50px] h-[50px] bg-secondary border-[1px] border-white"
+        }
       />
     );
   }
 
   return (
-    <div className="min-w-[1063px]" style={{ backfaceVisibility: "hidden" }}>
+    <div
+      className="sm:min-w-[1063px] min-w-[950px]"
+      style={{ backfaceVisibility: "hidden" }}
+    >
       <div className="grid grid-rows-19 grid-cols-19">{tilesElements}</div>
     </div>
   );

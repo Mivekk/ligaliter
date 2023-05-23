@@ -16,7 +16,7 @@ interface ActivePlayersProps {
 
 const ActivePlayers: React.FC<ActivePlayersProps> = ({ data }) => {
   const players = data?.players
-    .sort((a, b) => (a.points < b.points ? 1 : -1))
+    .sort((a, b) => (a.points < b.points ? 1 : a.points === b.points ? 0 : -1))
     .map((item) => (
       <div key={item.id}>
         {item.username} {item.points}
@@ -25,7 +25,7 @@ const ActivePlayers: React.FC<ActivePlayersProps> = ({ data }) => {
 
   return (
     <div
-      className="fixed flex flex-col items-center z-40 bg-darker1 text-white rounded-xl 
+      className="fixed sm:flex hidden flex-col items-center z-40 bg-darker1 text-white rounded-xl 
          w-52 h-fit pb-2 top-20 right-8 shadow-lg"
     >
       <Heading>Players</Heading>

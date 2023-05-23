@@ -14,7 +14,7 @@ const TilePreview: React.FC<TilePreviewProps> = ({ letter, points }) => {
 
   return (
     <div
-      className={`relative w-14 h-14 flex justify-center items-center text-2xl
+      className={`relative sm:w-14 sm:h-14 w-[50px] h-[50px] flex justify-center items-center text-2xl
        border-[1px] shadow-[0px_2px_black] border-black rounded-lg cursor-grabbing`}
       style={{ backgroundColor: "yellow", opacity: 0.5 }}
     >

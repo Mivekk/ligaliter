@@ -36,26 +36,26 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
       : false;
 
   return (
-    <>
+    <div className="fixed bottom-2 origin-center w-fit -translate-x-1/2 left-1/2">
+      <div className="flex justify-center gap-2">
+        <div className="w-full">
+          <SwapButton myTurn={isMyTurn} />
+        </div>
+        <div className="w-full">
+          <PlayButton isValid={isValid} playPointCount={playPointCount} />
+        </div>
+        <div className="w-full">
+          <PassButton myTurn={isMyTurn} />
+        </div>
+      </div>
       <div
         className={
-          "fixed bottom-5 origin-center -translate-x-1/2 left-1/2 w-[34rem] h-20 rounded-xl bg-zinc-600/50"
+          "sm:w-[34rem] w-fit flex max-w-[34rem] sm:h-20 h-18 px-1 rounded-xl bg-zinc-600/50 mt-2"
         }
       >
         <PlayerTiles />
       </div>
-      <div className="fixed bottom-28 flex items-end gap-2 origin-center -translate-x-1/2 left-1/2">
-        <div>
-          <SwapButton myTurn={isMyTurn} />
-        </div>
-        <div>
-          <PlayButton isValid={isValid} playPointCount={playPointCount} />
-        </div>
-        <div>
-          <PassButton myTurn={isMyTurn} />
-        </div>
-      </div>
-    </>
+    </div>
   );
 };
 

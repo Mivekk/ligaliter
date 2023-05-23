@@ -25,7 +25,8 @@ const PlayButton: React.FC<PlayButtonProps> = ({ isValid, playPointCount }) => {
   return (
     <div
       onClick={handleOnClick}
-      className={`flex flex-col items-center text-white text-2xl justify-center select-none sm:w-52 w-1/2 ${
+      className={`flex flex-col items-center text-white text-2xl justify-center select-none sm:w-52 w-full 
+      ${
         isValid
           ? "h-20 flex-col bg-violet-600 rounded-xl hover:opacity-75 cursor-pointer"
           : "h-10 bg-gray-400"

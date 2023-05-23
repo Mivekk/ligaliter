@@ -25,7 +25,7 @@ const SwapButton: React.FC<SwapButtonProps> = ({ myTurn }) => {
     <div
       onClick={handleOnClick}
       className={`flex flex-col items-center text-white text-2xl 
-            justify-center select-none sm:w-40 w-1/4 h-10 ${
+            justify-center select-none sm:w-40 w-full h-10 ${
               myTurn
                 ? "bg-violet-600 hover:opacity-75 cursor-pointer"
                 : "bg-gray-400"
