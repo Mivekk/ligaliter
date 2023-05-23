@@ -37,7 +37,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
 
   return (
     <div className="fixed bottom-2 origin-center w-fit -translate-x-1/2 left-1/2">
-      <div className="flex justify-center gap-2">
+      <div className="flex items-end justify-center gap-2">
         <div className="w-full">
           <SwapButton myTurn={isMyTurn} />
         </div>
@@ -50,7 +50,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
       </div>
       <div
         className={
-          "sm:w-[34rem] w-fit flex max-w-[34rem] sm:h-20 h-18 px-1 rounded-xl bg-zinc-600/50 mt-2"
+          "sm:w-[34rem] justify-center w-fit flex max-w-[34rem] sm:h-20 h-18 px-1 rounded-xl bg-zinc-600/50 mt-2"
         }
       >
         <PlayerTiles />

@@ -3,11 +3,7 @@ import { useRouter } from "next/router";
 import React from "react";
 import { useMutation, useQuery } from "urql";
 
-interface NavBarProps {
-  warnOnLeave?: boolean;
-}
-
-const NavBar: React.FC<NavBarProps> = ({ warnOnLeave }) => {
+const NavBar: React.FC<{}> = () => {
   const router = useRouter();
 
   const [{ data }] = useQuery({ query: MeDocument });
@@ -15,6 +11,7 @@ const NavBar: React.FC<NavBarProps> = ({ warnOnLeave }) => {
 
   return (
     <>
+      <div className="absolute -top-24 w-full h-24 bg-darker1"></div>
       <div
         className="flex absolute bg-darker1 flex-row items-center justify-between px-6
           w-full sm:h-14 h-8 text-md text-black z-20"
