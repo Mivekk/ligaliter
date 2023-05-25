@@ -2,6 +2,7 @@ import { EndTurnDocument } from "@/generated/graphql";
 import { useRouter } from "next/router";
 import React from "react";
 import { useMutation } from "urql";
+import { motion } from "framer-motion";
 
 interface PlayButtonProps {
   isValid: boolean;
@@ -22,19 +23,35 @@ const PlayButton: React.FC<PlayButtonProps> = ({ isValid, playPointCount }) => {
     endTurn({ input: { uuid: gameId, points: playPointCount } });
   };
 
+  const buttonVariants = {
+    initial: {
+      height: "2.5rem",
+    },
+    valid: {
+      height: "5rem",
+    },
+  };
+
   return (
-    <div
+    <motion.div
       onClick={handleOnClick}
-      className={`flex flex-col items-center text-white text-2xl justify-center select-none sm:w-52 w-full 
+      whileHover={{ scale: 1.03 }}
+      whileTap={{ scale: 0.97 }}
+      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+      variants={buttonVariants}
+      initial={isValid ? "valid" : "initial"}
+      animate={isValid ? "valid" : "initial"}
+      className={`flex flex-col items-center text-white text-2xl justify-center 
+        select-none sm:w-52 w-full overflow-hidden
       ${
         isValid
-          ? "h-20 flex-col bg-violet-600 rounded-xl hover:opacity-75 cursor-pointer"
+          ? "h-20 flex-col bg-violet-600 rounded-xl cursor-pointer"
           : "h-10 bg-gray-400"
       }`}
     >
       <div>PLAY</div>
       <div>{isValid ? `${playPointCount} PTS` : null}</div>
-    </div>
+    </motion.div>
   );
 };
 

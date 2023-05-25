@@ -55,36 +55,46 @@ const NavBar: React.FC<{}> = () => {
 
   return (
     <>
-      <div className="hidden sm:flex absolute bg-darker1 flex-row items-center justify-between px-6 w-full h-14 text-md text-black z-20">
-        <NavBarMenu />
-      </div>
-      <div
-        className={`sm:hidden fixed z-50 flex flex-col w-full h-fit max-h-screen bg-darker1 ${
-          showMenu ? "rounded-b-xl" : ""
-        } select-none`}
-      >
-        <HiMenuAlt2
-          className="w-7 h-7 ml-1 mb-1 mt-1"
-          onClick={() => setShowMenu((prev) => !prev)}
-        />
-        <motion.div
-          initial="closed"
-          animate={showMenu ? "open" : "closed"}
-          exit="closed"
-          className="overflow-hidden"
-          variants={dropdownVariants}
-          onAnimationComplete={showMenu ? undefined : () => setShowMenu(false)}
-        >
-          <div className="ml-4">
-            <Heading>Players</Heading>
-            <div className="flex flex-col text-lg">{players}</div>
-          </div>
-          <div className="flex self-center w-[95%] h-[1px] bg-black my-1"></div>
-          <div className="flex flex-col items-center gap-1 text-lg pb-2">
+      {!players ? (
+        <div className="absolute flex bg-darker1 flex-row items-center justify-between px-6 w-full h-14 text-md text-black z-20">
+          <NavBarMenu />
+        </div>
+      ) : (
+        <>
+          <div className="absolute sm:flex hidden bg-darker1 flex-row items-center justify-between px-6 w-full h-14 text-md text-black z-20">
             <NavBarMenu />
           </div>
-        </motion.div>
-      </div>
+          <div
+            className={`fixed z-50 sm:hidden flex flex-col w-full h-fit max-h-screen bg-darker1 ${
+              showMenu ? "rounded-b-xl" : ""
+            } select-none`}
+          >
+            <HiMenuAlt2
+              className="w-7 h-7 ml-1 mb-1 mt-1"
+              onClick={() => setShowMenu((prev) => !prev)}
+            />
+            <motion.div
+              initial="closed"
+              animate={showMenu ? "open" : "closed"}
+              exit="closed"
+              className="overflow-hidden"
+              variants={dropdownVariants}
+              onAnimationComplete={
+                showMenu ? undefined : () => setShowMenu(false)
+              }
+            >
+              <div className="ml-4">
+                <Heading>Players</Heading>
+                <div className="flex flex-col text-lg">{players}</div>
+              </div>
+              <div className="flex self-center w-[95%] h-[1px] bg-black my-1"></div>
+              <div className="flex flex-col items-center gap-1 text-lg pb-2">
+                <NavBarMenu />
+              </div>
+            </motion.div>
+          </div>
+        </>
+      )}
     </>
   );
 };
