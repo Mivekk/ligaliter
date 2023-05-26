@@ -12,8 +12,8 @@ module.exports = {
       },
       fontFamily: {
         sans: ['"Mukta"', "sans-serif"],
-        home: ['"DynaPuff"', "cursive"],
-        main: ['"Mukta"', "sans-serif"],
+        home: ['"Mukta"', "sans-serif"],
+        main: ['"DynaPuff"', "cursive"],
       },
       gridTemplateColumns: {
         19: "repeat(19, minmax(0, 1fr))",
