@@ -147,7 +147,7 @@ const GameContainer: React.FC<ContainerProps> = ({ wordList }) => {
     <Wrapper>
       <div
         className="relative w-full h-screen flex justify-center 
-          items-center select-none touch-none"
+          items-center touch-none"
         onMouseUp={() => setMouseHold(false)}
         onTouchEnd={() => setTouchHold(false)}
         onMouseMove={(event) => handleMouseMove(event)}

@@ -14,6 +14,7 @@ import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/router";
 import React from "react";
 import { useMutation, useQuery, useSubscription } from "urql";
+import { MdOutlineContentCopy } from "react-icons/md";
 
 const Lobby: React.FC<{}> = ({}) => {
   const router = useRouter();
@@ -53,10 +54,19 @@ const Lobby: React.FC<{}> = ({}) => {
 
   return (
     <Wrapper>
-      <div className="flex flex-col items-center justify-center md:w-[50rem] w-[22.5rem] h-[26rem] bg-secondary rounded-md gap-2.5 shadow-xl">
-        <Heading>Players:</Heading>
-        {players}
-        <div className="flex gap-2">
+      <div className="flex flex-col items-center md:w-[44rem] w-[22.5rem] h-fit min-h-[20rem] bg-secondary rounded-md shadow-xl">
+        <div className="flex flex-col items-center mt-1">
+          <Heading>Players</Heading>
+          {players}
+        </div>
+        <div
+          className="text-xl cursor-pointer mt-auto flex gap-2"
+          onClick={() => navigator.clipboard.writeText(lobbyUUID)}
+        >
+          <div>Lobby ID: {lobbyUUID}</div>
+          <MdOutlineContentCopy className="translate-y-1" />
+        </div>
+        <div className="flex gap-2 mb-2 mt-1">
           <Button
             onClick={async () => {
               await newGame({ uuid: lobbyUUID });
@@ -76,7 +86,6 @@ const Lobby: React.FC<{}> = ({}) => {
             Leave lobby
           </Button>
         </div>
-        <div className="text-xl">Lobby ID: {lobbyUUID}</div>
       </div>
     </Wrapper>
   );

@@ -69,7 +69,7 @@ const NavBar: React.FC<{}> = () => {
           <div
             className={`fixed z-50 sm:hidden flex flex-col w-full h-fit max-h-screen bg-darker1 ${
               showMenu ? "rounded-b-xl" : ""
-            } select-none`}
+            }`}
           >
             <HiMenuAlt2
               className="w-7 h-7 ml-1 mb-1 mt-1"
@@ -85,7 +85,7 @@ const NavBar: React.FC<{}> = () => {
                 showMenu ? undefined : () => setShowMenu(false)
               }
             >
-              <div className="ml-4">
+              <div>
                 <Heading>Players</Heading>
                 <div className="flex flex-col text-lg">{players}</div>
               </div>

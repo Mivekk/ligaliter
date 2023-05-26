@@ -42,7 +42,7 @@ const PlayButton: React.FC<PlayButtonProps> = ({ isValid, playPointCount }) => {
       initial={isValid ? "valid" : "initial"}
       animate={isValid ? "valid" : "initial"}
       className={`flex flex-col items-center text-white text-2xl justify-center 
-        select-none sm:w-52 w-full overflow-hidden
+        sm:w-52 w-full overflow-hidden
       ${
         isValid
           ? "h-20 flex-col bg-violet-600 rounded-xl cursor-pointer"

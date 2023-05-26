@@ -205,7 +205,7 @@ const Tile: React.FC<TileProps> = ({
             draggable ? drag(node!) : null, drop(node!);
           }}
           className={`relative sm:w-14 sm:h-14 w-[50px] h-[50px] flex justify-center items-center text-2xl
-       border-[1px] shadow-[0px_2px_black] border-black rounded-lg select-none`}
+       border-[1px] shadow-[0px_2px_black] border-black rounded-lg`}
           style={{
             zIndex: letter || isDropzone ? 50 : -50,
             opacity: letter ? 1.0 : 0.0,
@@ -217,7 +217,7 @@ const Tile: React.FC<TileProps> = ({
           }}
         >
           {letter}
-          <div className={"absolute top-0 right-1 text-sm select-none"}>
+          <div className={"absolute top-0 right-1 text-sm"}>
             {letter && tileBag[`${letter}`].value !== -1
               ? tileBag[`${letter}`].value
               : null}

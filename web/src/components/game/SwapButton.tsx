@@ -29,7 +29,7 @@ const SwapButton: React.FC<SwapButtonProps> = ({ myTurn }) => {
       whileTap={{ scale: 0.97 }}
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
       className={`flex flex-col items-center text-white text-2xl 
-            justify-center select-none sm:w-40 w-full h-10 ${
+            justify-center sm:w-40 w-full h-10 ${
               myTurn ? "bg-violet-600 cursor-pointer" : "bg-gray-400"
             }`}
     >

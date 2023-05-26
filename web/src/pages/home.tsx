@@ -14,7 +14,7 @@ const Home: React.FC<{}> = ({}) => {
         <div className="flex sm:w-[26rem] w-[22.5rem] justify-between -translate-y-6">
           <button
             onClick={() => setIsCreatingLobby(true)}
-            className={`w-full h-10 bg-secondary rounded-xl flex justify-center ${
+            className={`w-full h-[1.7rem] bg-secondary rounded-t-xl flex justify-center ${
               isCreatingLobby ? null : "opacity-75"
             }`}
           >
@@ -22,7 +22,7 @@ const Home: React.FC<{}> = ({}) => {
           </button>
           <button
             onClick={() => setIsCreatingLobby(false)}
-            className={`w-full h-10 bg-secondary rounded-xl flex justify-center ${
+            className={`w-full h-[1.7rem] bg-secondary rounded-t-xl flex justify-center ${
               isCreatingLobby ? "opacity-75" : null
             }`}
           >

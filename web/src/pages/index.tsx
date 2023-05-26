@@ -16,7 +16,7 @@ const Index: React.FC<{}> = ({}) => {
         whileHover={{ scale: 1.03 }}
         whileTap={{ scale: 0.97 }}
         transition={{ type: "spring", stiffness: 400, damping: 25 }}
-        className="w-[14rem] h-[3.5rem] bg-utility text-white text-lg rounded-xl font-normal"
+        className="w-[14rem] h-[3.5rem] bg-utility text-white text-lg rounded-xl font-normal sm:select-auto"
         onClick={() => {
           router.push("/home");
         }}
