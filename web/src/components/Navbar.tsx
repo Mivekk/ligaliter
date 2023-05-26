@@ -12,27 +12,34 @@ import NavBarMenu from "./NavBarMenu";
 
 const NavBar: React.FC<{}> = () => {
   const router = useRouter();
-  const gameId = router.query.gameId as string;
+  const gameId = router.query.gameId;
 
-  const [{ data: queryData }] = useQuery({
-    query: GetPlayerStatsDocument,
-    variables: { uuid: gameId },
-  });
+  let players = undefined;
 
-  const [{ data: subscriptionData }] = useSubscription({
-    query: UpdatePlayerStatsDocument,
-    variables: { uuid: gameId },
-  });
+  if (gameId) {
+    const [{ data: queryData }] = useQuery({
+      query: GetPlayerStatsDocument,
+      variables: { uuid: gameId as string },
+    });
 
-  const data = subscriptionData?.updatePlayerStats || queryData?.getPlayerStats;
+    const [{ data: subscriptionData }] = useSubscription({
+      query: UpdatePlayerStatsDocument,
+      variables: { uuid: gameId as string },
+    });
 
-  const players = data?.players
-    .sort((a, b) => (a.points < b.points ? 1 : a.points === b.points ? 0 : -1))
-    .map((item) => (
-      <div key={item.id}>
-        {item.username} {item.points}
-      </div>
-    ));
+    const data =
+      subscriptionData?.updatePlayerStats || queryData?.getPlayerStats;
+
+    players = data?.players
+      .sort((a, b) =>
+        a.points < b.points ? 1 : a.points === b.points ? 0 : -1
+      )
+      .map((item) => (
+        <div key={item.id}>
+          {item.username} {item.points}
+        </div>
+      ));
+  }
 
   const [showMenu, setShowMenu] = useState(false);
 
