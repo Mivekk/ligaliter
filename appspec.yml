@@ -3,3 +3,8 @@ os: linux
 files:
   - source: server
     destination: /home/ec2-user/server
+hooks:
+  AfterInstall:
+    - location: server/scripts/after_install.sh
+      timeout: 300
+      runas: ec2-user
