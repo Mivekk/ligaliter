@@ -2,4 +2,4 @@ version: 0.0
 os: linux
 files:
   - source: server
-    destination: /server
+    destination: /home/ec2-user/server
