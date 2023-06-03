@@ -23,17 +23,17 @@ import { User } from "../entities/User";
 import {
   ApolloContext,
   GameData,
-  LobbyData,
   LobbyPlayers,
   TOPICS,
   TileUpdatedPayload,
 } from "../types";
 import { fetchGameData } from "../utils/fetchGameData";
+import { fetchLobbyData } from "../utils/fetchLobbyData";
+import { getNewLetter } from "../utils/getNewLetter";
 import { initialTileBag } from "../utils/initialTileBag";
 import { isAuth } from "../utils/isAuth";
 import { playerIdToUser } from "../utils/playerIdToUser";
 import { randomPlayerTiles } from "../utils/randomPlayerTiles";
-import { getNewLetter } from "../utils/getNewLetter";
 
 @InputType()
 class MoveTileInput {
@@ -118,12 +118,10 @@ export class GameResolver {
     @Ctx() { redis }: ApolloContext,
     @PubSub(TOPICS.NEW_PLAYER_IN_LOBBY) publish: Publisher<LobbyPlayers>
   ): Promise<GameResponseObject | null> {
-    const lobbyID = await redis.get(uuid);
-    if (!lobbyID) {
+    const lobbyData = await fetchLobbyData(uuid, redis);
+    if (!lobbyData) {
       return null;
     }
-
-    const lobbyData = JSON.parse(lobbyID) as LobbyData;
 
     const startingPlayer =
       lobbyData.players[Math.floor(Math.random() * lobbyData.players.length)];
@@ -140,6 +138,7 @@ export class GameResolver {
       tileBag: initialTileBag,
       players: playersData,
       activeId: startingPlayer.id,
+      startTime: new Date().toISOString(),
     };
 
     await redis.setex(
@@ -276,6 +275,8 @@ export class GameResolver {
     if (input.points > 0) {
       player.points += input.points;
     }
+
+    gameData.startTime = new Date().toISOString();
 
     // next player turn
     gameData.activeId =
@@ -417,5 +418,18 @@ export class GameResolver {
       activePlayer,
       players: playerStats,
     };
+  }
+
+  @Query(() => String, { nullable: true })
+  async getRoundStartTime(
+    @Arg("uuid") uuid: string,
+    @Ctx() { redis }: ApolloContext
+  ): Promise<string | null> {
+    const gameData = await fetchGameData(uuid, redis);
+    if (!gameData) {
+      return null;
+    }
+
+    return gameData.startTime;
   }
 }

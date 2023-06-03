@@ -25,6 +25,7 @@ export type GameData = {
   tileBag: TileBagType;
   players: PlayerData[];
   activeId: number;
+  startTime: string;
 };
 
 export type ApolloContext = {

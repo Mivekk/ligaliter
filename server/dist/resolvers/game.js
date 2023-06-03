@@ -28,11 +28,12 @@ const Game_1 = require("../entities/Game");
 const User_1 = require("../entities/User");
 const types_1 = require("../types");
 const fetchGameData_1 = require("../utils/fetchGameData");
+const fetchLobbyData_1 = require("../utils/fetchLobbyData");
+const getNewLetter_1 = require("../utils/getNewLetter");
 const initialTileBag_1 = require("../utils/initialTileBag");
 const isAuth_1 = require("../utils/isAuth");
 const playerIdToUser_1 = require("../utils/playerIdToUser");
 const randomPlayerTiles_1 = require("../utils/randomPlayerTiles");
-const getNewLetter_1 = require("../utils/getNewLetter");
 let MoveTileInput = class MoveTileInput {
 };
 __decorate([
@@ -143,11 +144,10 @@ GameInfoResponseObject = __decorate([
 let GameResolver = class GameResolver {
     newGame(uuid, { redis }, publish) {
         return __awaiter(this, void 0, void 0, function* () {
-            const lobbyID = yield redis.get(uuid);
-            if (!lobbyID) {
+            const lobbyData = yield (0, fetchLobbyData_1.fetchLobbyData)(uuid, redis);
+            if (!lobbyData) {
                 return null;
             }
-            const lobbyData = JSON.parse(lobbyID);
             const startingPlayer = lobbyData.players[Math.floor(Math.random() * lobbyData.players.length)];
             const playersData = lobbyData.players.map((player) => ({
                 id: player.id,
@@ -160,6 +160,7 @@ let GameResolver = class GameResolver {
                 tileBag: initialTileBag_1.initialTileBag,
                 players: playersData,
                 activeId: startingPlayer.id,
+                startTime: new Date().toISOString(),
             };
             yield redis.setex(`game-${uuid}`, constants_1.GAME_EXPIRATION_TIME, JSON.stringify(data));
             const players = yield (0, playerIdToUser_1.playerIdToUser)(lobbyData.players);
@@ -238,6 +239,7 @@ let GameResolver = class GameResolver {
             if (input.points > 0) {
                 player.points += input.points;
             }
+            gameData.startTime = new Date().toISOString();
             gameData.activeId =
                 gameData.players[(gameData.players.findIndex((el) => el.id === gameData.activeId) + 1) %
                     gameData.players.length].id;
@@ -329,6 +331,15 @@ let GameResolver = class GameResolver {
             };
         });
     }
+    getRoundStartTime(uuid, { redis }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const gameData = yield (0, fetchGameData_1.fetchGameData)(uuid, redis);
+            if (!gameData) {
+                return null;
+            }
+            return gameData.startTime;
+        });
+    }
 };
 __decorate([
     (0, type_graphql_1.Mutation)(() => GameResponseObject, { nullable: true }),
@@ -410,6 +421,14 @@ __decorate([
     __metadata("design:paramtypes", [Object, String, Object]),
     __metadata("design:returntype", Promise)
 ], GameResolver.prototype, "updatePlayerStats", null);
+__decorate([
+    (0, type_graphql_1.Query)(() => String, { nullable: true }),
+    __param(0, (0, type_graphql_1.Arg)("uuid")),
+    __param(1, (0, type_graphql_1.Ctx)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], GameResolver.prototype, "getRoundStartTime", null);
 GameResolver = __decorate([
     (0, type_graphql_1.Resolver)()
 ], GameResolver);
