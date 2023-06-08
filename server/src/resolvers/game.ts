@@ -25,6 +25,7 @@ import {
   GameData,
   LobbyPlayers,
   TOPICS,
+  TileType,
   TileUpdatedPayload,
 } from "../types";
 import { fetchGameData } from "../utils/fetchGameData";
@@ -306,21 +307,35 @@ export class GameResolver {
 
     // swap button
     if (input.points === -1) {
-      player.tiles = player.tiles.map((tile) => ({
-        ...tile,
-        letter: getNewLetter(gameData.tileBag, true),
-      }));
+      player.tiles = player.tiles
+        .map((tile) => {
+          const newLetter = getNewLetter(gameData.tileBag, true);
+          if (!newLetter) {
+            return null;
+          }
+
+          return {
+            ...tile,
+            letter: newLetter,
+          };
+        })
+        .filter((tile) => tile !== null) as TileType[];
     }
 
     // refill all missing tiles
     for (let i = BOARD_SIZE; i < BOARD_SIZE + MAX_PLAYER_TILES; i++) {
       if (!player.tiles.find((item) => item.id === i)) {
+        const newLetter = getNewLetter(gameData.tileBag, false);
+        if (!newLetter) {
+          continue;
+        }
+
         player.tiles.push({
           id: i,
           userId,
           draggable: true,
           placed: false,
-          letter: getNewLetter(gameData.tileBag, false),
+          letter: newLetter,
         });
       }
     }

@@ -9,6 +9,9 @@ const getNewLetter = (tileBag, swap) => {
             allTiles.push(letters[i]);
         }
     }
+    if (!allTiles.length) {
+        return undefined;
+    }
     const letter = allTiles[Math.floor(Math.random() * allTiles.length)];
     if (!swap) {
         tileBag[letter].amount--;

@@ -258,16 +258,28 @@ let GameResolver = class GameResolver {
                 return false;
             });
             if (input.points === -1) {
-                player.tiles = player.tiles.map((tile) => (Object.assign(Object.assign({}, tile), { letter: (0, getNewLetter_1.getNewLetter)(gameData.tileBag, true) })));
+                player.tiles = player.tiles
+                    .map((tile) => {
+                    const newLetter = (0, getNewLetter_1.getNewLetter)(gameData.tileBag, true);
+                    if (!newLetter) {
+                        return null;
+                    }
+                    return Object.assign(Object.assign({}, tile), { letter: newLetter });
+                })
+                    .filter((tile) => tile !== null);
             }
             for (let i = constants_1.BOARD_SIZE; i < constants_1.BOARD_SIZE + constants_1.MAX_PLAYER_TILES; i++) {
                 if (!player.tiles.find((item) => item.id === i)) {
+                    const newLetter = (0, getNewLetter_1.getNewLetter)(gameData.tileBag, false);
+                    if (!newLetter) {
+                        continue;
+                    }
                     player.tiles.push({
                         id: i,
                         userId,
                         draggable: true,
                         placed: false,
-                        letter: (0, getNewLetter_1.getNewLetter)(gameData.tileBag, false),
+                        letter: newLetter,
                     });
                 }
             }

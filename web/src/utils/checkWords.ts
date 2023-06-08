@@ -38,14 +38,34 @@ export const checkWords = (
     // points got horizontally
     let horizontalCount = 0;
 
+    const adjTiles = [
+      { x: 0, y: boardLength },
+      { x: 1, y: 0 },
+      { x: 0, y: -boardLength },
+      { x: -1, y: 0 },
+    ];
+
     // possible word
     let possibleWord: string[] = [];
     let currentId = wordStartId;
+    let adjToPlaced = false;
     // if wordStartId is not max to the right
     if (currentId % boardLength !== boardLength - 1) {
       while (boardTiles[currentId]?.letter !== undefined) {
         // push every letter to final word
         possibleWord.push(boardTiles[currentId].letter!);
+
+        adjTiles.forEach((adjTile) => {
+          const adjId = currentId + adjTile.x + adjTile.y;
+          if (adjId < 0 || adjId >= boardSize) {
+            return;
+          }
+
+          if (boardTiles[adjId].placed) {
+            adjToPlaced = true;
+          }
+        });
+
         // add value of that letter to the horizontal sum
         horizontalCount += tileBag[`${boardTiles[currentId].letter!}`].value;
 
@@ -60,7 +80,7 @@ export const checkWords = (
 
     // if a word is shorter than 2 letter then
     // it's not considered as a valid word
-    if (possibleWord.length > 1) {
+    if (possibleWord.length > 1 && adjToPlaced) {
       words.add(possibleWord.join(""));
       anyWord++;
     } else {
@@ -85,12 +105,25 @@ export const checkWords = (
       }
     }
 
+    adjToPlaced = false;
     // if word is not on the bottom
     currentId = wordStartId;
     if (currentId <= boardSize - boardLength) {
       while (boardTiles[currentId]?.letter !== undefined) {
         // push every letter to final word
         possibleWord.push(boardTiles[currentId].letter!);
+
+        adjTiles.forEach((adjTile) => {
+          const adjId = currentId + adjTile.x + adjTile.y;
+          if (adjId < 0 || adjId >= boardSize) {
+            return;
+          }
+
+          if (boardTiles[adjId].placed) {
+            adjToPlaced = true;
+          }
+        });
+
         // add value of that letter to the vertical sum
         verticalCount += tileBag[`${boardTiles[currentId].letter!}`].value;
 
@@ -104,7 +137,7 @@ export const checkWords = (
     }
 
     // do not add empty words
-    if (possibleWord.length > 1) {
+    if (possibleWord.length > 1 && adjToPlaced) {
       words.add(possibleWord.join(""));
       anyWord++;
     } else {
@@ -124,7 +157,7 @@ export const checkWords = (
   });
 
   // if there are no words final return value is false
-  if (words.size === 0) {
+  if (words.size !== 1) {
     areWordsValid = false;
   }
 

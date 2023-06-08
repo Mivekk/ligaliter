@@ -1,39 +1,22 @@
 import React from "react";
 
 import { boardSize } from "@/utils/game/constants";
-import {
-  doubleLetter,
-  doubleWord,
-  tripleLetter,
-  tripleWord,
-} from "@/utils/specialTiles";
+import { tileBackground } from "@/utils/game/tileBackground";
 
 const BoardDisplay: React.FC<{}> = () => {
   // create an array of empty divs that look like empty tile
   const tilesElements = [];
   for (let i = 0; i < boardSize; i++) {
-    const doubleWordTile = doubleWord.find((val) => val === i);
-    const tripleWordTile = tripleWord.find((val) => val === i);
-    const doubleLetterTile = doubleLetter.find((val) => val === i);
-    const tripleLetterTile = tripleLetter.find((val) => val === i);
-
-    let color = "bg-secondary";
-    if (tripleWordTile !== undefined) {
-      color = "bg-[#FF006E]";
-    } else if (doubleLetterTile !== undefined) {
-      color = "bg-[#3A86FF]";
-    } else if (tripleLetterTile !== undefined) {
-      color = "bg-[#FFBE0B]";
-    } else if (doubleWordTile !== undefined) {
-      color = "bg-[#FB5607]";
-    }
+    const { text, color } = tileBackground(i);
 
     tilesElements.push(
       <div
         key={i}
         className={`flex justify-center items-center text-white sm:w-14 sm:h-14 
-          w-[50px] h-[50px] bg-secondary border-[1px] border-white`}
-      ></div>
+          w-[50px] h-[50px] ${color} border-[1px] border-white font-bold text-xl text-opacity-50`}
+      >
+        {text}
+      </div>
     );
   }
 

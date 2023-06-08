@@ -20,6 +20,8 @@ interface ActiveIndicatorProps {
     | undefined;
 }
 
+const roundTimeBuffer = 3;
+
 const ActiveIndicator: React.FC<ActiveIndicatorProps> = ({ data }) => {
   const router = useRouter();
   const gameId = router.query.gameId as string;
@@ -29,6 +31,10 @@ const ActiveIndicator: React.FC<ActiveIndicatorProps> = ({ data }) => {
     query: GetRoundStartTimeDocument,
     variables: { uuid: router.query.gameId as string },
     requestPolicy: "network-only",
+  });
+
+  const [{ data: meData, fetching: meFetching }] = useQuery({
+    query: MeDocument,
   });
 
   const [, endTurn] = useMutation(EndTurnDocument);
@@ -54,13 +60,7 @@ const ActiveIndicator: React.FC<ActiveIndicatorProps> = ({ data }) => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCountdown((prev) => {
-        if (prev <= 1) {
-          //endTurn({ input: { uuid: gameId, points: 0 } });
-
-          return roundTime;
-        }
-
-        return prev - 1;
+        return prev > 0 ? prev - 1 : 0;
       });
     }, 1000);
 

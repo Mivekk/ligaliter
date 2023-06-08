@@ -19,6 +19,13 @@ import { usePreview } from "react-dnd-preview";
 import { useMutation, useQuery, useSubscription } from "urql";
 import TilePreview from "./TilePreview";
 import { motion } from "framer-motion";
+import {
+  doubleLetter,
+  doubleWord,
+  tripleLetter,
+  tripleWord,
+} from "@/utils/specialTiles";
+import { tileBackground } from "@/utils/game/tileBackground";
 
 const Tile: React.FC<TileProps> = ({
   id,
@@ -198,6 +205,18 @@ const Tile: React.FC<TileProps> = ({
     },
   });
 
+  let { color: tileBackgroundColor } = tileBackground(id);
+
+  if (placed) {
+    if (tileBackgroundColor === "bg-secondary") {
+      tileBackgroundColor = "bg-orange-400";
+    }
+  } else if (draggable) {
+    tileBackgroundColor = "bg-yellow-400";
+  } else {
+    tileBackgroundColor = "bg-gray-400";
+  }
+
   return (
     <>
       {!isDragging ? (
@@ -206,15 +225,10 @@ const Tile: React.FC<TileProps> = ({
             draggable ? drag(node!) : null, drop(node!);
           }}
           className={`relative sm:w-14 sm:h-14 w-[50px] h-[50px] flex justify-center items-center text-2xl
-       border-[1px] shadow-[0px_2px_black] border-black rounded-lg select-none`}
+       border-[1px] shadow-[0px_2px_black] ${tileBackgroundColor} border-black rounded-lg select-none`}
           style={{
             zIndex: letter || isDropzone ? 50 : -50,
             opacity: letter ? 1.0 : 0.0,
-            backgroundColor: placed
-              ? "orange"
-              : draggable
-              ? "yellow"
-              : "lightgrey",
           }}
         >
           {letter}

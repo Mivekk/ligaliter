@@ -6,10 +6,5 @@
 
 * {
   box-sizing: border-box;
-}
-
-@media (max-width: 640px) {
-  * {
-    user-select: none;
-  }
+  user-select: none;
 }
