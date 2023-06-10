@@ -49,7 +49,7 @@ const GameContainer: React.FC<ContainerProps> = ({ wordList }) => {
   const { boardTiles, tileBag } = useContext(TilesContext);
   const [playPointCount, setPlayPointCount] = useState(0);
   const [isValid, setIsValid] = useState(false);
-  const [zoom, setZoom] = useState(1.0);
+  const [zoom, setZoom] = useState(0.7);
   const [mouseHold, setMouseHold] = useState(false);
   const [touchHold, setTouchHold] = useState(false);
   const [boardPosition, setBoardPosition] = useState<BoardOffsetType>({
@@ -72,16 +72,16 @@ const GameContainer: React.FC<ContainerProps> = ({ wordList }) => {
 
   // look for valid words that player put on board
   useEffect(() => {
-    const res = checkWords(boardTiles, wordList, tileBag);
+    const points = checkWords(boardTiles, wordList, tileBag);
 
-    setPlayPointCount(res.pointCount);
-    setIsValid(res.areWordsValid);
+    setPlayPointCount(points);
+    setIsValid(points > 0);
   }, [boardTiles]);
 
   // handle board zooming
   const handleWheel = (event: React.WheelEvent<HTMLDivElement>) => {
     const scrollDir = event.deltaY;
-    if ((zoom >= 1.5 && scrollDir < 0) || (zoom <= 0.5 && scrollDir > 0)) {
+    if ((zoom >= 1.2 && scrollDir < 0) || (zoom <= 0.5 && scrollDir > 0)) {
       return;
     }
 

@@ -1,170 +1,138 @@
 import { TileBagType, TileType } from "@/types";
-import { boardLength, boardSize } from "./game/constants";
+import { boardCenterId, boardLength, boardSize } from "./game/constants";
+
+const isAdjacentToPlaced = (boardTiles: TileType[]): boolean => {
+  let isAdjacent = false;
+  let touchesCenter = false;
+  for (let i = 0; i < boardSize && !isAdjacent; i++) {
+    if (!boardTiles[i].draggable) {
+      continue;
+    }
+
+    if (i === boardCenterId) {
+      touchesCenter = true;
+      break;
+    }
+
+    const adjacentIndexes: number[] = [-1, 1, -boardLength, boardLength];
+    for (let j = 0; j < adjacentIndexes.length; j++) {
+      const nextIndex = i + adjacentIndexes[j];
+      if (nextIndex < 0 || nextIndex >= boardSize) {
+        continue;
+      }
+
+      if (boardTiles[nextIndex].placed) {
+        isAdjacent = true;
+        break;
+      }
+    }
+  }
+
+  return isAdjacent || touchesCenter;
+};
+
+const isBoardCorrect = (boardTiles: TileType[]): boolean => {
+  const draggableIndexes: { x: number; y: number }[] = [];
+  boardTiles.forEach((tile) => {
+    if (tile.draggable) {
+      draggableIndexes.push({
+        x: tile.id % boardLength,
+        y: Math.floor(tile.id / boardLength),
+      });
+    }
+  });
+
+  if (!draggableIndexes.length) {
+    return false;
+  }
+
+  let sameX = draggableIndexes.find(
+    (index) => index.x !== draggableIndexes[0].x
+  );
+
+  let sameY = draggableIndexes.find(
+    (index) => index.y !== draggableIndexes[0].y
+  );
+
+  if (sameX && sameY) {
+    return false;
+  }
+
+  if (!isAdjacentToPlaced(boardTiles)) {
+    return false;
+  }
+
+  return true;
+};
+
+const getFirstIndex = (boardTiles: TileType[]): number | undefined => {
+  for (let i = 0; i < boardSize; i++) {
+    if (boardTiles[i].draggable) {
+      return i;
+    }
+  }
+};
+
+const getLastIndex = (boardTiles: TileType[]): number | undefined => {
+  for (let i = boardSize - 1; i >= 0; i--) {
+    if (boardTiles[i].draggable) {
+      return i;
+    }
+  }
+};
+
+const getHorizontalPoints = (
+  boardTiles: TileType[],
+  wordList: string[],
+  tileBag: TileBagType
+): number => {
+  return 0;
+};
+
+const getVerticalPoints = (
+  boardTiles: TileType[],
+  wordList: string[],
+  tileBag: TileBagType
+): number => {
+  return 0;
+};
 
 export const checkWords = (
   boardTiles: TileType[],
   wordList: string[],
   tileBag: TileBagType
-): { areWordsValid: boolean; pointCount: number } => {
-  // final return value
-  let areWordsValid = true;
+): number => {
+  if (!isBoardCorrect(boardTiles)) {
+    return 0;
+  }
 
-  // final point count
+  let firstIndex = getFirstIndex(boardTiles)!;
+  let lastIndex = getLastIndex(boardTiles)!;
+
+  console.log(firstIndex, lastIndex);
+
   let pointCount = 0;
+  if (lastIndex >= firstIndex + boardLength) {
+    getVerticalPoints(boardTiles, wordList, tileBag);
 
-  // create a set containing all unique words
-  const words = new Set<string>();
-
-  // is there any word there (it fixes a bug when player places 1 letter only)
-  let anyWord = 0;
-
-  boardTiles.map((item) => {
-    if (!item.draggable) {
-      return;
-    }
-
-    // look for starting id
-    let wordStartId = item.id;
-    // if item.id is not first from the left
-    if (wordStartId % boardLength !== 0) {
-      // look for word first id
-      while (
-        wordStartId % boardLength !== 0 &&
-        boardTiles[wordStartId - 1].letter !== undefined
-      ) {
-        wordStartId--;
+    for (let i = firstIndex; i <= lastIndex; i += boardLength) {
+      if (!boardTiles[i].draggable) {
+        continue;
       }
+
+      pointCount += getHorizontalPoints(boardTiles, wordList, tileBag);
     }
-    // points got horizontally
-    let horizontalCount = 0;
+  } else {
+    getHorizontalPoints(boardTiles, wordList, tileBag);
 
-    const adjTiles = [
-      { x: 0, y: boardLength },
-      { x: 1, y: 0 },
-      { x: 0, y: -boardLength },
-      { x: -1, y: 0 },
-    ];
-
-    // possible word
-    let possibleWord: string[] = [];
-    let currentId = wordStartId;
-    let adjToPlaced = false;
-    // if wordStartId is not max to the right
-    if (currentId % boardLength !== boardLength - 1) {
-      while (boardTiles[currentId]?.letter !== undefined) {
-        // push every letter to final word
-        possibleWord.push(boardTiles[currentId].letter!);
-
-        adjTiles.forEach((adjTile) => {
-          const adjId = currentId + adjTile.x + adjTile.y;
-          if (adjId < 0 || adjId >= boardSize) {
-            return;
-          }
-
-          if (boardTiles[adjId].placed) {
-            adjToPlaced = true;
-          }
-        });
-
-        // add value of that letter to the horizontal sum
-        horizontalCount += tileBag[`${boardTiles[currentId].letter!}`].value;
-
-        // if currentId is on the right edge
-        if (currentId % boardLength === boardLength - 1) {
-          break;
-        }
-
-        currentId++;
+    for (let i = firstIndex; i <= lastIndex; i++) {
+      if (!boardTiles[i].draggable) {
+        continue;
       }
+
+      pointCount += getVerticalPoints(boardTiles, wordList, tileBag);
     }
-
-    // if a word is shorter than 2 letter then
-    // it's not considered as a valid word
-    if (possibleWord.length > 1 && adjToPlaced) {
-      words.add(possibleWord.join(""));
-      anyWord++;
-    } else {
-      // if it's not a word set a final point count to 0
-      anyWord--;
-      horizontalCount = 0;
-    }
-    possibleWord = [];
-
-    // points got vertically
-    let verticalCount = 0;
-
-    // check vertically
-    wordStartId = item.id;
-    // when wordStartId is not on the top line
-    if (wordStartId >= boardLength) {
-      while (
-        wordStartId >= boardLength &&
-        boardTiles[wordStartId - boardLength].letter !== undefined
-      ) {
-        wordStartId -= boardLength;
-      }
-    }
-
-    adjToPlaced = false;
-    // if word is not on the bottom
-    currentId = wordStartId;
-    if (currentId <= boardSize - boardLength) {
-      while (boardTiles[currentId]?.letter !== undefined) {
-        // push every letter to final word
-        possibleWord.push(boardTiles[currentId].letter!);
-
-        adjTiles.forEach((adjTile) => {
-          const adjId = currentId + adjTile.x + adjTile.y;
-          if (adjId < 0 || adjId >= boardSize) {
-            return;
-          }
-
-          if (boardTiles[adjId].placed) {
-            adjToPlaced = true;
-          }
-        });
-
-        // add value of that letter to the vertical sum
-        verticalCount += tileBag[`${boardTiles[currentId].letter!}`].value;
-
-        // if currentId is on the max bottom edge
-        if (currentId > boardSize - boardLength) {
-          break;
-        }
-
-        currentId += boardLength;
-      }
-    }
-
-    // do not add empty words
-    if (possibleWord.length > 1 && adjToPlaced) {
-      words.add(possibleWord.join(""));
-      anyWord++;
-    } else {
-      verticalCount = 0;
-      anyWord--;
-    }
-
-    // final point count is the sum of horizontal and vertical sum
-    pointCount = horizontalCount + verticalCount;
-  });
-
-  words.forEach((word) => {
-    // if any of the words are invalid everything is invalid
-    if (wordList.find((element) => element === word) === undefined) {
-      areWordsValid = false;
-    }
-  });
-
-  // if there are no words final return value is false
-  if (words.size !== 1) {
-    areWordsValid = false;
   }
 
-  // if there are no words return false
-  if (anyWord < 0) {
-    areWordsValid = false;
-  }
-
-  return { areWordsValid, pointCount };
+  return pointCount;
 };
