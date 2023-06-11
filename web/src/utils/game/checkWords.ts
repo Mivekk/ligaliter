@@ -1,6 +1,6 @@
 import { TileType } from "@/types";
-import { boardCenterId, boardLength, boardSize } from "./game/constants";
-import { tileBag } from "./game/tileBag";
+import { boardCenterId, boardLength, boardSize } from "./constants";
+import { tileBag } from "./tileBag";
 
 const isAdjacentToPlaced = (boardTiles: TileType[]): boolean => {
   let isAdjacent = false;
@@ -102,17 +102,25 @@ const getLastIndex = (boardTiles: TileType[]): number | undefined => {
   }
 };
 
-const countWordPoints = (wordList: string[], word: string): number => {
-  let correctWord = wordList.find((curWord) => curWord === word);
-  if (!correctWord) {
+const countWordPoints = (word: string): number => {
+  let points = 0;
+  for (let i = 0; i < word.length; i++) {
+    points += tileBag[word[i]].value;
+  }
+  return points;
+};
+
+const isWordCorrect = (wordList: string[], word: string): number => {
+  if (word.length === 1) {
     return 0;
   }
 
-  let points = 0;
-  for (let i = 0; i < correctWord.length; i++) {
-    points += tileBag[correctWord[i]].value;
+  let correctWord = wordList.find((curWord) => curWord === word);
+  if (!correctWord) {
+    return -9999;
   }
-  return points;
+
+  return 1;
 };
 
 const getHorizontalPoints = (
@@ -141,7 +149,12 @@ const getHorizontalPoints = (
     currentIndex % boardLength !== 0
   );
 
-  return countWordPoints(wordList, word);
+  const isCorrect = isWordCorrect(wordList, word);
+  if (isCorrect <= 0) {
+    return isCorrect;
+  }
+
+  return countWordPoints(word);
 };
 
 const getVerticalPoints = (
@@ -162,7 +175,12 @@ const getVerticalPoints = (
     currentIndex += boardLength;
   } while (currentIndex < boardSize && boardTiles[currentIndex].letter);
 
-  return countWordPoints(wordList, word);
+  const isCorrect = isWordCorrect(wordList, word);
+  if (isCorrect <= 0) {
+    return isCorrect;
+  }
+
+  return countWordPoints(word);
 };
 
 export const checkWords = (

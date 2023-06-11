@@ -2,17 +2,19 @@ import {
   GetPlayerStatsDocument,
   UpdatePlayerStatsDocument,
 } from "@/generated/graphql";
+import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { HiMenuAlt2 } from "react-icons/hi";
 import { useQuery, useSubscription } from "urql";
-import { motion } from "framer-motion";
 import Heading from "./Heading";
 import NavBarMenu from "./NavBarMenu";
 
 const NavBar: React.FC<{}> = () => {
   const router = useRouter();
   const gameId = router.query.gameId;
+
+  const [showMenu, setShowMenu] = useState(false);
 
   const [{ data: queryData }] = useQuery({
     query: GetPlayerStatsDocument,
@@ -35,8 +37,6 @@ const NavBar: React.FC<{}> = () => {
         {item.username} {item.points}
       </div>
     ));
-
-  const [showMenu, setShowMenu] = useState(false);
 
   const dropdownVariants = {
     open: {
@@ -79,7 +79,7 @@ const NavBar: React.FC<{}> = () => {
               initial="closed"
               animate={showMenu ? "open" : "closed"}
               exit="closed"
-              className="overflow-hidden"
+              className="overflow-hidden ml-4"
               variants={dropdownVariants}
               onAnimationComplete={
                 showMenu ? undefined : () => setShowMenu(false)

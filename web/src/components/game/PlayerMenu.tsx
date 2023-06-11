@@ -17,14 +17,14 @@ interface PlayerMenuProps {
       }
     | null
     | undefined;
-  isValid: boolean;
   playPointCount: number;
+  isValid: boolean;
 }
 
 const PlayerMenu: React.FC<PlayerMenuProps> = ({
   data,
-  isValid,
   playPointCount,
+  isValid,
 }) => {
   const [{ data: meData }] = useQuery({
     query: MeDocument,

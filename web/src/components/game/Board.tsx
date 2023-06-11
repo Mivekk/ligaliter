@@ -1,79 +1,148 @@
+import React, { useContext, useEffect, useState } from "react";
+import { useDragLayer } from "react-dnd";
+import BoardDisplay from "./BoardDisplay";
+import BoardDropzone from "./BoardDropzone";
 import { TilesContext } from "@/contexts/tilesContext";
-import {
-  GetBoardTilesDocument,
-  MeDocument,
-  UpdateBoardTilesDocument,
-} from "@/generated/graphql";
-import { TileType } from "@/types";
-import { boardSize } from "@/utils/game/constants";
-import { useRouter } from "next/router";
-import React, { useContext, useEffect } from "react";
-import { useQuery, useSubscription } from "urql";
-import Tile from "./Tile";
+import { checkWords } from "@/utils/game/checkWords";
 
-const Board: React.FC<{}> = () => {
-  const router = useRouter();
-  const gameId = router.query.gameId as string;
+type BoardOffsetType = {
+  x: number;
+  y: number;
+  xOffset: number;
+  yOffset: number;
+  lastXOffset: number;
+  lastYOffset: number;
+};
 
-  const { boardTiles, setBoardTiles } = useContext(TilesContext);
+interface BoardProps {
+  wordList: string[];
+  setPlayPointCount: React.Dispatch<React.SetStateAction<number>>;
+  setIsValid: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-  const [{ data: meData }] = useQuery({ query: MeDocument });
-
-  const [{ data: queryData }] = useQuery({
-    query: GetBoardTilesDocument,
-    variables: { uuid: gameId },
+const Board: React.FC<BoardProps> = ({
+  wordList,
+  setPlayPointCount,
+  setIsValid,
+}) => {
+  const [zoom, setZoom] = useState(0.7);
+  const [mouseHold, setMouseHold] = useState(false);
+  const [touchHold, setTouchHold] = useState(false);
+  const [boardPosition, setBoardPosition] = useState<BoardOffsetType>({
+    x: 0,
+    y: 0,
+    xOffset: 0,
+    yOffset: 0,
+    lastXOffset: 0,
+    lastYOffset: 0,
   });
+  const { boardTiles } = useContext(TilesContext);
 
-  const [{ data: subscriptionData }] = useSubscription({
-    query: UpdateBoardTilesDocument,
-    variables: { uuid: gameId },
-  });
-
-  // first fetch is query
-  const data = subscriptionData?.updateBoardTiles || queryData?.getBoardTiles;
+  const { currentOffset } = useDragLayer((monitor) => ({
+    currentOffset: monitor.getSourceClientOffset(),
+  }));
 
   useEffect(() => {
-    if (!data) {
+    setMouseHold(false);
+    setTouchHold(false);
+  }, [currentOffset !== null]);
+
+  useEffect(() => {
+    const points = checkWords(boardTiles, wordList);
+
+    setPlayPointCount(points);
+    setIsValid(points > 0);
+  }, [boardTiles]);
+
+  const handleWheel = (event: React.WheelEvent<HTMLDivElement>) => {
+    const scrollDir = event.deltaY;
+    if ((zoom >= 1.2 && scrollDir < 0) || (zoom <= 0.5 && scrollDir > 0)) {
       return;
     }
 
-    const newTiles: TileType[] = [];
-    for (let i = 0; i < boardSize; i++) {
-      newTiles[i] = {
-        id: i,
-        draggable: false,
-        placed: false,
-      };
+    setZoom((prevZoom) => prevZoom + scrollDir * -0.001);
+  };
+
+  const handleMouseDown = (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
+    setBoardPosition((prevBoardPos) => ({
+      ...prevBoardPos,
+      x: event.clientX,
+      y: event.clientY,
+      lastXOffset: prevBoardPos.xOffset,
+      lastYOffset: prevBoardPos.yOffset,
+    }));
+    setMouseHold(true);
+  };
+
+  const handleTouchDown = (event: React.TouchEvent<HTMLDivElement>) => {
+    const touch = event.touches[0];
+
+    setBoardPosition((prevBoardPos) => ({
+      ...prevBoardPos,
+      x: touch.clientX,
+      y: touch.clientY,
+      lastXOffset: prevBoardPos.xOffset,
+      lastYOffset: prevBoardPos.yOffset,
+    }));
+    setTouchHold(true);
+  };
+
+  const handleMouseMove = (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
+    if (!mouseHold) {
+      return;
     }
 
-    data.forEach((tile) => {
-      newTiles[tile.id] = tile;
+    setBoardPosition((prevBoardPos) => ({
+      ...prevBoardPos,
+      xOffset: prevBoardPos.lastXOffset + event.clientX - prevBoardPos.x,
+      yOffset: prevBoardPos.lastYOffset + event.clientY - prevBoardPos.y,
+    }));
+  };
 
-      if (meData?.me && tile.userId !== meData.me.id && !tile.placed) {
-        tile.letter = "?";
-        tile.draggable = false;
-      }
-    });
+  const handleTouchMove = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (!touchHold) {
+      return;
+    }
 
-    setBoardTiles(newTiles);
-  }, [queryData, subscriptionData, meData]);
-
-  const tilesElements = boardTiles.map((item) => (
-    <Tile
-      key={item.id}
-      id={item.id}
-      letter={item.letter}
-      draggable={item.draggable}
-      placed={item.placed}
-      gameId={gameId}
-    />
-  ));
+    const touch = event.touches[0];
+    setBoardPosition((prevBoardPos) => ({
+      ...prevBoardPos,
+      xOffset: prevBoardPos.lastXOffset + touch.clientX - prevBoardPos.x,
+      yOffset: prevBoardPos.lastYOffset + touch.clientY - prevBoardPos.y,
+    }));
+  };
 
   return (
-    <div className="sm:min-w-[1063px] min-w-[950px]">
-      <div className="grid grid-rows-19 grid-cols-19">{tilesElements}</div>
+    <div
+      className="relative w-full h-screen flex justify-center 
+        items-center touch-none"
+      onMouseUp={() => setMouseHold(false)}
+      onTouchEnd={() => setTouchHold(false)}
+      onMouseMove={(event) => handleMouseMove(event)}
+      onTouchMove={(event) => handleTouchMove(event)}
+      onWheel={(event) => handleWheel(event)}
+      style={{
+        top: boardPosition.yOffset,
+        left: boardPosition.xOffset,
+        transform: `scale(${zoom})`,
+      }}
+    >
+      <div className="flex flex-wrap w-fit h-fit origin-center">
+        <div
+          className="absolute"
+          onMouseDown={(event) => handleMouseDown(event)}
+          onTouchStart={(event) => handleTouchDown(event)}
+        >
+          <BoardDisplay />
+        </div>
+        <BoardDropzone />
+      </div>
     </div>
   );
 };
 
-export default React.memo(Board);
+export default Board;
