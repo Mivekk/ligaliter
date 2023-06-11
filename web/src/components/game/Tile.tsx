@@ -13,19 +13,12 @@ import {
   TileType,
 } from "@/types";
 import { boardSize } from "@/utils/game/constants";
+import { tileBackground } from "@/utils/game/tileBackground";
 import React, { useContext, useEffect } from "react";
 import { useDrag, useDragLayer, useDrop } from "react-dnd";
-import { usePreview } from "react-dnd-preview";
 import { useMutation, useQuery, useSubscription } from "urql";
 import TilePreview from "./TilePreview";
-import { motion } from "framer-motion";
-import {
-  doubleLetter,
-  doubleWord,
-  tripleLetter,
-  tripleWord,
-} from "@/utils/specialTiles";
-import { tileBackground } from "@/utils/game/tileBackground";
+import { tileBag } from "@/utils/game/tileBag";
 
 const Tile: React.FC<TileProps> = ({
   id,
@@ -35,7 +28,6 @@ const Tile: React.FC<TileProps> = ({
   gameId,
 }) => {
   const {
-    tileBag,
     playerTiles,
     setPlayerTiles,
     boardTiles,
@@ -233,15 +225,15 @@ const Tile: React.FC<TileProps> = ({
         >
           {letter}
           <div className={"absolute top-0 right-1 text-sm"}>
-            {letter && tileBag[`${letter}`].value !== -1
-              ? tileBag[`${letter}`].value
+            {letter && tileBag[letter].value !== -1
+              ? tileBag[letter].value
               : null}
           </div>
         </div>
       ) : (
         <TilePreview
           letter={dragLayer.item?.letter}
-          points={tileBag[`${dragLayer.item?.letter}`]?.value}
+          points={tileBag[dragLayer.item?.letter]?.value}
         />
       )}
     </>

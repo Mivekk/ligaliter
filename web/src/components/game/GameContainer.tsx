@@ -46,7 +46,7 @@ const GameContainer: React.FC<ContainerProps> = ({ wordList }) => {
 
   const data = subscriptionData?.updatePlayerStats || queryData?.getPlayerStats;
 
-  const { boardTiles, tileBag } = useContext(TilesContext);
+  const { boardTiles } = useContext(TilesContext);
   const [playPointCount, setPlayPointCount] = useState(0);
   const [isValid, setIsValid] = useState(false);
   const [zoom, setZoom] = useState(0.7);
@@ -72,7 +72,7 @@ const GameContainer: React.FC<ContainerProps> = ({ wordList }) => {
 
   // look for valid words that player put on board
   useEffect(() => {
-    const points = checkWords(boardTiles, wordList, tileBag);
+    const points = checkWords(boardTiles, wordList);
 
     setPlayPointCount(points);
     setIsValid(points > 0);
