@@ -11,7 +11,7 @@ import React, { useContext, useEffect } from "react";
 import { useQuery, useSubscription } from "urql";
 import Tile from "./Tile";
 
-const BoardDropzone: React.FC<{}> = () => {
+const BoardForeground: React.FC<{}> = () => {
   const router = useRouter();
   const gameId = router.query.gameId as string;
 
@@ -22,14 +22,15 @@ const BoardDropzone: React.FC<{}> = () => {
   const [{ data: queryData }] = useQuery({
     query: GetBoardTilesDocument,
     variables: { uuid: gameId },
+    pause: !gameId,
   });
 
   const [{ data: subscriptionData }] = useSubscription({
     query: UpdateBoardTilesDocument,
     variables: { uuid: gameId },
+    pause: !gameId,
   });
 
-  // first fetch is query
   const data = subscriptionData?.updateBoardTiles || queryData?.getBoardTiles;
 
   useEffect(() => {
@@ -76,4 +77,4 @@ const BoardDropzone: React.FC<{}> = () => {
   );
 };
 
-export default React.memo(BoardDropzone);
+export default React.memo(BoardForeground);

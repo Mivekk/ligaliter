@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useDragLayer } from "react-dnd";
-import BoardDisplay from "./BoardDisplay";
-import BoardDropzone from "./BoardDropzone";
+import BoardBackground from "./BoardBackground";
+import BoardForeground from "./BoardForeground";
 import { TilesContext } from "@/contexts/tilesContext";
 import { checkWords } from "@/utils/game/checkWords";
 
@@ -137,9 +137,9 @@ const Board: React.FC<BoardProps> = ({
           onMouseDown={(event) => handleMouseDown(event)}
           onTouchStart={(event) => handleTouchDown(event)}
         >
-          <BoardDisplay />
+          <BoardBackground />
         </div>
-        <BoardDropzone />
+        <BoardForeground />
       </div>
     </div>
   );

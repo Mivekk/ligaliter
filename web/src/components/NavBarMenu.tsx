@@ -6,10 +6,7 @@ import { useMutation, useQuery } from "urql";
 const NavBarMenu: React.FC<{}> = () => {
   const router = useRouter();
 
-  const [{ data }] = useQuery({
-    query: MeDocument,
-    requestPolicy: "cache-and-network",
-  });
+  const [{ data }] = useQuery({ query: MeDocument });
   const [, logout] = useMutation(LogoutDocument);
 
   return (

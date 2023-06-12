@@ -28,7 +28,7 @@ const documents = {
     "query GetLobbyPlayers($uuid: String!) {\n  getLobbyPlayers(uuid: $uuid) {\n    owner {\n      ...UserFields\n    }\n    players {\n      ...UserFields\n    }\n  }\n}": types.GetLobbyPlayersDocument,
     "query GetPlayerStats($uuid: String!) {\n  getPlayerStats(uuid: $uuid) {\n    id\n    activePlayer {\n      id\n      username\n    }\n    players {\n      id\n      username\n      points\n    }\n  }\n}": types.GetPlayerStatsDocument,
     "query GetPlayerTiles($uuid: String!) {\n  getPlayerTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    placed\n    userId\n  }\n}": types.GetPlayerTilesDocument,
-    "query getRoundStartTime($uuid: String!) {\n  getRoundStartTime(uuid: $uuid)\n}": types.GetRoundStartTimeDocument,
+    "query GetRoundStartTime($uuid: String!) {\n  getRoundStartTime(uuid: $uuid)\n}": types.GetRoundStartTimeDocument,
     "query Me {\n  me {\n    ...UserFields\n  }\n}": types.MeDocument,
     "query Users {\n  users {\n    ...UserFields\n  }\n}": types.UsersDocument,
     "subscription UpdateBoardTiles($uuid: String!) {\n  updateBoardTiles(uuid: $uuid) {\n    id\n    letter\n    draggable\n    placed\n    userId\n  }\n}": types.UpdateBoardTilesDocument,
@@ -113,7 +113,7 @@ export function graphql(source: "query GetPlayerTiles($uuid: String!) {\n  getPl
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "query getRoundStartTime($uuid: String!) {\n  getRoundStartTime(uuid: $uuid)\n}"): (typeof documents)["query getRoundStartTime($uuid: String!) {\n  getRoundStartTime(uuid: $uuid)\n}"];
+export function graphql(source: "query GetRoundStartTime($uuid: String!) {\n  getRoundStartTime(uuid: $uuid)\n}"): (typeof documents)["query GetRoundStartTime($uuid: String!) {\n  getRoundStartTime(uuid: $uuid)\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

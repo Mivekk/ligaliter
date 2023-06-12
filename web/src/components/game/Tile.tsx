@@ -17,7 +17,6 @@ import { tileBackground } from "@/utils/game/tileBackground";
 import React, { useContext, useEffect } from "react";
 import { useDrag, useDragLayer, useDrop } from "react-dnd";
 import { useMutation, useQuery, useSubscription } from "urql";
-import TilePreview from "./TilePreview";
 import { tileBag } from "@/utils/game/tileBag";
 
 const Tile: React.FC<TileProps> = ({
@@ -36,14 +35,6 @@ const Tile: React.FC<TileProps> = ({
     setIsDragging,
   } = useContext(TilesContext);
 
-  const dragLayer = useDragLayer((monitor) => ({
-    item: monitor.getItem(),
-    itemType: monitor.getItemType(),
-    initialOffset: monitor.getInitialSourceClientOffset(),
-    currentOffset: monitor.getSourceClientOffset(),
-    isDragging: monitor.isDragging(),
-  }));
-
   const [, moveTile] = useMutation(MoveTileDocument);
 
   const [{ data: meData }] = useQuery({ query: MeDocument });
@@ -51,11 +42,13 @@ const Tile: React.FC<TileProps> = ({
   const [{ data: queryData }] = useQuery({
     query: GetPlayerStatsDocument,
     variables: { uuid: gameId },
+    pause: !gameId,
   });
 
   const [{ data: subscriptionData }] = useSubscription({
     query: UpdatePlayerStatsDocument,
     variables: { uuid: gameId },
+    pause: !gameId,
   });
 
   const data = subscriptionData?.updatePlayerStats || queryData?.getPlayerStats;
@@ -197,46 +190,25 @@ const Tile: React.FC<TileProps> = ({
     },
   });
 
-  let { color: tileBackgroundColor } = tileBackground(id);
-
-  if (placed) {
-    if (tileBackgroundColor === "bg-secondary") {
-      tileBackgroundColor = "bg-orange-400";
-    }
-  } else if (draggable) {
-    tileBackgroundColor = "bg-yellow-400";
-  } else {
-    tileBackgroundColor = "bg-gray-400";
-  }
-
   return (
-    <>
-      {!isDragging ? (
-        <div
-          ref={(node) => {
-            draggable ? drag(node!) : null, drop(node!);
-          }}
-          className={`relative sm:w-14 sm:h-14 w-[50px] h-[50px] flex justify-center items-center text-2xl
-       border-[1px] shadow-[0px_2px_black] ${tileBackgroundColor} border-black rounded-lg select-none`}
-          style={{
-            zIndex: letter || isDropzone ? 50 : -50,
-            opacity: letter ? 1.0 : 0.0,
-          }}
-        >
-          {letter}
-          <div className={"absolute top-0 right-1 text-sm"}>
-            {letter && tileBag[letter].value !== -1
-              ? tileBag[letter].value
-              : null}
-          </div>
-        </div>
-      ) : (
-        <TilePreview
-          letter={dragLayer.item?.letter}
-          points={tileBag[dragLayer.item?.letter]?.value}
-        />
-      )}
-    </>
+    <div
+      ref={(node) => {
+        draggable ? drag(node!) : null, drop(node!);
+      }}
+      className={`relative sm:w-14 sm:h-14 w-[50px] h-[50px] flex justify-center items-center text-2xl
+       border-[1px] shadow-[0px_2px_black] ${
+         draggable ? "bg-[#FFFF00]" : "bg-[#c0c0c0]"
+       }  border-black rounded-lg`}
+      style={{
+        zIndex: (letter && !placed) || isDropzone ? 50 : -50,
+        opacity: letter && !placed ? 1.0 : 0.0,
+      }}
+    >
+      {letter}
+      <div className={"absolute top-0 right-1 text-sm"}>
+        {letter && tileBag[letter].value !== -1 ? tileBag[letter].value : null}
+      </div>
+    </div>
   );
 };
 

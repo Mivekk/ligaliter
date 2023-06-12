@@ -1,12 +1,4 @@
-import {
-  EndTurnDocument,
-  GetRoundStartTimeDocument,
-  MeDocument,
-} from "@/generated/graphql";
-import { roundTime } from "@/utils/game/constants";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import { useMutation, useQuery } from "urql";
+import React from "react";
 
 interface ActiveIndicatorProps {
   data:
@@ -20,62 +12,14 @@ interface ActiveIndicatorProps {
     | undefined;
 }
 
-const roundTimeBuffer = 3;
-
 const ActiveIndicator: React.FC<ActiveIndicatorProps> = ({ data }) => {
-  const router = useRouter();
-  const gameId = router.query.gameId as string;
-  const [countdown, setCountdown] = useState(roundTime);
-
-  const [{ data: queryData, fetching }, reexecuteQuery] = useQuery({
-    query: GetRoundStartTimeDocument,
-    variables: { uuid: router.query.gameId as string },
-    requestPolicy: "network-only",
-  });
-
-  const [{ data: meData, fetching: meFetching }] = useQuery({
-    query: MeDocument,
-  });
-
-  const [, endTurn] = useMutation(EndTurnDocument);
-
-  useEffect(() => {
-    reexecuteQuery();
-  }, [data]);
-
-  useEffect(() => {
-    if (!queryData || fetching) {
-      return;
-    }
-
-    const roundStartTime = new Date(queryData.getRoundStartTime);
-
-    const currentTime = new Date();
-
-    const timeElapsed = currentTime.getTime() - roundStartTime.getTime();
-
-    setCountdown(roundTime - Math.floor(timeElapsed / 1000));
-  }, [queryData, fetching, data]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCountdown((prev) => {
-        return prev > 0 ? prev - 1 : 0;
-      });
-    }, 1000);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, [gameId]);
-
   return (
     <div
       className="fixed sm:top-14 top-8 origin-center -translate-x-1/2 left-1/2 w-[14rem] shadow-lg
         h-10 text-xl rounded-b-xl bg-darker2 z-30 text-white flex justify-center items-center 
         sm:select-auto"
     >
-      {data?.activePlayer.username} {countdown}
+      {data?.activePlayer.username}
     </div>
   );
 };

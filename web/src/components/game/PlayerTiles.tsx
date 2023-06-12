@@ -17,6 +17,7 @@ const PlayerTiles: React.FC<{}> = () => {
   const [{ data: queryData, fetching: qfetching }] = useQuery({
     query: GetPlayerTilesDocument,
     variables: { uuid: gameId },
+    pause: !gameId,
   });
 
   const data = queryData?.getPlayerTiles;

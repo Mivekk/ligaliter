@@ -27,11 +27,13 @@ const Game: React.FC<{}> = ({}) => {
   const [{ data: queryData }] = useQuery({
     query: GetPlayerStatsDocument,
     variables: { uuid: gameId },
+    pause: !gameId,
   });
 
   const [{ data: subscriptionData }] = useSubscription({
     query: UpdatePlayerStatsDocument,
     variables: { uuid: gameId },
+    pause: !gameId,
   });
 
   const data = subscriptionData?.updatePlayerStats || queryData?.getPlayerStats;
