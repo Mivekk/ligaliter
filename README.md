@@ -10,9 +10,9 @@ In the future:
 
 - Using JWT for user authentication
 - Adding AWS Cognito for login
+- Users can upload their profile image (stored in AWS S3 bucket)
 - Optimizing bundle size
 
-<br />
 <h3>Used following technologies:</h3>
 
 Backend
